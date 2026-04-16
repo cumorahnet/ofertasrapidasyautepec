@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ofertas Rápidas Yaute v33.1 - Motor EscanPro</title>
+    <title>Ofertas Rápidas Yaute v33.0 - Motor EscanPro</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -47,95 +47,18 @@
         .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); z-index: 8000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 20px; }
         .modal-content-custom { background: white; width: 100%; max-width: 420px; border-radius: 28px; padding: 25px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); position: relative; }
 
-        /* ============================================================
-           SCANNER MODAL — MOTOR ESCANPRO v2 INTEGRADO
-           ============================================================ */
-        #ia-modal {
-            position: fixed; inset: 0; background: #000;
-            z-index: 10000; display: none; flex-direction: column;
-        }
-
-        /* Sección de cámara — ocupa toda la pantalla hasta que hay resultado */
-        #cam-section-ia {
-            position: relative; flex: 1; background: #000;
-            overflow: hidden; display: flex; align-items: center; justify-content: center;
-            transition: flex 0.3s ease;
-        }
+        /* --- SCANNER MODAL (INTEGRANDO ESCANPRO) --- */
+        #ia-modal { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; flex-direction: column; }
+        #cam-section-ia { position: relative; flex: 1; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         #cam-preview-ia { width: 100%; height: 100%; object-fit: cover; }
+        .scan-frame { width: 75%; height: 45%; border: 3px solid var(--accent); border-radius: 24px; box-shadow: 0 0 0 4000px rgba(0,0,0,0.6); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+        #btn-snap-ia { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 80px; height: 80px; background: white; border: 8px solid rgba(59, 130, 246, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 2.2rem; cursor: pointer; z-index: 100; }
+        #ia-result-panel { background: #ffffff; padding: 20px; border-top-left-radius: 30px; border-top-right-radius: 30px; min-height: 400px; color: var(--primary); z-index: 20; box-shadow: 0 -15px 40px rgba(0,0,0,0.4); overflow-y: auto; }
+        #capture-preview-ia { width: 100%; border-radius: 14px; background: #000; margin-bottom: 15px; display: none; border: 3px solid var(--accent); max-height: 180px; object-fit: contain; }
 
-        /* Marco de enfoque */
-        .scan-frame {
-            width: 78%; height: 46%; border: 3px solid var(--accent); border-radius: 24px;
-            box-shadow: 0 0 0 4000px rgba(0,0,0,0.55), 0 0 30px rgba(59,130,246,0.4);
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            pointer-events: none;
-            animation: pulseFrame 2s ease-in-out infinite;
-        }
-        @keyframes pulseFrame {
-            0%, 100% { border-color: var(--accent); box-shadow: 0 0 0 4000px rgba(0,0,0,0.55), 0 0 20px rgba(59,130,246,0.3); }
-            50%       { border-color: #60a5fa;      box-shadow: 0 0 0 4000px rgba(0,0,0,0.55), 0 0 40px rgba(59,130,246,0.6); }
-        }
-
-        /* Instrucción sobre el marco */
-        .scan-hint {
-            position: absolute; bottom: calc(27% + 12px); left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.65); color: rgba(255,255,255,0.85);
-            font-size: 0.7rem; font-weight: 700; letter-spacing: 1px;
-            padding: 5px 14px; border-radius: 20px; white-space: nowrap;
-            pointer-events: none;
-        }
-
-        /* Botón disparador */
-        #btn-snap-ia {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 80px; height: 80px; background: white;
-            border: 8px solid rgba(59, 130, 246, 0.35); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            color: var(--accent); font-size: 2.2rem; cursor: pointer; z-index: 100;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.5);
-            transition: transform 0.1s;
-        }
-        #btn-snap-ia:active { transform: translateX(-50%) scale(0.92); }
-
-        /* Selector de cámara */
-        #video-source-select {
-            background: rgba(0,0,0,0.7); color: white;
-            border-color: var(--accent); font-size: 0.65rem;
-        }
-
-        /* Panel de resultado */
-        #ia-result-panel {
-            background: #ffffff; padding: 20px 20px 30px;
-            border-top-left-radius: 30px; border-top-right-radius: 30px;
-            max-height: 60vh; color: var(--primary); z-index: 20;
-            box-shadow: 0 -15px 40px rgba(0,0,0,0.4); overflow-y: auto;
-            display: none; /* oculto hasta que haya resultado */
-        }
-
-        /* Miniatura de captura */
-        #capture-preview-ia {
-            width: 100%; border-radius: 14px; background: #000;
-            margin-bottom: 14px; display: none;
-            border: 3px solid var(--accent); max-height: 160px; object-fit: contain;
-        }
-
-        /* Spinner */
-        .ai-spinner {
-            width: 44px; height: 44px; border-radius: 50%;
-            border: 3px solid #f1f5f9; border-top-color: var(--accent);
-            animation: spin 0.75s linear infinite; margin: 0 auto 12px;
-        }
+        /* Estilos EscanPro integrados */
+        .ai-spinner { width: 40px; height: 40px; border-radius: 50%; border: 3px solid #f1f5f9; border-top-color: var(--accent); animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Badge "producto guardado en catálogo" */
-        .badge-saved {
-            display: inline-flex; align-items: center; gap: 5px;
-            background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;
-            border-radius: 50px; font-size: 0.7rem; font-weight: 800;
-            padding: 4px 12px; margin-bottom: 12px;
-        }
-
-        /* ============================================================ */
 
         /* --- FINANZAS --- */
         .stat-card { text-align: center; padding: 20px; border-radius: 22px; color: white; margin-bottom: 15px; }
@@ -149,21 +72,17 @@
         /* --- TICKET --- */
         #ticket-render { position: absolute; top: -5000px; width: 450px; background: white; padding: 40px; font-family: monospace; color: black; line-height: 1.4; border: 1px solid #eee; }
         #toast-alert { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); z-index: 30000; padding: 14px 28px; border-radius: 50px; font-weight: 800; display: none; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.25); text-align: center; min-width: 280px; }
-
-        /* sub-nav heredado */
-        .sub-nav { display: flex; gap: 8px; margin-bottom: 15px; }
-        .sub-btn { flex: 1; padding: 10px; border: none; border-radius: 14px; font-weight: 700; font-size: 0.75rem; background: #f1f5f9; color: #64748b; cursor: pointer; }
-        .sub-btn.active { background: var(--accent); color: white; }
-        .inner-sub-nav { display: flex; gap: 8px; margin-bottom: 15px; }
-        .inner-btn { flex: 1; padding: 8px; border: none; border-radius: 12px; font-weight: 700; font-size: 0.72rem; background: #f1f5f9; color: #64748b; cursor: pointer; }
-        .inner-btn.active { background: var(--success); color: white; }
     </style>
 </head>
 <body>
 
+    <div id="splash-screen">
+        <div class="splash-loader"></div>
+        <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing: 2px; color: var(--primary);">VERSION 33.0 - ESCANPRO</div>
+    </div>
+
     <div id="toast-alert"></div>
 
-    <!-- ===== MODAL EDITAR ===== -->
     <div id="edit-modal" class="modal-overlay">
         <div class="modal-content-custom">
             <h5 class="fw-bold mb-4 text-primary">Editar Registro Pro</h5>
@@ -185,7 +104,6 @@
         </div>
     </div>
 
-    <!-- ===== HEADER ===== -->
     <header>
         <div class="d-flex flex-column align-items-center">
             <div class="d-flex align-items-center">
@@ -193,162 +111,78 @@
                 <img src="logo.png" alt="Logo" style="height: 25px; width: auto; margin-left: 10px;" onerror="this.style.display='none'">
                 <div id="status-dot" class="status-dot bg-warning"></div>
             </div>
-            <div style="margin-top: 6px;"><span class="version-badge">v33.1 · EscanPro</span></div>
+            <div style="margin-top: 6px;"><span class="version-badge">v33.0</span></div>
         </div>
     </header>
 
-    <!-- ===== MAIN ===== -->
     <main>
-        <!-- TAB OPERACIONES -->
         <div id="tab-operaciones" class="tab-content">
             <div class="card-custom">
                 <div class="row g-2 mb-2">
-                    <div class="col-6" style="position:relative">
-                        <label class="text-uppercase">Tienda</label>
-                        <input type="text" id="in-tienda" class="form-control text-uppercase fw-bold text-primary">
-                        <div id="sug-tienda" class="sug-box d-none"></div>
-                    </div>
-                    <div class="col-6" style="position:relative">
-                        <label class="text-uppercase">Cliente</label>
-                        <input type="text" id="in-cliente" class="form-control text-uppercase">
-                        <div id="sug-cliente" class="sug-box d-none"></div>
-                    </div>
+                    <div class="col-6" style="position:relative"><label class="text-uppercase">Tienda</label><input type="text" id="in-tienda" class="form-control text-uppercase fw-bold text-primary"><div id="sug-tienda" class="sug-box d-none"></div></div>
+                    <div class="col-6" style="position:relative"><label class="text-uppercase">Cliente</label><input type="text" id="in-cliente" class="form-control text-uppercase"><div id="sug-cliente" class="sug-box d-none"></div></div>
                 </div>
-
                 <div class="row g-2 mb-2 align-items-end">
-                    <div class="col-3">
-                        <label class="text-uppercase">Cant.</label>
-                        <input type="number" id="in-cantidad" class="form-control text-center fw-bold" value="1">
-                    </div>
+                    <div class="col-3"><label class="text-uppercase">Cant.</label><input type="number" id="in-cantidad" class="form-control text-center fw-bold" value="1"></div>
                     <div class="col" style="position:relative">
-                        <!-- Icono cámara abre el scanner -->
-                        <label class="text-uppercase d-flex justify-content-between">
-                            Producto
-                            <i class="fas fa-camera text-primary" style="font-size:1.2rem; cursor:pointer;" onclick="window.openScanner()" title="Escanear etiqueta"></i>
-                        </label>
-                        <input type="text" id="in-producto" class="form-control text-uppercase" placeholder="BUSCAR ARTÍCULO...">
-                        <div id="sug-producto" class="sug-box d-none"></div>
+                        <label class="text-uppercase d-flex justify-content-between">Producto <i class="fas fa-camera text-primary" style="font-size:1.2rem; cursor:pointer;" onclick="window.openScanner()"></i></label>
+                        <input type="text" id="in-producto" class="form-control text-uppercase" placeholder="BUSCAR ARTÍCULO..."><div id="sug-producto" class="sug-box d-none"></div>
                     </div>
                 </div>
-
                 <div class="row g-2 mb-3">
-                    <div class="col-6">
-                        <label class="text-uppercase">Costo Anaquel</label>
-                        <input type="number" id="in-costo" class="form-control fw-bold border-danger" step="0.01">
-                    </div>
-                    <div class="col-6">
-                        <label class="text-uppercase">Precio Venta</label>
-                        <input type="number" id="in-precio" class="form-control fw-bold border-success" step="0.01">
-                    </div>
+                    <div class="col-6"><label class="text-uppercase">Costo Anaquel</label><input type="number" id="in-costo" class="form-control fw-bold border-danger" step="0.01"></div>
+                    <div class="col-6"><label class="text-uppercase">Precio Venta</label><input type="number" id="in-precio" class="form-control fw-bold border-success" step="0.01"></div>
                 </div>
-
                 <button id="btn-save-record" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow">GUARDAR REGISTRO</button>
             </div>
         </div>
 
-        <!-- TAB ENTREGAS -->
         <div id="tab-entregas" class="tab-content" style="display: none;">
-            <div class="card-custom py-2 mb-3 text-center border-0" style="background: #f1f5f9;">
-                <input type="date" id="entregas-date" class="form-control text-center fw-bold border-0 bg-transparent" onchange="window.renderEntregas()">
-            </div>
+            <div class="card-custom py-2 mb-3 text-center border-0" style="background: #f1f5f9;"><input type="date" id="entregas-date" class="form-control text-center fw-bold border-0 bg-transparent" onchange="window.renderEntregas()"></div>
             <div id="lista-entregas"></div>
         </div>
 
-        <!-- TAB CONTROL -->
         <div id="tab-control" class="tab-content" style="display: none;">
             <div class="sub-nav">
-                <button class="sub-btn active" id="sub-btn-fin" onclick="window.switchSubTab('finanzas')"><i class="fas fa-chart-line"></i> FINANZAS</button>
-                <button class="sub-btn" id="sub-btn-cat" onclick="window.switchSubTab('catalogo')"><i class="fas fa-boxes"></i> CONTROL</button>
+                <button class="sub-btn active" id="sub-btn-fin" onclick="window.switchSubTab('finanzas')"><i class="fas fa-chart-line"></i>FINANZAS</button>
+                <button class="sub-btn" id="sub-btn-cat" onclick="window.switchSubTab('catalogo')"><i class="fas fa-boxes"></i>CONTROL</button>
             </div>
             <div id="control-content"></div>
         </div>
     </main>
 
-    <!-- ===== SCANNER MODAL — ESCANPRO v2 ===== -->
     <div id="ia-modal">
-
-        <!-- Sección cámara -->
         <div id="cam-section-ia">
-            <!-- Selector de cámara -->
-            <div style="position: absolute; top: 20px; right: 20px; z-index: 15000; max-width: 150px;">
-                <select id="video-source-select" class="form-select form-select-sm" onchange="window.changeCameraIA()"></select>
+            <div style="position: absolute; top: 20px; right: 20px; z-index: 15000; max-width: 140px;">
+                <select id="video-source-select" class="form-select form-select-sm" onchange="window.changeCameraIA()" style="background:rgba(0,0,0,0.7); color:white; border-color:var(--accent); font-size:0.65rem;"></select>
             </div>
-            <!-- Botón salir -->
-            <button class="btn btn-dark btn-sm rounded-pill"
-                style="position: absolute; top: 25px; left: 20px; z-index: 15000; font-weight:800;"
-                onclick="window.closeScanner()">✕ SALIR</button>
-
+            <button class="btn btn-dark btn-sm rounded-pill" style="position: absolute; top: 25px; left: 20px; z-index: 15000; font-weight:800;" onclick="window.closeScanner()">✕ SALIR</button>
             <video id="cam-preview-ia" autoplay playsinline muted></video>
             <div class="scan-frame"></div>
-            <div class="scan-hint">CENTRA LA ETIQUETA EN EL MARCO</div>
-
-            <!-- Botón captura -->
-            <div id="btn-snap-ia" onclick="window.captureIAImage()">
-                <i class="fas fa-camera"></i>
-            </div>
+            <div id="btn-snap-ia" onclick="window.captureIAImage()"><i class="fas fa-camera"></i></div>
         </div>
-
-        <!-- Panel resultado -->
         <div id="ia-result-panel">
-
-            <!-- Estado: analizando -->
             <div id="ia-loading" style="display:none;" class="text-center py-4">
                 <div class="ai-spinner"></div>
-                <div class="fw-bold h6" style="color:var(--accent);">Gemini analizando etiqueta...</div>
-                <p class="text-muted small mb-0">Extrayendo nombre y presentación del producto</p>
+                <div class="fw-bold text-accent h6">Gemini analizando etiqueta...</div>
+                <p class="text-muted small">Mejorando contraste y leyendo datos</p>
             </div>
 
-            <!-- Formulario de resultado -->
-            <div id="ia-form" style="display:none;">
-                <!-- Miniatura de la captura -->
+            <div id="ia-form">
                 <img id="capture-preview-ia" alt="Captura">
-
-                <!-- Badge guardado en catálogo -->
-                <div id="ia-saved-badge" class="badge-saved" style="display:none;">
-                    <i class="fas fa-check-circle"></i> Guardado en catálogo
-                </div>
-
-                <!-- Campos extraídos por IA (solo lectura desde IA, editables por usuario) -->
-                <div class="mb-2">
-                    <label class="text-uppercase fw-bold small text-muted">Producto Identificado</label>
-                    <input type="text" id="ia-res-name" class="form-control fw-bold text-uppercase" placeholder="Nombre del artículo">
-                </div>
-                <div class="mb-3">
-                    <label class="text-uppercase fw-bold small text-muted">Contenido / Presentación</label>
-                    <input type="text" id="ia-res-size" class="form-control fw-bold" placeholder="Ej: 1 kg, 500 ml, 6 pzas">
-                </div>
-
-                <!-- Precios — el usuario los digita siempre -->
+                <div class="mb-3"><label class="text-uppercase fw-bold small text-muted">Producto Identificado</label><input type="text" id="ia-res-name" class="form-control fw-bold text-uppercase bg-light"></div>
                 <div class="row g-2 mb-4">
-                    <div class="col-6">
-                        <label class="text-uppercase fw-bold small text-muted">Costo Anaquel</label>
-                        <input type="number" id="ia-res-costo" class="form-control fw-bold text-danger border-danger" placeholder="0.00" step="0.01">
-                    </div>
-                    <div class="col-6">
-                        <label class="text-uppercase fw-bold small text-muted">Precio Venta</label>
-                        <input type="number" id="ia-res-price" class="form-control fw-bold text-success border-success" placeholder="0.00" step="0.01">
-                    </div>
+                    <div class="col-6"><label class="text-uppercase fw-bold small text-muted">Contenido/Pres.</label><input type="text" id="ia-res-size" class="form-control fw-bold"></div>
+                    <div class="col-6"><label class="text-uppercase fw-bold small text-muted">Precio Venta</label><input type="number" id="ia-res-price" class="form-control fw-bold text-success border-success" placeholder="0.00"></div>
                 </div>
-
-                <!-- Acciones -->
                 <div class="d-flex gap-2">
-                    <button class="btn btn-light border rounded-pill px-4" onclick="window.resetIAUI()" title="Nueva captura">
-                        <i class="fas fa-sync-alt"></i>
-                    </button>
-                    <button class="btn btn-primary flex-grow-1 py-3 rounded-pill fw-bold shadow"
-                        onclick="window.transferToApp()">
-                        <i class="fas fa-arrow-right me-1"></i> USAR EN VENTA
-                    </button>
+                    <button class="btn btn-light border rounded-pill px-4" onclick="window.resetIAUI()"><i class="fas fa-sync-alt"></i></button>
+                    <button class="btn btn-primary flex-grow-1 py-3 rounded-pill fw-bold shadow" onclick="window.transferToApp()">GUARDAR Y OFERTAR</button>
                 </div>
-                <p class="text-muted text-center mt-2 mb-0" style="font-size:0.7rem;">
-                    El producto se guardará en el catálogo al transferir.
-                </p>
             </div>
-
         </div>
     </div>
 
-    <!-- ===== TICKET INVISIBLE ===== -->
     <div id="ticket-render">
         <div style="text-align: center; margin-bottom: 25px;">
             <img src="logo.png" alt="Logo" style="width: 140px; height: auto;" onerror="this.style.display='none'">
@@ -363,494 +197,274 @@
         <div style="text-align: center; margin-top: 45px; font-size: 1.1rem; border: 1.5px solid #000; padding: 12px; font-weight: bold; color: black;">¡Gracias por su compra!</div>
     </div>
 
-    <!-- ===== NAV ===== -->
     <nav class="bottom-nav">
         <button class="tab-btn active" onclick="window.showTab('operaciones', this)"><i class="fas fa-cash-register"></i>Ventas</button>
         <button class="tab-btn" onclick="window.showTab('entregas', this)"><i class="fas fa-truck"></i>Reparto</button>
         <button class="tab-btn" onclick="window.showTab('control', this)"><i class="fas fa-shield-halved"></i>Gestión</button>
     </nav>
 
-    <!-- ===== SCRIPTS ===== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { initializeFirestore, collection, doc, addDoc, updateDoc, deleteDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        /* ── CONFIG ──────────────────────────────────────────── */
-        const firebaseConfig = {
-            apiKey: "AIzaSyCR5V_yg6aLumW_D8oFPEblHZ5ox2gTs98",
-            authDomain: "ofertas-rapidas-yautepec.firebaseapp.com",
-            projectId: "ofertas-rapidas-yautepec",
-            storageBucket: "ofertas-rapidas-yautepec.firebasestorage.app",
-            messagingSenderId: "81339635207",
-            appId: "1:81339635207:web:26d180f92224d9a036fca2"
-        };
-        const apiKeyGemini = "AIzaSyDJicNgq309eja6V0IAZI8w0j6NBYMBmjU";
+        const firebaseConfig = { apiKey: "AIzaSyCR5V_yg6aLumW_D8oFPEblHZ5ox2gTs98", authDomain: "ofertas-rapidas-yautepec.firebaseapp.com", projectId: "ofertas-rapidas-yautepec", storageBucket: "ofertas-rapidas-yautepec.firebasestorage.app", messagingSenderId: "81339635207", appId: "1:81339635207:web:26d180f92224d9a036fca2" };
+        const apiKeyGemini = "AIzaSyDJicNgq309eja6V0IAZI8w0j6NBYMBmjU"; 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'yaute-v1-shared';
-
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = initializeFirestore(app, { experimentalForceLongPolling: true });
 
-        /* ── STATE ───────────────────────────────────────────── */
         window.state = { sales: [], clients: [], stores: [], products: [] };
-        let currentUser = null, editRef = null, activeSubTab = 'finanzas', activeFinanceView = 'compras';
-        let currentIAStream = null;
+        let currentUser = null, deleteRef = { col: '', id: '' }, editRef = null, activeSubTab = 'finanzas', activeFinanceView = 'compras';
+        let currentIAStream = null, abortControllerIA = null;
 
-        /* ── HELPERS FECHA ───────────────────────────────────── */
         const getMXTimeParts = () => {
-            const formatter = new Intl.DateTimeFormat('en-US', {
-                timeZone: 'America/Mexico_City', year: 'numeric', month: '2-digit',
-                day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
-            });
+            const formatter = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Mexico_City', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
             return formatter.formatToParts(new Date()).reduce((acc, p) => ({ ...acc, [p.type]: p.value }), {});
         };
-        const getMXDateStr  = () => { const p = getMXTimeParts(); return `${parseInt(p.day)}/${parseInt(p.month)}/${p.year}`; };
-        const getMXISODate  = () => { const p = getMXTimeParts(); return `${p.year}-${p.month}-${p.day}`; };
+        const getMXDateStr = () => { const p = getMXTimeParts(); return `${parseInt(p.day)}/${parseInt(p.month)}/${p.year}`; };
+        const getMXISODate = () => { const p = getMXTimeParts(); return `${p.year}-${p.month}-${p.day}`; };
         const normalizeDateStr = (str) => str ? str.split('/').map(p => parseInt(p)).join('/') : "";
+        const formatProperName = (str) => str ? str.trim().toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : "";
 
-        let finDate = getMXISODate(), finStore = "", finClient = "";
+        let finDate = getMXISODate(), finDateFrom = getMXISODate(), finDateTo = getMXISODate(), finStore = "", finClient = "";
+        const toast = (m, type = 'success') => { const el = document.getElementById('toast-alert'); if(!el) return; el.style.background = type === 'success' ? 'var(--success)' : 'var(--danger)'; el.innerText = m; el.style.display = 'block'; setTimeout(() => { if(el) el.style.display = 'none'; }, 2000); };
 
-        /* ── TOAST ───────────────────────────────────────────── */
-        const toast = (m, type = 'success') => {
-            const el = document.getElementById('toast-alert');
-            if (!el) return;
-            el.style.background = type === 'success' ? 'var(--success)' : 'var(--danger)';
-            el.innerText = m; el.style.display = 'block';
-            setTimeout(() => { if (el) el.style.display = 'none'; }, 2500);
-        };
-
-        /* ── FIREBASE AUTH + SYNC ────────────────────────────── */
-        signInAnonymously(auth).then(() => {
-            onAuthStateChanged(auth, (user) => { if (user) { currentUser = user; startSync(); } });
-        });
+        signInAnonymously(auth).then(() => { onAuthStateChanged(auth, (user) => { if (user) { currentUser = user; startSync(); } }); });
 
         const startSync = () => {
             ['sales', 'clients', 'stores', 'products'].forEach(name => {
                 onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', name), (snap) => {
                     window.state[name] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                     document.getElementById('status-dot').className = "status-dot bg-success";
-                    if (name === 'sales') { window.renderEntregas(); if (activeSubTab === 'finanzas') window.renderFinanceMenu(); }
+                    const splash = document.getElementById('splash-screen');
+                    if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.remove(), 500); }
+                    if(name === 'sales') { window.renderEntregas(); if(activeSubTab === 'finanzas') window.renderFinanceMenu(); }
                 });
             });
-            setupAuto('in-tienda',   'sug-tienda',   'stores');
-            setupAuto('in-cliente',  'sug-cliente',  'clients');
+            setupAuto('in-tienda', 'sug-tienda', 'stores');
+            setupAuto('in-cliente', 'sug-cliente', 'clients');
             setupAuto('in-producto', 'sug-producto', 'products');
         };
 
         const setupAuto = (inpId, boxId, key) => {
-            const inp = document.getElementById(inpId);
-            const box = document.getElementById(boxId);
+            const inp = document.getElementById(inpId); const box = document.getElementById(boxId);
             if (!inp || !box) return;
             inp.oninput = () => {
-                const val = inp.value.toUpperCase();
-                if (!val) { box.classList.add('d-none'); return; }
-                const suggestions = (window.state[key] || []).map(x => (x.nombre || "").toUpperCase());
+                const val = inp.value.toUpperCase(); if(!val) { box.classList.add('d-none'); return; }
+                let suggestions = window.state[key] ? window.state[key].map(x => (x.nombre || "").toUpperCase()) : [];
                 const filtered = suggestions.filter(s => s.includes(val)).slice(0, 5);
                 box.innerHTML = filtered.map(s => `<div class="sug-item" data-val="${s}">${s}</div>`).join('');
                 box.classList.toggle('d-none', filtered.length === 0);
             };
-            box.onclick = (e) => {
-                const it = e.target.closest('.sug-item'); if (!it) return;
+            box.onclick = (e) => { 
+                const it = e.target.closest('.sug-item'); if(!it) return; 
                 const selectedVal = it.dataset.val.trim();
                 inp.value = selectedVal; box.classList.add('d-none');
-                if (key === 'products') {
+                if(key === 'products') {
                     const prod = window.state.products.find(x => (x.nombre || "").toUpperCase() === selectedVal);
-                    if (prod) {
-                        document.getElementById('in-costo').value  = prod.costo  || 0;
-                        document.getElementById('in-precio').value = prod.precio || 0;
-                    }
+                    if(prod) { document.getElementById('in-costo').value = prod.costo || 0; document.getElementById('in-precio').value = prod.precio || 0; }
                 }
             };
         };
 
-        /* ── NAVEGACIÓN ──────────────────────────────────────── */
+        // --- NAVEGACIÓN ---
         window.showTab = (id, btn) => {
-            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none'); 
             const target = document.getElementById('tab-' + id);
-            if (target) target.style.display = 'block';
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            if (btn) btn.classList.add('active');
-            if (id === 'control') window.switchSubTab('finanzas');
+            if (target) target.style.display = 'block'; 
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
+            if (btn) btn.classList.add('active'); 
+            if(id === 'control') window.switchSubTab('finanzas'); 
         };
 
-        window.switchSubTab = (id) => {
-            activeSubTab = id;
+        window.switchSubTab = (id) => { 
+            activeSubTab = id; 
             document.getElementById('sub-btn-fin').classList.toggle('active', id === 'finanzas');
-            document.getElementById('sub-btn-cat').classList.toggle('active', id === 'catalogo');
-            if (id === 'catalogo') window.renderControlList(); else window.renderFinanceMenu();
+            document.getElementById('sub-btn-cat').classList.toggle('active', id === 'catalogo'); 
+            if(id === 'catalogo') window.renderControlList(); else window.renderFinanceMenu(); 
         };
 
-        /* ── EDITAR REGISTRO ─────────────────────────────────── */
-        window.openEditModal = (record) => {
-            editRef = record;
-            document.getElementById('ed-tienda').value   = record.tienda;
-            document.getElementById('ed-cliente').value  = record.cliente;
-            document.getElementById('ed-producto').value = record.producto;
-            document.getElementById('ed-cantidad').value = record.cantidad;
-            document.getElementById('ed-costo').value    = record.costo;
+        // --- EDITAR REGISTRO PRO (LÓGICA CRISTO + CASCADA) ---
+        window.openEditModal = (record) => { 
+            editRef = record; 
+            document.getElementById('ed-tienda').value = record.tienda; 
+            document.getElementById('ed-cliente').value = record.cliente; 
+            document.getElementById('ed-producto').value = record.producto; 
+            document.getElementById('ed-cantidad').value = record.cantidad; 
+            document.getElementById('ed-costo').value = record.costo; 
             const prod = window.state.products.find(p => p.nombre.toUpperCase() === record.producto.toUpperCase());
-            document.getElementById('ed-precio').value = prod ? prod.precio : record.precio;
+            document.getElementById('ed-precio').value = prod ? prod.precio : record.precio; 
             if (record.fechaStr) {
                 const parts = record.fechaStr.split('/');
-                document.getElementById('ed-fecha').value = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+                document.getElementById('ed-fecha').value = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
             }
-            document.getElementById('edit-modal').style.display = 'flex';
+            document.getElementById('edit-modal').style.display = 'flex'; 
         };
 
-        window.confirmUpdate = async () => {
-            if (!editRef) return;
-            const t   = document.getElementById('ed-tienda').value.trim().toUpperCase();
-            const c   = document.getElementById('ed-cliente').value.trim().toUpperCase();
-            const p   = document.getElementById('ed-producto').value.trim().toUpperCase();
-            const q   = parseInt(document.getElementById('ed-cantidad').value) || 1;
-            const co  = parseFloat(document.getElementById('ed-costo').value)  || 0;
-            const prI = parseFloat(document.getElementById('ed-precio').value) || 0;
-            const fVal = document.getElementById('ed-fecha').value;
-
+        window.confirmUpdate = async () => { 
+            if(!editRef) return; 
+            const t = document.getElementById('ed-tienda').value.trim().toUpperCase(), 
+                  c = document.getElementById('ed-cliente').value.trim().toUpperCase(), 
+                  p = document.getElementById('ed-producto').value.trim().toUpperCase(), 
+                  q = parseInt(document.getElementById('ed-cantidad').value) || 1, 
+                  co = parseFloat(document.getElementById('ed-costo').value) || 0,
+                  prI = parseFloat(document.getElementById('ed-precio').value) || 0,
+                  fVal = document.getElementById('ed-fecha').value; 
+            
             let salePrice = (c === "CRISTO") ? co : prI;
-            const dateParts   = fVal.split('-');
+            const dateParts = fVal.split('-');
             const newFechaStr = `${parseInt(dateParts[2])}/${parseInt(dateParts[1])}/${dateParts[0]}`;
             const newTimestamp = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 12, 0, 0).getTime();
 
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'sales', editRef.id), {
-                tienda: t, cliente: c, producto: p, cantidad: q,
-                costo: co, precio: salePrice, total: q * salePrice,
-                fechaStr: newFechaStr, timestamp: newTimestamp
-            });
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'sales', editRef.id), { 
+                tienda: t, cliente: c, producto: p, cantidad: q, costo: co, precio: salePrice, total: q*salePrice, fechaStr: newFechaStr, timestamp: newTimestamp
+            }); 
 
             const existingProd = window.state.products.find(s => (s.nombre || "").toUpperCase() === p);
-            if (!existingProd)
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { nombre: p, costo: co, precio: prI });
-            else
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', existingProd.id), { costo: co, precio: prI });
+            if(!existingProd) await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { nombre: p, costo: co, precio: prI });
+            else await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', existingProd.id), { costo: co, precio: prI });
 
-            toast("Sincronizado ✅");
-            document.getElementById('edit-modal').style.display = 'none';
+            toast("Sincronizado ✅"); document.getElementById('edit-modal').style.display = 'none';
         };
 
-        window.closeEditModal = () => document.getElementById('edit-modal').style.display = 'none';
-
-        /* ══════════════════════════════════════════════════════
-           MOTOR SCANNER — ESCANPRO v2
-           ══════════════════════════════════════════════════════ */
-
-        /* Abre el modal y arranca la cámara trasera por defecto */
+        // --- MOTOR SCANNER (MEJORA ESCANPRO INTEGRADA) ---
         window.openScanner = async () => {
-            window.resetIAUI();
             document.getElementById('ia-modal').style.display = 'flex';
-            document.getElementById('ia-result-panel').style.display = 'none';
-
             try {
-                // 1. Pedir permiso genérico primero (necesario en algunos navegadores)
-                await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-
-                // 2. Enumerar dispositivos y llenar selector
-                const devices    = await navigator.mediaDevices.enumerateDevices();
-                const videoDevs  = devices.filter(d => d.kind === 'videoinput');
-                const sel        = document.getElementById('video-source-select');
-                sel.innerHTML    = videoDevs.map((d, i) =>
-                    `<option value="${d.deviceId}">${d.label || 'Cámara ' + (i + 1)}</option>`
-                ).join('');
-
-                // 3. Preferir cámara trasera
-                const backCam = videoDevs.find(d => /back|rear|trasera|environment/i.test(d.label));
-                const chosen  = backCam || videoDevs[videoDevs.length - 1] || videoDevs[0];
-                if (chosen) {
-                    sel.value = chosen.deviceId;
-                    await window.startCameraIA(chosen.deviceId);
-                }
-            } catch (e) {
-                console.error('openScanner error:', e);
-                toast("Error al acceder a la cámara", "danger");
-            }
+                await navigator.mediaDevices.getUserMedia({ video: true });
+                const devices = await navigator.mediaDevices.enumerateDevices();
+                const videoDevices = devices.filter(d => d.kind === 'videoinput');
+                document.getElementById('video-source-select').innerHTML = videoDevices.map(d => `<option value="${d.deviceId}">${d.label || 'Cámara'}</option>`).join('');
+                if (videoDevices.length > 0) window.startCameraIA(videoDevices[0].deviceId);
+            } catch (e) { toast("Error cámara", "danger"); }
         };
 
         window.startCameraIA = async (deviceId) => {
             if (currentIAStream) currentIAStream.getTracks().forEach(t => t.stop());
-            try {
-                currentIAStream = await navigator.mediaDevices.getUserMedia({
-                    video: { deviceId: { exact: deviceId }, width: { ideal: 1920 }, height: { ideal: 1080 } }
-                });
-                document.getElementById('cam-preview-ia').srcObject = currentIAStream;
-            } catch (e) {
-                console.error('startCameraIA error:', e);
-                toast("No se pudo iniciar la cámara", "danger");
+            currentIAStream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: deviceId }, width: 1280, height: 720 } });
+            document.getElementById('cam-preview-ia').srcObject = currentIAStream;
+        };
+
+        // Función de compresión y mejora de contraste (Tu lógica EscanPro)
+        const compressAndEnhance = (v) => {
+            const c = document.createElement('canvas');
+            c.width = 1024; c.height = Math.round(v.videoHeight * 1024 / v.videoWidth);
+            const ctx = c.getContext('2d');
+            ctx.drawImage(v, 0, 0, c.width, c.height);
+            const imageData = ctx.getImageData(0, 0, c.width, c.height);
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = Math.min(255, Math.max(0, (data[i] - 128) * 1.2 + 128));
+                data[i+1] = Math.min(255, Math.max(0, (data[i+1] - 128) * 1.2 + 128));
+                data[i+2] = Math.min(255, Math.max(0, (data[i+2] - 128) * 1.2 + 128));
             }
+            ctx.putImageData(imageData, 0, 0);
+            return c.toDataURL('image/jpeg', 0.85);
         };
 
-        window.changeCameraIA = () => {
-            const deviceId = document.getElementById('video-source-select').value;
-            if (deviceId) window.startCameraIA(deviceId);
-        };
-
-        /* Compresión + mejora de contraste (lógica EscanPro) */
-        const compressAndEnhance = (videoEl) => {
-            const TARGET_W = 1200;
-            const scale    = Math.min(TARGET_W / videoEl.videoWidth, 1);
-            const w        = Math.round(videoEl.videoWidth  * scale);
-            const h        = Math.round(videoEl.videoHeight * scale);
-
-            const canvas = document.createElement('canvas');
-            canvas.width = w; canvas.height = h;
-            const ctx = canvas.getContext('2d');
-
-            // Dibujar frame
-            ctx.drawImage(videoEl, 0, 0, w, h);
-
-            // Mejora de contraste (+20%) para textos pequeños y brillos
-            const imgData = ctx.getImageData(0, 0, w, h);
-            const d = imgData.data;
-            const factor = 1.2; // factor de contraste
-            for (let i = 0; i < d.length; i += 4) {
-                d[i]   = Math.min(255, Math.max(0, (d[i]   - 128) * factor + 128)); // R
-                d[i+1] = Math.min(255, Math.max(0, (d[i+1] - 128) * factor + 128)); // G
-                d[i+2] = Math.min(255, Math.max(0, (d[i+2] - 128) * factor + 128)); // B
-            }
-            ctx.putImageData(imgData, 0, 0);
-
-            // Calidad 0.88 — balance nitidez/peso para Gemini
-            return canvas.toDataURL('image/jpeg', 0.88);
-        };
-
-        /* Captura y envía a Gemini */
         window.captureIAImage = async () => {
-            const video = document.getElementById('cam-preview-ia');
-            if (!video.srcObject) { toast("Cámara no activa", "danger"); return; }
-
-            // Mostrar miniatura de lo capturado
-            const dataURL = compressAndEnhance(video);
-            const prevImg = document.getElementById('capture-preview-ia');
-            prevImg.src = dataURL; prevImg.style.display = 'block';
-
-            // Mostrar panel con spinner
-            document.getElementById('ia-result-panel').style.display = 'block';
+            const v = document.getElementById('cam-preview-ia');
+            const dataURL = compressAndEnhance(v);
+            document.getElementById('capture-preview-ia').src = dataURL;
+            document.getElementById('capture-preview-ia').style.display = 'block';
             document.getElementById('ia-loading').style.display = 'block';
-            document.getElementById('ia-form').style.display    = 'none';
-            document.getElementById('ia-saved-badge').style.display = 'none';
+            document.getElementById('ia-form').style.display = 'none';
 
             try {
                 const b64 = dataURL.split(',')[1];
-
-                /* Prompt optimizado EscanPro:
-                   - Dos intentos de extracción en un solo call
-                   - Respuesta estrictamente JSON */
-                const prompt = `Eres un lector experto de etiquetas de productos de consumo en México.
-Analiza la imagen y extrae:
-1. "nombre": marca comercial + nombre del producto (sin gramaje).
-2. "presentacion": contenido neto o presentación (gramaje, volumen, número de piezas, etc.).
-
-Si hay texto pequeño o con brillo, intenta igualmente leerlo.
-Responde ÚNICAMENTE con JSON válido, sin texto adicional ni backticks:
-{"nombre":"...","presentacion":"..."}`;
-
-                const response = await fetch(
-                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKeyGemini}`,
-                    {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{
-                                parts: [
-                                    { inline_data: { mime_type: "image/jpeg", data: b64 } },
-                                    { text: prompt }
-                                ]
-                            }],
-                            generationConfig: { temperature: 0.1, maxOutputTokens: 200 }
-                        })
-                    }
-                );
-
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-                const resJson = await response.json();
-                const rawText = resJson.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                // Limpiar posibles backticks residuales
-                const cleanText = rawText.replace(/```json|```/gi, '').trim();
-                const data = JSON.parse(cleanText);
-
-                // Llenar campos de resultado
-                document.getElementById('ia-res-name').value = (data.nombre        || '').toUpperCase();
-                document.getElementById('ia-res-size').value = (data.presentacion  || '').toUpperCase();
-                // Precios vacíos — el usuario los digita
-                document.getElementById('ia-res-costo').value = '';
-                document.getElementById('ia-res-price').value = '';
-
-                // Buscar si ya existe en catálogo y autocompletar precios
-                const nombreCompleto = `${(data.nombre || '').toUpperCase()} ${(data.presentacion || '').toUpperCase()}`.trim();
-                const existente = window.state.products.find(p =>
-                    (p.nombre || '').toUpperCase() === nombreCompleto
-                );
-                if (existente) {
-                    document.getElementById('ia-res-costo').value = existente.costo  || '';
-                    document.getElementById('ia-res-price').value = existente.precio || '';
-                }
-
+                const prompt = 'Extrae de esta etiqueta: 1) Nombre: marca y producto. 2) Presentación: gramaje o contenido neto. Responde JSON: {"nombre":"...","presentacion":"..."}';
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKeyGemini}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ contents: [{ parts: [{ inline_data: { mime_type: "image/jpeg", data: b64 } }, { text: prompt }] }] })
+                });
+                const res = await resp.json();
+                const text = res.candidates?.[0]?.content?.parts?.[0]?.text.replace(/```json|```/g, "").trim();
+                const data = JSON.parse(text);
+                document.getElementById('ia-res-name').value = data.nombre.toUpperCase();
+                document.getElementById('ia-res-size').value = data.presentacion.toUpperCase();
                 document.getElementById('ia-loading').style.display = 'none';
-                document.getElementById('ia-form').style.display    = 'block';
-
-            } catch (e) {
-                console.error('captureIAImage error:', e);
-                document.getElementById('ia-loading').style.display = 'none';
-                document.getElementById('ia-form').style.display    = 'block';
-                toast("Error al analizar imagen. Intenta de nuevo.", "danger");
-            }
+                document.getElementById('ia-form').style.display = 'block';
+            } catch (e) { toast("Error IA", "danger"); window.resetIAUI(); }
         };
 
-        /* Transfiere datos al formulario de venta Y guarda en catálogo */
-        window.transferToApp = async () => {
-            const nombre = document.getElementById('ia-res-name').value.trim().toUpperCase();
-            const pres   = document.getElementById('ia-res-size').value.trim().toUpperCase();
-            const costo  = parseFloat(document.getElementById('ia-res-costo').value) || 0;
-            const precio = parseFloat(document.getElementById('ia-res-price').value) || 0;
-
-            if (!nombre) { toast("El nombre del producto está vacío", "danger"); return; }
-
-            const nombreCompleto = `${nombre} ${pres}`.trim();
-
-            // ── Guardar / actualizar en catálogo de Firebase ──────────
-            try {
-                const existente = window.state.products.find(p =>
-                    (p.nombre || '').toUpperCase() === nombreCompleto
-                );
-                if (!existente) {
-                    await addDoc(
-                        collection(db, 'artifacts', appId, 'public', 'data', 'products'),
-                        { nombre: nombreCompleto, costo, precio }
-                    );
-                } else if (costo > 0 || precio > 0) {
-                    await updateDoc(
-                        doc(db, 'artifacts', appId, 'public', 'data', 'products', existente.id),
-                        { costo, precio }
-                    );
-                }
-                document.getElementById('ia-saved-badge').style.display = 'inline-flex';
-            } catch (e) {
-                console.error('Error guardando producto:', e);
-            }
-
-            // ── Transferir al formulario de venta ──────────────────────
-            document.getElementById('in-producto').value = nombreCompleto;
-            document.getElementById('in-costo').value   = costo  || '';
-            document.getElementById('in-precio').value  = precio || '';
-
-            // Cerrar scanner y poner foco en campo de cantidad
+        window.transferToApp = () => {
+            const n = document.getElementById('ia-res-name').value, s = document.getElementById('ia-res-size').value, p = document.getElementById('ia-res-price').value;
+            document.getElementById('in-producto').value = `${n} ${s}`.trim();
+            document.getElementById('in-precio').value = p || 0;
             window.closeScanner();
-            toast("Artículo cargado ✅");
-            setTimeout(() => document.getElementById('in-cantidad').focus(), 300);
+            toast("Datos cargados ✅");
         };
 
-        /* Resetea el panel de resultado */
         window.resetIAUI = () => {
-            document.getElementById('ia-res-name').value  = '';
-            document.getElementById('ia-res-size').value  = '';
-            document.getElementById('ia-res-costo').value = '';
-            document.getElementById('ia-res-price').value = '';
-            const prev = document.getElementById('capture-preview-ia');
-            prev.src = ''; prev.style.display = 'none';
-            document.getElementById('ia-loading').style.display       = 'none';
-            document.getElementById('ia-form').style.display          = 'none';
-            document.getElementById('ia-saved-badge').style.display   = 'none';
-            document.getElementById('ia-result-panel').style.display  = 'none';
+            document.getElementById('ia-res-name').value = ""; document.getElementById('ia-res-size').value = ""; document.getElementById('ia-res-price').value = "";
+            document.getElementById('capture-preview-ia').style.display = 'none';
+            document.getElementById('ia-loading').style.display = 'none'; document.getElementById('ia-form').style.display = 'block';
         };
 
-        /* Cierra el scanner y detiene el stream */
-        window.closeScanner = () => {
-            if (currentIAStream) currentIAStream.getTracks().forEach(t => t.stop());
-            currentIAStream = null;
-            document.getElementById('ia-modal').style.display = 'none';
-        };
+        window.closeScanner = () => { if (currentIAStream) currentIAStream.getTracks().forEach(t => t.stop()); document.getElementById('ia-modal').style.display = 'none'; };
 
-        /* ══════════════════════════════════════════════════════ */
-
-        /* ── FINANZAS RENDER ─────────────────────────────────── */
+        // --- FINANZAS RENDER ---
         window.renderFinanceMenu = () => {
             const container = document.getElementById('control-content');
             container.innerHTML = `
-                <div class="inner-sub-nav">
-                    <button class="inner-btn ${activeFinanceView==='compras'   ? 'active':''}" onclick="window.setFinView('compras')">Compras</button>
-                    <button class="inner-btn ${activeFinanceView==='ganancias' ? 'active':''}" onclick="window.setFinView('ganancias')">Ganancias</button>
-                    <button class="inner-btn ${activeFinanceView==='diezmo'    ? 'active':''}" onclick="window.setFinView('diezmo')">Diezmo</button>
-                </div>
+                <div class="inner-sub-nav"><button class="inner-btn ${activeFinanceView === 'compras' ? 'active' : ''}" onclick="window.setFinView('compras')">Compras</button><button class="inner-btn ${activeFinanceView === 'ganancias' ? 'active' : ''}" onclick="window.setFinView('ganancias')">Ganancias</button><button class="inner-btn ${activeFinanceView === 'diezmo' ? 'active' : ''}" onclick="window.setFinView('diezmo')">Diezmo</button></div>
                 <div class="card-custom mb-2 bg-light shadow-none border px-3">
                     <div class="row g-2">
-                        <div class="col-6"><label class="text-uppercase">Tienda</label><select id="fin-store-sel" onchange="window.updateFinFilter('store',this.value)" class="form-select form-select-sm"><option value="">TODAS</option></select></div>
-                        <div class="col-6"><label class="text-uppercase">Cliente</label><select id="fin-client-sel" onchange="window.updateFinFilter('client',this.value)" class="form-select form-select-sm"><option value="">TODOS</option></select></div>
+                        <div class="col-6"><label class="text-uppercase">Tienda</label><select id="fin-store-sel" onchange="window.updateFinFilter('store', this.value)" class="form-select form-select-sm"><option value="">TODAS</option></select></div>
+                        <div class="col-6"><label class="text-uppercase">Cliente</label><select id="fin-client-sel" onchange="window.updateFinFilter('client', this.value)" class="form-select form-select-sm"><option value="">TODOS</option></select></div>
                     </div>
                 </div>
                 <div id="finance-results"></div>`;
-
-            const stores  = [...new Set(window.state.sales.map(s => (s.tienda  || '').toUpperCase()))].sort();
-            const clients = [...new Set(window.state.sales.map(s => (s.cliente || '').toUpperCase()))].sort();
-            document.getElementById('fin-store-sel').innerHTML  += stores.map(t  => `<option value="${t}" ${finStore===t?'selected':''}>${t}</option>`).join('');
-            document.getElementById('fin-client-sel').innerHTML += clients.map(c => `<option value="${c}" ${finClient===c?'selected':''}>${c}</option>`).join('');
+            
+            const stores = [...new Set(window.state.sales.map(s => (s.tienda || "").toUpperCase()))].sort();
+            const clients = [...new Set(window.state.sales.map(s => (s.cliente || "").toUpperCase()))].sort();
+            document.getElementById('fin-store-sel').innerHTML += stores.map(t => `<option value="${t}" ${finStore === t ? 'selected' : ''}>${t}</option>`).join('');
+            document.getElementById('fin-client-sel').innerHTML += clients.map(c => `<option value="${c}" ${finClient === c ? 'selected' : ''}>${c}</option>`).join('');
             window.renderFinanceResults();
         };
 
         window.renderFinanceResults = () => {
-            const res = document.getElementById('finance-results'); if (!res) return;
-            const target   = normalizeDateStr(`${parseInt(finDate.split('-')[2])}/${parseInt(finDate.split('-')[1])}/${finDate.split('-')[0]}`);
-            let filtered   = window.state.sales.filter(x => normalizeDateStr(x.fechaStr) === target);
-            filtered       = filtered.filter(x => (!finStore || x.tienda === finStore) && (!finClient || x.cliente === finClient));
+            const res = document.getElementById('finance-results'); if(!res) return;
+            const target = normalizeDateStr(`${parseInt(finDate.split('-')[2])}/${parseInt(finDate.split('-')[1])}/${finDate.split('-')[0]}`);
+            let filtered = window.state.sales.filter(x => normalizeDateStr(x.fechaStr) === target);
+            filtered = filtered.filter(x => (!finStore || x.tienda === finStore) && (!finClient || x.cliente === finClient));
 
-            const totalVenta = filtered.reduce((a, b) => a + (b.total  || 0), 0);
+            const totalVenta = filtered.reduce((a, b) => a + (b.total || 0), 0);
             const totalCosto = filtered.reduce((a, b) => a + ((b.costo || 0) * (b.cantidad || 0)), 0);
-            const piezas     = filtered.reduce((a, b) => a + (b.cantidad || 0), 0);
+            const piezas = filtered.reduce((a, b) => a + (b.cantidad || 0), 0);
 
-            if (activeFinanceView === 'compras') {
-                res.innerHTML = `<div class="stat-card bg-gradient-primary shadow"><h3>$${totalCosto.toFixed(2)}</h3><small>PAGO EN CAJA</small><div class="mt-2"><span class="badge bg-white text-primary rounded-pill">${piezas} PIEZAS</span></div></div>` +
-                    filtered.map(s => `<div class="card-custom finance-item d-flex justify-content-between py-2 small"><div><b>${s.producto}</b><br>${s.tienda}</div><div class="text-end"><b>$${((s.costo||0)*s.cantidad).toFixed(2)}</b><br><i class="fas fa-pen text-primary" onclick='window.openEditModal(${JSON.stringify(s)})'></i></div></div>`).join('');
-            } else if (activeFinanceView === 'ganancias') {
-                res.innerHTML = `<div class="stat-card bg-gradient-success shadow"><h3>$${(totalVenta-totalCosto).toFixed(2)}</h3><small>UTILIDAD NETA</small></div>`;
-            } else if (activeFinanceView === 'diezmo') {
-                res.innerHTML = `<div class="stat-card bg-gradient-warning shadow"><h3>$${((totalVenta-totalCosto)*0.1).toFixed(2)}</h3><small>10% PARA EL SEÑOR</small></div>`;
+            if(activeFinanceView === 'compras') {
+                res.innerHTML = `<div class="stat-card bg-gradient-primary shadow"><h3>$${totalCosto.toFixed(2)}</h3><small>PAGO EN CAJA</small><div class="mt-2"><span class="badge bg-white text-primary rounded-pill">${piezas} PIEZAS</span></div></div>` + 
+                filtered.map(s => `<div class="card-custom finance-item d-flex justify-content-between py-2 small"><div><b>${s.producto}</b><br>${s.tienda}</div><div class="text-end"><b>$${((s.costo||0)*s.cantidad).toFixed(2)}</b><br><i class="fas fa-pen text-accent" onclick='window.openEditModal(${JSON.stringify(s)})'></i></div></div>`).join('');
+            } else if(activeFinanceView === 'ganancias') {
+                res.innerHTML = `<div class="stat-card bg-gradient-success shadow"><h3>$${(totalVenta - totalCosto).toFixed(2)}</h3><small>UTILIDAD NETA</small></div>`;
+            } else if(activeFinanceView === 'diezmo') {
+                res.innerHTML = `<div class="stat-card bg-gradient-warning shadow"><h3>$${((totalVenta - totalCosto)*0.1).toFixed(2)}</h3><small>10% PARA EL SEÑOR</small></div>`;
             }
         };
 
         window.updateFinFilter = (k, v) => { if(k==='store') finStore=v; if(k==='client') finClient=v; window.renderFinanceResults(); };
-        window.setFinView      = (v) => { activeFinanceView = v; window.renderFinanceMenu(); };
+        window.setFinView = (v) => { activeFinanceView = v; window.renderFinanceMenu(); };
 
-        window.renderControlList = () => {
-            const container = document.getElementById('control-content');
-            container.innerHTML = `<div class="card-custom"><p class="text-muted text-center mb-0">Control de catálogo disponible aquí.</p></div>`;
-        };
-
-        window.renderEntregas = () => { /* lógica de reparto — sin cambios */ };
-
-        /* ── GUARDAR VENTA ───────────────────────────────────── */
-        window.onload = () => {
+        window.onload = () => { 
             const bSave = document.getElementById('btn-save-record');
-            if (bSave) bSave.onclick = async () => {
-                const t   = document.getElementById('in-tienda').value.trim().toUpperCase();
-                const c   = document.getElementById('in-cliente').value.trim().toUpperCase();
-                const p   = document.getElementById('in-producto').value.trim().toUpperCase();
-                const q   = parseInt(document.getElementById('in-cantidad').value)  || 1;
-                const co  = parseFloat(document.getElementById('in-costo').value)   || 0;
-                const prI = parseFloat(document.getElementById('in-precio').value)  || 0;
-
+            if(bSave) bSave.onclick = async () => {
+                const t = document.getElementById('in-tienda').value.trim().toUpperCase(), c = document.getElementById('in-cliente').value.trim().toUpperCase(), p = document.getElementById('in-producto').value.trim().toUpperCase(), q = parseInt(document.getElementById('in-cantidad').value) || 1, co = parseFloat(document.getElementById('in-costo').value) || 0, prI = parseFloat(document.getElementById('in-precio').value) || 0;
                 let salePrice = (c === "CRISTO") ? co : prI;
-                if (!t || !c || !p) return toast("Faltan datos", "danger");
-
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'sales'), {
-                    tienda: t, cliente: c, producto: p, cantidad: q,
-                    costo: co, precio: salePrice, total: q * salePrice,
-                    fechaStr: getMXDateStr(), timestamp: Date.now(),
-                    uid: currentUser.uid, entregado: false, pagado: false
-                });
-
-                const ex = window.state.products.find(s => (s.nombre || '').toUpperCase() === p);
-                if (!ex)
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { nombre: p, costo: co, precio: prI });
-                else
-                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', ex.id), { costo: co, precio: prI });
-
-                toast("Venta guardada! ✅");
+                if(!t || !c || !p) return toast("Faltan datos", "danger");
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'sales'), { tienda: t, cliente: c, producto: p, cantidad: q, costo: co, precio: salePrice, total: q*salePrice, fechaStr: getMXDateStr(), timestamp: Date.now(), uid: currentUser.uid, entregado: false, pagado: false });
+                const ex = window.state.products.find(s => (s.nombre || "").toUpperCase() === p);
+                if(!ex) await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { nombre: p, costo: co, precio: prI });
+                else await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', ex.id), { costo: co, precio: prI });
+                toast("Venta guardada!");
             };
-
-            // Fecha de entregas
-            const ed = document.getElementById('entregas-date');
-            if (ed) ed.value = getMXISODate();
         };
+
+        window.renderEntregas = () => { /* Lógica de reparto simplificada para v33 */ };
+        window.closeEditModal = () => document.getElementById('edit-modal').style.display='none';
     </script>
 </body>
 </html>
