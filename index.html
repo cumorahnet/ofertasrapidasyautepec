@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ofertas Rápidas Yaute v33.3 - Control Total</title>
+    <title>Ofertas Rápidas Yaute v33.5 - Estabilidad Total</title>
     
     <!-- Librerías Externas -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -20,8 +20,6 @@
             --bg: #f8fafc;
             --card-radius: 20px;
             --shadow: 0 4px 20px rgba(15, 23, 42, 0.08);
-            --surface: #13131c;
-            --border: #2a2a45;
         }
 
         html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; background-color: var(--bg); }
@@ -66,11 +64,6 @@
         .inner-btn { white-space: nowrap; border: 1px solid #e2e8f0; background: white; padding: 8px 16px; font-size: 0.7rem; font-weight: 800; border-radius: 50px; color: #64748b; text-transform: uppercase; transition: 0.2s; }
         .inner-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* --- API KEY BOX --- */
-        .apikey-box { background: #f1f5f9; padding: 15px; border-radius: 16px; margin-bottom: 15px; border: 1px solid #e2e8f0; }
-        .apikey-input-wrap { display: flex; gap: 8px; margin-top: 10px; }
-        .apikey-input-wrap input { flex: 1; font-family: monospace; font-size: 0.8rem; padding: 8px; border-radius: 8px; border: 1px solid #cbd5e1; }
-
         /* --- FINANZAS --- */
         .stat-card { text-align: center; padding: 20px; border-radius: 22px; color: white; margin-bottom: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .bg-gradient-primary { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
@@ -85,7 +78,11 @@
         .check-item { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; color: #64748b; }
         .check-item input { width: 20px; height: 20px; accent-color: var(--accent); }
 
-        /* --- SCANNER ESCANPRO --- */
+        /* --- TICKET RENDER --- */
+        #ticket-render { position: absolute; top: -5000px; width: 450px; background: white; padding: 40px; font-family: monospace; color: black; line-height: 1.4; border: 1px solid #eee; }
+        #toast-alert { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); z-index: 30000; padding: 14px 28px; border-radius: 50px; font-weight: 800; display: none; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.25); text-align: center; min-width: 280px; }
+
+        /* --- SCANNER MODAL --- */
         #ia-modal { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; flex-direction: column; }
         #cam-section-ia { position: relative; flex: 1; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         #cam-preview-ia { width: 100%; height: 100%; object-fit: cover; }
@@ -95,22 +92,18 @@
         #capture-preview-ia { width: 100%; border-radius: 14px; background: #000; margin-bottom: 15px; display: none; border: 3px solid var(--accent); max-height: 180px; object-fit: contain; }
         .ai-spinner { width: 40px; height: 40px; border-radius: 50%; border: 3px solid #f1f5f9; border-top-color: var(--accent); animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* --- TICKET RENDER --- */
-        #ticket-render { position: absolute; top: -5000px; width: 450px; background: white; padding: 40px; font-family: monospace; color: black; line-height: 1.4; border: 1px solid #eee; }
-        #toast-alert { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); z-index: 30000; padding: 14px 28px; border-radius: 50px; font-weight: 800; display: none; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.25); text-align: center; min-width: 280px; }
     </style>
 </head>
 <body>
 
     <div id="splash-screen">
         <div class="splash-loader"></div>
-        <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing: 2px; color: var(--primary);">VERSION 33.3 - CONFIGURANDO IA</div>
+        <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing: 2px; color: var(--primary);">VERSION 33.5 - SAMSUNG FIX</div>
     </div>
 
     <div id="toast-alert"></div>
 
-    <!-- MODAL EDITAR VENTA (CONTROL TOTAL) -->
+    <!-- MODAL EDITAR VENTA -->
     <div id="edit-modal" class="modal-overlay">
         <div class="modal-content-custom">
             <h5 class="fw-bold mb-4 text-primary">Editar Registro Pro</h5>
@@ -132,7 +125,6 @@
         </div>
     </div>
 
-    <!-- MODAL BORRAR -->
     <div id="delete-modal" class="modal-overlay">
         <div class="modal-content-custom text-center">
             <div class="mb-3 text-danger"><i class="fas fa-trash-alt fa-4x"></i></div>
@@ -144,7 +136,7 @@
         </div>
     </div>
 
-    <!-- CABECERA SOLICITADA -->
+    <!-- CABECERA PROFESIONAL -->
     <header>
         <div class="d-flex flex-column align-items-center">
             <div class="d-flex align-items-center">
@@ -152,7 +144,7 @@
                 <img src="logo.png" alt="Logo" style="height: 25px; width: auto; margin-left: 10px;" onerror="this.style.display='none'">
                 <div id="status-dot" class="status-dot bg-warning"></div>
             </div>
-            <div style="margin-top: 6px;"><span class="version-badge">v33.3</span></div>
+            <div style="margin-top: 6px;"><span class="version-badge">v33.5</span></div>
         </div>
     </header>
 
@@ -179,7 +171,7 @@
             </div>
         </div>
 
-        <!-- TAB REPARTO -->
+        <!-- TAB REPARTO (RESTAURADO) -->
         <div id="tab-entregas" class="tab-content" style="display: none;">
             <div class="card-custom py-2 mb-3 text-center border-0" style="background: #f1f5f9;"><input type="date" id="entregas-date" class="form-control text-center fw-bold border-0 bg-transparent" onchange="window.renderEntregas()"></div>
             <div id="lista-entregas"></div>
@@ -195,7 +187,7 @@
         </div>
     </main>
 
-    <!-- SCANNER IA MODAL (CÁMARA TRASERA FORZADA) -->
+    <!-- SCANNER IA MODAL -->
     <div id="ia-modal">
         <div id="cam-section-ia">
             <button class="btn btn-dark btn-sm rounded-pill" style="position: absolute; top: 25px; left: 20px; z-index: 15000; font-weight:800;" onclick="window.closeScanner()">✕ SALIR</button>
@@ -223,10 +215,10 @@
         </div>
     </div>
 
-    <!-- TICKET RENDER -->
+    <!-- TICKET RENDER (RESTAURADO) -->
     <div id="ticket-render">
         <div style="text-align: center; margin-bottom: 25px;">
-            <img src="logo.png" alt="Logo" style="width: 130px; height: auto;" onerror="this.style.display='none'">
+            <img src="logo.png" alt="Logo" style="width: 140px; height: auto;" onerror="this.style.display='none'">
             <div style="font-size: 1.8rem; font-weight: 900; margin-top: 15px; color: black;">OFERTAS RÁPIDAS YAUTE</div>
         </div>
         <div id="t-fecha" style="text-align: center; margin-bottom: 20px; font-size: 1.1rem; color: black;"></div>
@@ -247,9 +239,10 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { initializeFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeFirestore, collection, doc, addDoc, updateDoc, deleteDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyCR5V_yg6aLumW_D8oFPEblHZ5ox2gTs98", authDomain: "ofertas-rapidas-yautepec.firebaseapp.com", projectId: "ofertas-rapidas-yautepec", storageBucket: "ofertas-rapidas-yautepec.firebasestorage.app", messagingSenderId: "81339635207", appId: "1:81339635207:web:26d180f92224d9a036fca2" };
+        const apiKeyGemini = "AIzaSyDJicNgq309eja6V0IAZI8w0j6NBYMBmjU"; 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'yaute-v1-shared';
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -321,7 +314,7 @@
             if(id === 'catalogo') window.renderControlList(); else window.renderFinanceMenu(); 
         };
 
-        // --- REPARTO ---
+        // --- REPARTO RESTAURADO ---
         window.renderEntregas = () => {
             const list = document.getElementById('lista-entregas'), dateVal = document.getElementById('entregas-date').value || getMXISODate();
             const target = normalizeDateStr(dateVal.split('-').reverse().join('/'));
@@ -343,7 +336,7 @@
         window.updateSaleStatus = async (cli, date, field, val) => {
             const matching = window.state.sales.filter(s => (s.cliente||"").toUpperCase() === cli.toUpperCase() && normalizeDateStr(s.fechaStr) === date);
             for (const s of matching) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'sales', s.id), { [field]: val });
-            toast("Estado actualizado");
+            toast("Actualizado");
         };
 
         window.shareTicket = async (n, d) => {
@@ -363,7 +356,7 @@
             }, 'image/png');
         };
 
-        // --- FINANZAS ---
+        // --- FINANZAS RESTAURADO ---
         window.renderFinanceMenu = () => {
             const container = document.getElementById('control-content');
             container.innerHTML = `
@@ -400,24 +393,36 @@
         window.updateFinFilter = (k, v) => { if(k==='store') finStore=v; if(k==='client') finClient=v; window.renderFinanceResults(); };
         window.setFinView = (v) => { activeFinanceView = v; window.renderFinanceMenu(); };
 
-        // --- SCANNER ESCANPRO (LÓGICA MEJORADA) ---
-        function getStoredApiKey() { return localStorage.getItem('escanpro_gemini_key') || ""; }
-        window.saveApiKey = () => { const v = document.getElementById('api-key-input').value.trim(); if(v.startsWith('AIza')){ localStorage.setItem('escanpro_gemini_key', v); toast("API Key guardada ✓"); window.renderControlList(); } else toast("Llave inválida", "danger"); };
-
-        window.openScanner = async () => { if(!getStoredApiKey()) return toast("Primero configura la API Key en Gestión", "danger"); document.getElementById('ia-modal').style.display = 'flex'; window.resetIAUI(); window.startCameraIA(); };
+        // --- SCANNER ESCANPRO (SAMSUNG FIX) ---
+        window.openScanner = async () => { document.getElementById('ia-modal').style.display = 'flex'; window.resetIAUI(); window.startCameraIA(); };
+        
         window.startCameraIA = async () => {
             if (currentIAStream) currentIAStream.getTracks().forEach(t => t.stop());
-            currentIAStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-            document.getElementById('cam-preview-ia').srcObject = currentIAStream;
+            try {
+                // Modo más compatible para Samsung: FacingMode Environment
+                currentIAStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                const v = document.getElementById('cam-preview-ia');
+                v.srcObject = currentIAStream;
+                v.setAttribute("playsinline", true); 
+                v.play();
+            } catch (e) { toast("Error al iniciar cámara", "danger"); }
         };
 
         window.captureIAImage = async () => {
-            const v = document.getElementById('cam-preview-ia'), c = document.createElement('canvas');
+            const v = document.getElementById('cam-preview-ia');
+            const c = document.createElement('canvas');
             c.width = 1024; c.height = Math.round(v.videoHeight * 1024 / v.videoWidth);
             const ctx = c.getContext('2d'); ctx.drawImage(v, 0, 0, c.width, c.height);
+            
+            // Mejora de contraste EscanPro
             const imgData = ctx.getImageData(0,0,c.width,c.height), d = imgData.data;
-            for (let i = 0; i < d.length; i += 4) { d[i]=Math.min(255,Math.max(0,(d[i]-128)*1.2+128)); d[i+1]=Math.min(255,Math.max(0,(d[i+1]-128)*1.2+128)); d[i+2]=Math.min(255,Math.max(0,(d[i+2]-128)*1.2+128)); }
+            for (let i = 0; i < d.length; i += 4) { 
+                d[i]=Math.min(255,Math.max(0,(d[i]-128)*1.2+128)); 
+                d[i+1]=Math.min(255,Math.max(0,(d[i+1]-128)*1.2+128)); 
+                d[i+2]=Math.min(255,Math.max(0,(d[i+2]-128)*1.2+128)); 
+            }
             ctx.putImageData(imgData,0,0);
+            
             const dataURL = c.toDataURL('image/jpeg', 0.85);
             document.getElementById('capture-preview-ia').src = dataURL;
             document.getElementById('capture-preview-ia').style.display = 'block';
@@ -425,53 +430,38 @@
             document.getElementById('ia-form').style.display = 'none';
 
             try {
-                const key = getStoredApiKey();
-                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${key}`, {
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKeyGemini}`, {
                     method: 'POST', headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({ contents: [{ parts: [{ inline_data: { mime_type: "image/jpeg", data: dataURL.split(',')[1] } }, { text: 'Extrae JSON puro: {"nombre":"MARCA Y PRODUCTO","presentacion":"GRAMAJE"}' }] }] })
+                    body: JSON.stringify({ contents: [{ parts: [{ inline_data: { mime_type: "image/jpeg", data: dataURL.split(',')[1] } }, { text: 'Responde JSON puro: {"nombre":"MARCA Y PRODUCTO","presentacion":"CANTIDAD"}' }] }] })
                 });
                 const res = await resp.json();
-                if(res.error) throw new Error(res.error.message);
                 const text = res.candidates?.[0]?.content?.parts?.[0]?.text.replace(/```json|```/g, "").trim();
                 const data = JSON.parse(text);
                 document.getElementById('ia-res-name').value = data.nombre.toUpperCase();
                 document.getElementById('ia-res-size').value = data.presentacion.toUpperCase();
                 document.getElementById('ia-loading').style.display = 'none'; document.getElementById('ia-form').style.display = 'block';
-            } catch (e) { toast("Error IA: " + e.message, "danger"); window.resetIAUI(); }
+            } catch (e) { toast("Error lectura IA", "danger"); window.resetIAUI(); }
         };
 
         window.transferToApp = () => {
             const n = document.getElementById('ia-res-name').value, s = document.getElementById('ia-res-size').value, p = document.getElementById('ia-res-price').value;
             document.getElementById('in-producto').value = `${n} ${s}`.trim().toUpperCase();
             document.getElementById('in-precio').value = p || 0;
-            window.closeScanner(); toast("Cargado ✅");
+            window.closeScanner(); toast("Datos cargados ✅");
         };
 
-        // --- GESTIÓN / CONTROL ---
-        window.renderControlList = () => {
-            const container = document.getElementById('control-content'), key = getStoredApiKey();
-            container.innerHTML = `
-                <div class="inner-sub-nav"><button class="inner-btn active">Configuración</button></div>
-                <div class="apikey-box">
-                    <label class="text-uppercase small fw-bold">Gemini API Key</label>
-                    <div class="apikey-input-wrap">
-                        <input type="password" id="api-key-input" value="${key}" placeholder="AIzaSy...">
-                        <button class="btn btn-sm btn-primary px-3 rounded-pill" onclick="window.saveApiKey()">GUARDAR</button>
-                    </div>
-                </div>
-                <div id="cat-list"></div>`;
-            document.getElementById('cat-list').innerHTML = window.state.products.sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(it => `<div class="card-custom py-2 mb-1 d-flex justify-content-between align-items-center shadow-none border small px-3"><div><b>${it.nombre}</b><br><small class="text-muted">C: $${it.costo} | V: $${it.precio}</small></div><i class="fas fa-trash-can text-danger" onclick="window.preDelete('products','${it.id}')"></i></div>`).join('');
-        };
-
+        // --- EDICIÓN Y GUARDADO ---
         window.confirmUpdate = async () => {
             if(!editRef) return;
             const t = document.getElementById('ed-tienda').value.trim().toUpperCase(), c = document.getElementById('ed-cliente').value.trim().toUpperCase(), p = document.getElementById('ed-producto').value.trim().toUpperCase(), q = parseInt(document.getElementById('ed-cantidad').value) || 1, co = parseFloat(document.getElementById('ed-costo').value) || 0, prI = parseFloat(document.getElementById('ed-precio').value) || 0, fVal = document.getElementById('ed-fecha').value;
             let sp = (c === "CRISTO") ? co : prI;
             const dp = fVal.split('-'), nfs = `${parseInt(dp[2])}/${parseInt(dp[1])}/${dp[0]}`, nts = new Date(dp[0], dp[1]-1, dp[2], 12).getTime();
             await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'sales', editRef.id), { tienda: t, cliente: c, producto: p, cantidad: q, costo: co, precio: sp, total: q*sp, fechaStr: nfs, timestamp: nts });
-            const ex = window.state.products.find(s => (s.nombre||"").toUpperCase() === p);
-            if(!ex) await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { nombre: p, costo: co, precio: prI });
-            else await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', ex.id), { costo: co, precio: prI });
+            
+            const existingProd = window.state.products.find(s => (s.nombre || "").toUpperCase() === p);
+            if(!existingProd) await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { nombre: p, costo: co, precio: prI });
+            else await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', existingProd.id), { costo: co, precio: prI });
+
             toast("Sincronizado ✅"); window.closeEditModal();
         };
 
@@ -481,12 +471,20 @@
                 let sp = (c === "CRISTO") ? co : prI;
                 if(!t || !c || !p) return toast("Faltan datos", "danger");
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'sales'), { tienda: t, cliente: c, producto: p, cantidad: q, costo: co, precio: sp, total: q*sp, fechaStr: getMXDateStr(), timestamp: Date.now(), uid: currentUser.uid, entregado: false, pagado: false });
-                const ex = window.state.products.find(s => (s.nombre||"").toUpperCase() === p);
+                
+                const ex = window.state.products.find(s => (s.nombre || "").toUpperCase() === p);
                 if(!ex) await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { nombre: p, costo: co, precio: prI });
                 else await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', ex.id), { costo: co, precio: prI });
+                
                 toast("Venta guardada!"); document.getElementById('in-producto').value = ""; document.getElementById('in-cantidad').value = "1";
             };
             document.getElementById('entregas-date').value = getMXISODate();
+        };
+
+        window.renderControlList = () => {
+            const container = document.getElementById('control-content');
+            container.innerHTML = `<div class="inner-sub-nav"><button class="inner-btn active">Productos</button></div><div id="cat-list"></div>`;
+            document.getElementById('cat-list').innerHTML = window.state.products.sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(it => `<div class="card-custom py-2 mb-1 d-flex justify-content-between align-items-center shadow-none border small px-3"><div><b>${it.nombre}</b><br><small class="text-muted">C: $${it.costo} | V: $${it.precio}</small></div><i class="fas fa-trash-can text-danger" onclick="window.preDelete('products','${it.id}')"></i></div>`).join('');
         };
 
         window.preDelete = (col, id) => { deleteRef = { col, id }; document.getElementById('delete-modal').style.display = 'flex'; };
