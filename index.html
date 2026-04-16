@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ofertas Rápidas Yaute v33.1 - Estabilidad Total</title>
+    <title>Ofertas Rápidas Yaute v33.2 - Estabilidad Total</title>
     
     <!-- Librerías Externas -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -37,7 +37,7 @@
         .splash-loader { width: 50px; height: 50px; border: 5px solid #f1f5f9; border-top: 5px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* --- HEADER & NAV --- */
+        /* --- HEADER --- */
         header { background: var(--primary); color: white; padding: 1.2rem 1rem; position: sticky; top: 0; z-index: 1000; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .version-badge { font-size: 0.65rem; background: rgba(255,255,255,0.15); color: white; padding: 4px 12px; border-radius: 50px; font-weight: 800; border: 1px solid rgba(255,255,255,0.2); }
         .status-dot { width:10px; height:10px; border-radius:50%; margin-left: 10px; border: 2px solid rgba(255,255,255,0.3); display: inline-block; vertical-align: middle; }
@@ -51,7 +51,7 @@
         /* --- UI ELEMENTS --- */
         .card-custom { background: white; border-radius: var(--card-radius); padding: 20px; margin-bottom: 15px; border: 1px solid #f1f5f9; box-shadow: var(--shadow); position: relative; }
         .form-control, .form-select { padding: 0.8rem 1rem; font-size: 0.95rem; border-radius: 14px; border: 2px solid #f1f5f9; background: #fff; color: var(--primary); }
-        label.text-uppercase { font-size: 0.65rem; margin-bottom: 4px; font-weight: 800; color: #94a3b8; display: block; letter-spacing: 0.8px; }
+        label.text-uppercase { font-size: 0.65rem; margin-bottom: 4px; font-weight: 800; color: #94a3b8; display: block; letter-spacing: 0.5px; }
 
         /* --- MODALES --- */
         .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); z-index: 8000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 20px; }
@@ -75,16 +75,20 @@
         .sug-box { position: absolute; top: 100%; left: 0; right: 0; background: white; border-radius: 14px; max-height: 220px; overflow-y: auto; z-index: 1500; border: 1px solid #e2e8f0; box-shadow: 0 15px 30px rgba(0,0,0,0.15); margin-top: 5px; }
         .sug-item { padding: 14px 18px; border-bottom: 1px solid #f1f5f9; cursor: pointer; font-size: 0.95rem; text-transform: uppercase; font-weight: 700; color: var(--primary); }
 
-        /* --- TICKET --- */
-        #ticket-render { position: absolute; top: -5000px; width: 450px; background: white; padding: 40px; font-family: monospace; color: black; line-height: 1.4; border: 1px solid #eee; }
-        #toast-alert { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); z-index: 30000; padding: 14px 28px; border-radius: 50px; font-weight: 800; display: none; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.25); text-align: center; min-width: 280px; }
+        /* --- REPARTO --- */
+        .check-group { display: flex; gap: 15px; margin-top: 12px; border-top: 1px solid #f1f5f9; padding-top: 12px; }
+        .check-item { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; color: #64748b; }
+        .check-item input { width: 20px; height: 20px; accent-color: var(--accent); }
 
-        /* --- SCANNER MODAL (TRASPLANTE ESCANPRO) --- */
+        /* --- TICKET RENDER --- */
+        #ticket-render { position: absolute; top: -5000px; width: 450px; background: white; padding: 40px; font-family: monospace; color: black; line-height: 1.4; border: 1px solid #eee; }
+
+        /* --- SCANNER MODAL (ESCANPRO) --- */
         #ia-modal { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; flex-direction: column; }
         #cam-section-ia { position: relative; flex: 1; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         #cam-preview-ia { width: 100%; height: 100%; object-fit: cover; }
         .scan-frame { width: 75%; height: 45%; border: 3px solid var(--accent); border-radius: 24px; box-shadow: 0 0 0 4000px rgba(0,0,0,0.6); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
-        #btn-snap-ia { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 80px; height: 80px; background: white; border: 8px solid rgba(59, 130, 246, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 2.2rem; cursor: pointer; z-index: 100; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+        #btn-snap-ia { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 85px; height: 85px; background: white; border: 8px solid rgba(59, 130, 246, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 2.2rem; cursor: pointer; z-index: 100; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
         #ia-result-panel { background: #ffffff; padding: 20px; border-top-left-radius: 30px; border-top-right-radius: 30px; min-height: 400px; color: var(--primary); z-index: 20; box-shadow: 0 -15px 40px rgba(0,0,0,0.4); overflow-y: auto; }
         #capture-preview-ia { width: 100%; border-radius: 14px; background: #000; margin-bottom: 15px; display: none; border: 3px solid var(--accent); max-height: 180px; object-fit: contain; }
         .ai-spinner { width: 40px; height: 40px; border-radius: 50%; border: 3px solid #f1f5f9; border-top-color: var(--accent); animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
@@ -95,16 +99,27 @@
 
     <div id="splash-screen">
         <div class="splash-loader"></div>
-        <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing: 2px; color: var(--primary);">VERSION 33.1</div>
+        <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing: 2px; color: var(--primary);">VERSION 33.2</div>
     </div>
 
     <div id="toast-alert"></div>
 
-    <!-- MODAL EDITAR VENTA (CONTROL TOTAL) -->
+    <!-- MODALES -->
+    <div id="delete-modal" class="modal-overlay">
+        <div class="modal-content-custom text-center">
+            <div class="mb-3 text-danger"><i class="fas fa-trash-alt fa-4x"></i></div>
+            <h5 class="fw-bold">¿Borrar registro?</h5>
+            <div class="d-flex gap-2 mt-4">
+                <button class="btn btn-light flex-fill rounded-pill fw-bold" onclick="window.closeDeleteModal()">NO</button>
+                <button class="btn btn-danger flex-fill rounded-pill fw-bold" id="btn-confirm-delete">SÍ, BORRAR</button>
+            </div>
+        </div>
+    </div>
+
     <div id="edit-modal" class="modal-overlay">
         <div class="modal-content-custom">
             <h5 class="fw-bold mb-4 text-primary">Editar Registro Pro</h5>
-            <div class="mb-3"><label class="text-uppercase">Fecha del Registro</label><input type="date" id="ed-fecha" class="form-control fw-bold"></div>
+            <div class="mb-3"><label class="text-uppercase">Fecha</label><input type="date" id="ed-fecha" class="form-control fw-bold"></div>
             <div class="row g-2 mb-3">
                 <div class="col-6"><label class="text-uppercase">Tienda</label><input type="text" id="ed-tienda" class="form-control text-uppercase"></div>
                 <div class="col-6"><label class="text-uppercase">Cliente</label><input type="text" id="ed-cliente" class="form-control text-uppercase"></div>
@@ -113,7 +128,7 @@
             <div class="row g-2 mb-4">
                 <div class="col-4"><label class="text-uppercase">Cant.</label><input type="number" id="ed-cantidad" class="form-control text-center fw-bold"></div>
                 <div class="col-4"><label class="text-uppercase">Costo</label><input type="number" id="ed-costo" class="form-control text-danger fw-bold"></div>
-                <div class="col-4"><label class="text-uppercase">Venta Normal</label><input type="number" id="ed-precio" class="form-control text-success fw-bold"></div>
+                <div class="col-4"><label class="text-uppercase">Venta</label><input type="number" id="ed-precio" class="form-control text-success fw-bold"></div>
             </div>
             <div class="d-flex gap-2">
                 <button class="btn btn-light flex-fill rounded-pill" onclick="window.closeEditModal()">CANCELAR</button>
@@ -122,7 +137,7 @@
         </div>
     </div>
 
-    <!-- CABECERA PROFESIONAL -->
+    <!-- CABECERA SOLICITADA -->
     <header>
         <div class="d-flex flex-column align-items-center">
             <div class="d-flex align-items-center">
@@ -130,12 +145,12 @@
                 <img src="logo.png" alt="Logo" style="height: 25px; width: auto; margin-left: 10px;" onerror="this.style.display='none'">
                 <div id="status-dot" class="status-dot bg-warning"></div>
             </div>
-            <div style="margin-top: 6px;"><span class="version-badge">v33.1</span></div>
+            <div style="margin-top: 6px;"><span class="version-badge">v33.2</span></div>
         </div>
     </header>
 
     <main>
-        <!-- TAB VENTAS -->
+        <!-- VENTAS -->
         <div id="tab-operaciones" class="tab-content">
             <div class="card-custom">
                 <div class="row g-2 mb-2">
@@ -157,13 +172,13 @@
             </div>
         </div>
 
-        <!-- TAB REPARTO -->
+        <!-- REPARTO -->
         <div id="tab-entregas" class="tab-content" style="display: none;">
             <div class="card-custom py-2 mb-3 text-center border-0" style="background: #f1f5f9;"><input type="date" id="entregas-date" class="form-control text-center fw-bold border-0 bg-transparent" onchange="window.renderEntregas()"></div>
             <div id="lista-entregas"></div>
         </div>
 
-        <!-- TAB GESTIÓN -->
+        <!-- GESTIÓN -->
         <div id="tab-control" class="tab-content" style="display: none;">
             <div class="sub-nav">
                 <button class="sub-btn active" id="sub-btn-fin" onclick="window.switchSubTab('finanzas')"><i class="fas fa-chart-line"></i>FINANZAS</button>
@@ -173,7 +188,7 @@
         </div>
     </main>
 
-    <!-- SCANNER IA MODAL (TRASPLANTE ESCANPRO + CÁMARA TRASERA FORZADA) -->
+    <!-- SCANNER ESCANPRO -->
     <div id="ia-modal">
         <div id="cam-section-ia">
             <button class="btn btn-dark btn-sm rounded-pill" style="position: absolute; top: 25px; left: 20px; z-index: 15000; font-weight:800;" onclick="window.closeScanner()">✕ SALIR</button>
@@ -184,15 +199,13 @@
         <div id="ia-result-panel">
             <div id="ia-loading" style="display:none;" class="text-center py-4">
                 <div class="ai-spinner"></div>
-                <div class="fw-bold text-accent h6">Gemini analizando etiqueta...</div>
-                <p class="text-muted small">Mejorando contraste y leyendo datos</p>
+                <div class="fw-bold text-accent h6">Analizando producto...</div>
             </div>
-
             <div id="ia-form">
                 <img id="capture-preview-ia" alt="Captura">
-                <div class="mb-3"><label class="text-uppercase fw-bold small text-muted">Producto Identificado</label><input type="text" id="ia-res-name" class="form-control fw-bold text-uppercase bg-light"></div>
+                <div class="mb-3"><label class="text-uppercase fw-bold small text-muted">Identificado</label><input type="text" id="ia-res-name" class="form-control fw-bold text-uppercase bg-light"></div>
                 <div class="row g-2 mb-4">
-                    <div class="col-6"><label class="text-uppercase fw-bold small text-muted">Contenido/Pres.</label><input type="text" id="ia-res-size" class="form-control fw-bold"></div>
+                    <div class="col-6"><label class="text-uppercase fw-bold small text-muted">Presentación</label><input type="text" id="ia-res-size" class="form-control fw-bold"></div>
                     <div class="col-6"><label class="text-uppercase fw-bold small text-muted">Precio Venta</label><input type="number" id="ia-res-price" class="form-control fw-bold text-success border-success" placeholder="0.00"></div>
                 </div>
                 <div class="d-flex gap-2">
@@ -203,7 +216,7 @@
         </div>
     </div>
 
-    <!-- TICKET RENDER -->
+    <!-- TICKET -->
     <div id="ticket-render">
         <div style="text-align: center; margin-bottom: 25px;">
             <img src="logo.png" alt="Logo" style="width: 140px; height: auto;" onerror="this.style.display='none'">
@@ -215,7 +228,7 @@
         <table style="width: 100%; border-collapse: collapse; font-size: 1.1rem; color: black;"><tbody id="t-items"></tbody></table>
         <div style="border-top: 2px dashed #000; margin: 25px 0;"></div>
         <div style="display: flex; justify-content: space-between; font-size: 1.9rem; font-weight: 900; color: black;"><span>TOTAL:</span><span id="t-total"></span></div>
-        <div style="text-align: center; margin-top: 45px; font-size: 1.1rem; border: 1.5px solid #000; padding: 12px; font-weight: bold; color: black;">¡Gracias por su compra!</div>
+        <div style="text-align: center; margin-top: 45px; font-size: 1.1rem; border: 1.5px solid #000; padding: 12px; font-weight: bold; color: black;">¡Gracias por su preferencia!</div>
     </div>
 
     <nav class="bottom-nav">
@@ -227,7 +240,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { initializeFirestore, collection, doc, addDoc, updateDoc, deleteDoc, getDocs, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyCR5V_yg6aLumW_D8oFPEblHZ5ox2gTs98", authDomain: "ofertas-rapidas-yautepec.firebaseapp.com", projectId: "ofertas-rapidas-yautepec", storageBucket: "ofertas-rapidas-yautepec.firebasestorage.app", messagingSenderId: "81339635207", appId: "1:81339635207:web:26d180f92224d9a036fca2" };
         const apiKeyGemini = "AIzaSyDJicNgq309eja6V0IAZI8w0j6NBYMBmjU"; 
@@ -237,20 +250,20 @@
         const db = initializeFirestore(app, { experimentalForceLongPolling: true });
 
         window.state = { sales: [], clients: [], stores: [], products: [] };
-        let currentUser = null, deleteRef = { col: '', id: '' }, editRef = null, activeSubTab = 'finanzas', activeFinanceView = 'compras';
-        let currentIAStream = null, abortControllerIA = null;
+        let currentUser = null, deleteRef = null, editRef = null, activeSubTab = 'finanzas', activeFinanceView = 'compras';
+        let currentIAStream = null, finStore = "", finClient = "";
 
-        const getMXTimeParts = () => {
-            const formatter = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Mexico_City', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-            return formatter.formatToParts(new Date()).reduce((acc, p) => ({ ...acc, [p.type]: p.value }), {});
+        const getMXDateStr = () => {
+            const d = new Date(new Date().toLocaleString("en-US", {timeZone: "America/Mexico_City"}));
+            return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
         };
-        const getMXDateStr = () => { const p = getMXTimeParts(); return `${parseInt(p.day)}/${parseInt(p.month)}/${p.year}`; };
-        const getMXISODate = () => { const p = getMXTimeParts(); return `${p.year}-${p.month}-${p.day}`; };
-        const normalizeDateStr = (str) => str ? str.split('/').map(p => parseInt(p)).join('/') : "";
+        const getMXISODate = () => {
+            const d = new Date(new Date().toLocaleString("en-US", {timeZone: "America/Mexico_City"}));
+            return d.toISOString().split('T')[0];
+        };
+        const normalizeDateStr = (s) => s ? s.split('/').map(p => parseInt(p)).join('/') : "";
         const formatProperName = (str) => str ? str.trim().toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : "";
-
-        let finDate = getMXISODate(), finDateFrom = getMXISODate(), finDateTo = getMXISODate(), finStore = "", finClient = "";
-        const toast = (m, type = 'success') => { const el = document.getElementById('toast-alert'); if(!el) return; el.style.background = type === 'success' ? 'var(--success)' : 'var(--danger)'; el.innerText = m; el.style.display = 'block'; setTimeout(() => { if(el) el.style.display = 'none'; }, 2000); };
+        const toast = (m, type = 'success') => { const el = document.getElementById('toast-alert'); el.style.background = type === 'success' ? 'var(--success)' : 'var(--danger)'; el.innerText = m; el.style.display = 'block'; setTimeout(() => el.style.display = 'none', 2000); };
 
         signInAnonymously(auth).then(() => { onAuthStateChanged(auth, (user) => { if (user) { currentUser = user; startSync(); } }); });
 
@@ -259,8 +272,7 @@
                 onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', name), (snap) => {
                     window.state[name] = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                     document.getElementById('status-dot').className = "status-dot bg-success";
-                    const splash = document.getElementById('splash-screen');
-                    if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.remove(), 500); }
+                    if(document.getElementById('splash-screen')) document.getElementById('splash-screen').remove();
                     if(name === 'sales') { window.renderEntregas(); if(activeSubTab === 'finanzas') window.renderFinanceMenu(); }
                     if(activeSubTab === 'catalogo') window.renderControlList();
                 });
@@ -272,32 +284,27 @@
 
         const setupAuto = (inpId, boxId, key) => {
             const inp = document.getElementById(inpId); const box = document.getElementById(boxId);
-            if (!inp || !box) return;
             inp.oninput = () => {
                 const val = inp.value.toUpperCase(); if(!val) { box.classList.add('d-none'); return; }
-                let suggestions = window.state[key] ? window.state[key].map(x => (x.nombre || "").toUpperCase()) : [];
-                const filtered = suggestions.filter(s => s.includes(val)).slice(0, 5);
+                const filtered = window.state[key].map(x => (x.nombre || "").toUpperCase()).filter(s => s.includes(val)).slice(0, 5);
                 box.innerHTML = filtered.map(s => `<div class="sug-item" data-val="${s}">${s}</div>`).join('');
                 box.classList.toggle('d-none', filtered.length === 0);
             };
             box.onclick = (e) => { 
                 const it = e.target.closest('.sug-item'); if(!it) return; 
-                const selectedVal = it.dataset.val.trim();
-                inp.value = selectedVal; box.classList.add('d-none');
+                inp.value = it.dataset.val; box.classList.add('d-none');
                 if(key === 'products') {
-                    const prod = window.state.products.find(x => (x.nombre || "").toUpperCase() === selectedVal);
+                    const prod = window.state.products.find(x => x.nombre.toUpperCase() === it.dataset.val);
                     if(prod) { document.getElementById('in-costo').value = prod.costo || 0; document.getElementById('in-precio').value = prod.precio || 0; }
                 }
             };
         };
 
-        // --- NAVEGACIÓN ---
         window.showTab = (id, btn) => {
             document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none'); 
-            const target = document.getElementById('tab-' + id);
-            if (target) target.style.display = 'block'; 
+            document.getElementById('tab-' + id).style.display = 'block'; 
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); 
-            if (btn) btn.classList.add('active'); 
+            btn.classList.add('active'); 
             if(id === 'control') window.switchSubTab('finanzas'); 
         };
 
@@ -308,143 +315,50 @@
             if(id === 'catalogo') window.renderControlList(); else window.renderFinanceMenu(); 
         };
 
-        // --- EDITAR REGISTRO PRO (LÓGICA CRISTO + CASCADA) ---
-        window.openEditModal = (record) => { 
-            editRef = record; 
-            document.getElementById('ed-tienda').value = record.tienda; 
-            document.getElementById('ed-cliente').value = record.cliente; 
-            document.getElementById('ed-producto').value = record.producto; 
-            document.getElementById('ed-cantidad').value = record.cantidad; 
-            document.getElementById('ed-costo').value = record.costo; 
-            const prod = window.state.products.find(p => p.nombre.toUpperCase() === record.producto.toUpperCase());
-            document.getElementById('ed-precio').value = prod ? prod.precio : record.precio; 
-            if (record.fechaStr) {
-                const parts = record.fechaStr.split('/');
-                document.getElementById('ed-fecha').value = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-            }
-            document.getElementById('edit-modal').style.display = 'flex'; 
-        };
-
-        window.confirmUpdate = async () => { 
-            if(!editRef) return; 
-            const t = document.getElementById('ed-tienda').value.trim().toUpperCase(), 
-                  c = document.getElementById('ed-cliente').value.trim().toUpperCase(), 
-                  p = document.getElementById('ed-producto').value.trim().toUpperCase(), 
-                  q = parseInt(document.getElementById('ed-cantidad').value) || 1, 
-                  co = parseFloat(document.getElementById('ed-costo').value) || 0,
-                  prI = parseFloat(document.getElementById('ed-precio').value) || 0,
-                  fVal = document.getElementById('ed-fecha').value; 
+        // --- REPARTO RESTAURADO ---
+        window.renderEntregas = () => {
+            const list = document.getElementById('lista-entregas'), dateVal = document.getElementById('entregas-date').value || getMXISODate();
+            const target = normalizeDateStr(dateVal.split('-').reverse().join('/'));
+            const filtered = window.state.sales.filter(s => normalizeDateStr(s.fechaStr) === target);
+            const grouped = filtered.reduce((acc, v) => { if(!acc[v.cliente]) acc[v.cliente] = {t:0, items:[]}; acc[v.cliente].t += (v.total || 0); acc[v.cliente].items.push(v); return acc; }, {});
             
-            let salePrice = (c === "CRISTO") ? co : prI;
-            const dateParts = fVal.split('-');
-            const newFechaStr = `${parseInt(dateParts[2])}/${parseInt(dateParts[1])}/${dateParts[0]}`;
-            const newTimestamp = new Date(dateParts[0], dateParts[1] - 1, dateParts[2], 12, 0, 0).getTime();
-
-            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'sales', editRef.id), { 
-                tienda: t, cliente: c, producto: p, cantidad: q, costo: co, precio: salePrice, total: q*salePrice, fechaStr: newFechaStr, timestamp: newTimestamp
-            }); 
-
-            const existingProd = window.state.products.find(s => (s.nombre || "").toUpperCase() === p);
-            if(!existingProd) await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { nombre: p, costo: co, precio: prI });
-            else await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', existingProd.id), { costo: co, precio: prI });
-
-            toast("Sincronizado ✅"); document.getElementById('edit-modal').style.display = 'none';
+            list.innerHTML = Object.keys(grouped).map(cli => {
+                const isE = grouped[cli].items.every(i => i.entregado === true), isP = grouped[cli].items.every(i => i.pagado === true);
+                return `<div class="card-custom mb-2">
+                    <div class="d-flex justify-content-between align-items-center"><b>${cli}</b><button class="btn btn-sm btn-success rounded-pill px-3 fw-bold" onclick="window.shareTicket('${cli}', '${dateVal}')">WhatsApp</button></div>
+                    <div class="text-end fw-bold text-primary mt-1 small">$${grouped[cli].t.toFixed(2)}</div>
+                    <div class="check-group">
+                        <label class="check-item"><input type="checkbox" ${isE?'checked':''} onchange="window.updateSaleStatus('${cli}', '${target}', 'entregado', this.checked)"> Entregado</label>
+                        <label class="check-item"><input type="checkbox" ${isP?'checked':''} onchange="window.updateSaleStatus('${cli}', '${target}', 'pagado', this.checked)"> Pagado</label>
+                    </div>
+                </div>`;
+            }).join('');
         };
 
-        // --- MOTOR SCANNER (CÁMARA TRASERA FORZADA + LÓGICA ESCANPRO) ---
-        window.openScanner = async () => {
-            document.getElementById('ia-modal').style.display = 'flex';
-            window.resetIAUI();
-            window.startCameraIA(); 
+        window.updateSaleStatus = async (cli, date, field, val) => {
+            const matching = window.state.sales.filter(s => (s.cliente||"").toUpperCase() === cli.toUpperCase() && normalizeDateStr(s.fechaStr) === date);
+            for (const s of matching) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'sales', s.id), { [field]: val });
+            toast("Estado actualizado");
         };
 
-        window.startCameraIA = async () => {
-            if (currentIAStream) {
-                currentIAStream.getTracks().forEach(t => t.stop());
-                currentIAStream = null;
-            }
-            // Forzamos facingMode: environment
-            const constraints = { 
-                video: { 
-                    facingMode: 'environment', 
-                    width: { ideal: 1280 }, 
-                    height: { ideal: 720 } 
-                } 
-            };
-            try {
-                currentIAStream = await navigator.mediaDevices.getUserMedia(constraints);
-                document.getElementById('cam-preview-ia').srcObject = currentIAStream;
-            } catch (e) {
-                // Fallback si el dispositivo es estricto
-                try {
-                    currentIAStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                    document.getElementById('cam-preview-ia').srcObject = currentIAStream;
-                } catch (err) {
-                    toast("Error al activar cámara trasera", "danger");
-                    window.closeScanner();
-                }
-            }
+        window.shareTicket = async (n, d) => {
+            const target = normalizeDateStr(d.split('-').reverse().join('/'));
+            const items = window.state.sales.filter(s => (s.cliente||"").toUpperCase() === n.toUpperCase() && normalizeDateStr(s.fechaStr) === target);
+            const pName = formatProperName(n);
+            document.getElementById('t-cliente').innerText = pName;
+            document.getElementById('t-fecha').innerText = target;
+            let tot = 0;
+            document.getElementById('t-items').innerHTML = items.map(i => { tot += (i.total || 0); return `<tr><td style="padding:10px 0">${i.cantidad}x</td><td style="padding:10px 0; text-transform:uppercase">${i.producto}</td><td style="text-align:right; padding:10px 0;">$${(i.total || 0).toFixed(2)}</td></tr>`; }).join('');
+            document.getElementById('t-total').innerText = "$" + tot.toFixed(2);
+            const canvas = await html2canvas(document.getElementById('ticket-render'), { scale: 2, backgroundColor: '#ffffff' });
+            canvas.toBlob(async b => {
+                const f = new File([b], "Ticket.png", { type: 'image/png' }), msg = `hola *${pName}* te envió tu cuenta, gracias por tu preferencia`;
+                if(navigator.share) await navigator.share({ files: [f], text: msg });
+                else window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+            }, 'image/png');
         };
 
-        const compressAndEnhance = (v) => {
-            const c = document.createElement('canvas');
-            c.width = 1024; c.height = Math.round(v.videoHeight * 1024 / v.videoWidth);
-            const ctx = c.getContext('2d');
-            ctx.drawImage(v, 0, 0, c.width, c.height);
-            const imageData = ctx.getImageData(0, 0, c.width, c.height);
-            const data = imageData.data;
-            for (let i = 0; i < data.length; i += 4) {
-                data[i] = Math.min(255, Math.max(0, (data[i] - 128) * 1.2 + 128));
-                data[i+1] = Math.min(255, Math.max(0, (data[i+1] - 128) * 1.2 + 128));
-                data[i+2] = Math.min(255, Math.max(0, (data[i+2] - 128) * 1.2 + 128));
-            }
-            ctx.putImageData(imageData, 0, 0);
-            return c.toDataURL('image/jpeg', 0.85);
-        };
-
-        window.captureIAImage = async () => {
-            const v = document.getElementById('cam-preview-ia');
-            const dataURL = compressAndEnhance(v);
-            document.getElementById('capture-preview-ia').src = dataURL;
-            document.getElementById('capture-preview-ia').style.display = 'block';
-            document.getElementById('ia-loading').style.display = 'block';
-            document.getElementById('ia-form').style.display = 'none';
-
-            try {
-                const b64 = dataURL.split(',')[1];
-                const prompt = 'Extrae de esta etiqueta: 1) Nombre: marca y producto. 2) Presentación: gramaje o contenido neto. Responde JSON puro: {"nombre":"...","presentacion":"..."}';
-                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKeyGemini}`, {
-                    method: 'POST',
-                    headers: {'Content-Type':'application/json'},
-                    body: JSON.stringify({ contents: [{ parts: [{ inline_data: { mime_type: "image/jpeg", data: b64 } }, { text: prompt }] }] })
-                });
-                const res = await resp.json();
-                const text = res.candidates?.[0]?.content?.parts?.[0]?.text.replace(/```json|```/g, "").trim();
-                const data = JSON.parse(text);
-                document.getElementById('ia-res-name').value = data.nombre.toUpperCase();
-                document.getElementById('ia-res-size').value = data.presentacion.toUpperCase();
-                document.getElementById('ia-loading').style.display = 'none';
-                document.getElementById('ia-form').style.display = 'block';
-            } catch (e) { toast("Error IA", "danger"); window.resetIAUI(); }
-        };
-
-        window.transferToApp = () => {
-            const n = document.getElementById('ia-res-name').value, s = document.getElementById('ia-res-size').value, p = document.getElementById('ia-res-price').value;
-            document.getElementById('in-producto').value = `${n} ${s}`.trim().toUpperCase();
-            document.getElementById('in-precio').value = p || 0;
-            window.closeScanner();
-            toast("Datos cargados ✅");
-        };
-
-        window.resetIAUI = () => {
-            document.getElementById('ia-res-name').value = ""; document.getElementById('ia-res-size').value = ""; document.getElementById('ia-res-price').value = "";
-            document.getElementById('capture-preview-ia').style.display = 'none';
-            document.getElementById('ia-loading').style.display = 'none'; document.getElementById('ia-form').style.display = 'block';
-        };
-
-        window.closeScanner = () => { if (currentIAStream) currentIAStream.getTracks().forEach(t => t.stop()); document.getElementById('ia-modal').style.display = 'none'; };
-
-        // --- FINANZAS ---
+        // --- FINANZAS RESTAURADO ---
         window.renderFinanceMenu = () => {
             const container = document.getElementById('control-content');
             container.innerHTML = `
@@ -456,7 +370,6 @@
                     </div>
                 </div>
                 <div id="finance-results"></div>`;
-            
             const stores = [...new Set(window.state.sales.map(s => (s.tienda || "").toUpperCase()))].sort();
             const clients = [...new Set(window.state.sales.map(s => (s.cliente || "").toUpperCase()))].sort();
             document.getElementById('fin-store-sel').innerHTML += stores.map(t => `<option value="${t}" ${finStore === t ? 'selected' : ''}>${t}</option>`).join('');
@@ -465,58 +378,103 @@
         };
 
         window.renderFinanceResults = () => {
-            const res = document.getElementById('finance-results'); if(!res) return;
-            const target = getMXDateStr();
+            const res = document.getElementById('finance-results'), target = getMXDateStr();
             let filtered = window.state.sales.filter(x => normalizeDateStr(x.fechaStr) === normalizeDateStr(target));
             filtered = filtered.filter(x => (!finStore || x.tienda === finStore) && (!finClient || x.cliente === finClient));
-
-            const totalVenta = filtered.reduce((a, b) => a + (b.total || 0), 0);
-            const totalCosto = filtered.reduce((a, b) => a + ((b.costo || 0) * (b.cantidad || 0)), 0);
-            const piezas = filtered.reduce((a, b) => a + (b.cantidad || 0), 0);
+            
+            const v = filtered.reduce((a,b) => a + (b.total || 0), 0), c = filtered.reduce((a,b) => a + ((b.costo||0)*b.cantidad), 0), q = filtered.reduce((a,b) => a + (b.cantidad||0), 0);
 
             if(activeFinanceView === 'compras') {
-                res.innerHTML = `<div class="stat-card bg-gradient-primary shadow"><h3>$${totalCosto.toFixed(2)}</h3><small>PAGO EN CAJA</small><div class="mt-2"><span class="badge bg-white text-primary rounded-pill">${piezas} PIEZAS</span></div></div>` + 
-                filtered.map(s => `<div class="card-custom finance-item d-flex justify-content-between py-2 small"><div><b>${s.producto}</b><br>${s.tienda}</div><div class="text-end"><b>$${((s.costo||0)*s.cantidad).toFixed(2)}</b><br><i class="fas fa-pen text-accent" onclick='window.openEditModal(${JSON.stringify(s)})'></i></div></div>`).join('');
+                res.innerHTML = `<div class="stat-card bg-gradient-primary shadow"><h3>$${c.toFixed(2)}</h3><small>PAGO EN CAJA</small><div class="mt-2"><span class="badge bg-white text-primary rounded-pill">${q} PIEZAS</span></div></div>` + 
+                filtered.map(s => `<div class="card-custom finance-item d-flex justify-content-between py-2 small"><div><b>${s.producto}</b><br>${s.tienda}</div><div class="text-end"><b>$${((s.costo||0)*s.cantidad).toFixed(2)}</b><br><div class="d-flex gap-2"><i class="fas fa-pen text-accent" onclick='window.openEditModal(${JSON.stringify(s)})'></i><i class="fas fa-trash text-danger" onclick="window.preDelete('sales','${s.id}')"></i></div></div></div>`).join('');
             } else if(activeFinanceView === 'ganancias') {
-                res.innerHTML = `<div class="stat-card bg-gradient-success shadow"><h3>$${(totalVenta - totalCosto).toFixed(2)}</h3><small>UTILIDAD NETA HOY</small></div>`;
+                res.innerHTML = `<div class="stat-card bg-gradient-success shadow"><h3>$${(v - c).toFixed(2)}</h3><small>UTILIDAD HOY</small></div>`;
             } else if(activeFinanceView === 'diezmo') {
-                res.innerHTML = `<div class="stat-card bg-gradient-warning shadow"><h3>$${((totalVenta - totalCosto)*0.1).toFixed(2)}</h3><small>10% PARA EL SEÑOR</small></div>`;
+                res.innerHTML = `<div class="stat-card bg-gradient-warning shadow"><h3>$${((v - c)*0.1).toFixed(2)}</h3><small>DIEZMO</small></div>`;
             }
         };
 
         window.updateFinFilter = (k, v) => { if(k==='store') finStore=v; if(k==='client') finClient=v; window.renderFinanceResults(); };
         window.setFinView = (v) => { activeFinanceView = v; window.renderFinanceMenu(); };
 
-        window.onload = () => { 
-            const bSave = document.getElementById('btn-save-record');
-            if(bSave) bSave.onclick = async () => {
+        // --- SCANNER ESCANPRO INTEGRADO ---
+        window.openScanner = async () => { document.getElementById('ia-modal').style.display = 'flex'; window.resetIAUI(); window.startCameraIA(); };
+        window.startCameraIA = async () => {
+            if (currentIAStream) currentIAStream.getTracks().forEach(t => t.stop());
+            currentIAStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+            document.getElementById('cam-preview-ia').srcObject = currentIAStream;
+        };
+        window.captureIAImage = async () => {
+            const v = document.getElementById('cam-preview-ia'), c = document.createElement('canvas');
+            c.width = 1024; c.height = Math.round(v.videoHeight * 1024 / v.videoWidth);
+            const ctx = c.getContext('2d'); ctx.drawImage(v, 0, 0, c.width, c.height);
+            const imgData = ctx.getImageData(0,0,c.width,c.height), d = imgData.data;
+            for (let i = 0; i < d.length; i += 4) { d[i]=Math.min(255,Math.max(0,(d[i]-128)*1.2+128)); d[i+1]=Math.min(255,Math.max(0,(d[i+1]-128)*1.2+128)); d[i+2]=Math.min(255,Math.max(0,(d[i+2]-128)*1.2+128)); }
+            ctx.putImageData(imgData,0,0);
+            const dataURL = c.toDataURL('image/jpeg', 0.85);
+            document.getElementById('capture-preview-ia').src = dataURL;
+            document.getElementById('capture-preview-ia').style.display = 'block';
+            document.getElementById('ia-loading').style.display = 'block';
+            document.getElementById('ia-form').style.display = 'none';
+            try {
+                const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKeyGemini}`, {
+                    method: 'POST', headers: {'Content-Type':'application/json'},
+                    body: JSON.stringify({ contents: [{ parts: [{ inline_data: { mime_type: "image/jpeg", data: dataURL.split(',')[1] } }, { text: 'Extrae JSON puro: {"nombre":"MARCA Y PRODUCTO","presentacion":"GRAMAJE"}' }] }] })
+                });
+                const res = await resp.json(), text = res.candidates?.[0]?.content?.parts?.[0]?.text.replace(/```json|```/g, "").trim();
+                const data = JSON.parse(text);
+                document.getElementById('ia-res-name').value = data.nombre.toUpperCase();
+                document.getElementById('ia-res-size').value = data.presentacion.toUpperCase();
+                document.getElementById('ia-loading').style.display = 'none'; document.getElementById('ia-form').style.display = 'block';
+            } catch (e) { toast("Error lectura IA", "danger"); window.resetIAUI(); }
+        };
+
+        window.transferToApp = () => {
+            const n = document.getElementById('ia-res-name').value, s = document.getElementById('ia-res-size').value, p = document.getElementById('ia-res-price').value;
+            document.getElementById('in-producto').value = `${n} ${s}`.trim().toUpperCase();
+            document.getElementById('in-precio').value = p || 0;
+            window.closeScanner(); toast("Datos listos ✅");
+        };
+
+        // --- EDICIÓN Y GUARDADO ---
+        window.confirmUpdate = async () => {
+            if(!editRef) return;
+            const t = document.getElementById('ed-tienda').value.trim().toUpperCase(), c = document.getElementById('ed-cliente').value.trim().toUpperCase(), p = document.getElementById('ed-producto').value.trim().toUpperCase(), q = parseInt(document.getElementById('ed-cantidad').value) || 1, co = parseFloat(document.getElementById('ed-costo').value) || 0, prI = parseFloat(document.getElementById('ed-precio').value) || 0, fVal = document.getElementById('ed-fecha').value;
+            let sp = (c === "CRISTO") ? co : prI;
+            const dp = fVal.split('-'), nfs = `${parseInt(dp[2])}/${parseInt(dp[1])}/${dp[0]}`, nts = new Date(dp[0], dp[1]-1, dp[2], 12).getTime();
+            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'sales', editRef.id), { tienda: t, cliente: c, producto: p, cantidad: q, costo: co, precio: sp, total: q*sp, fechaStr: nfs, timestamp: nts });
+            const ex = window.state.products.find(s => (s.nombre||"").toUpperCase() === p);
+            if(!ex) await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { nombre: p, costo: co, precio: prI });
+            else await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', ex.id), { costo: co, precio: prI });
+            toast("Sincronizado ✅"); window.closeEditModal();
+        };
+
+        window.onload = () => {
+            document.getElementById('btn-save-record').onclick = async () => {
                 const t = document.getElementById('in-tienda').value.trim().toUpperCase(), c = document.getElementById('in-cliente').value.trim().toUpperCase(), p = document.getElementById('in-producto').value.trim().toUpperCase(), q = parseInt(document.getElementById('in-cantidad').value) || 1, co = parseFloat(document.getElementById('in-costo').value) || 0, prI = parseFloat(document.getElementById('in-precio').value) || 0;
-                let salePrice = (c === "CRISTO") ? co : prI;
+                let sp = (c === "CRISTO") ? co : prI;
                 if(!t || !c || !p) return toast("Faltan datos", "danger");
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'sales'), { tienda: t, cliente: c, producto: p, cantidad: q, costo: co, precio: salePrice, total: q*salePrice, fechaStr: getMXDateStr(), timestamp: Date.now(), uid: currentUser.uid, entregado: false, pagado: false });
-                
-                const ex = window.state.products.find(s => (s.nombre || "").toUpperCase() === p);
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'sales'), { tienda: t, cliente: c, producto: p, cantidad: q, costo: co, precio: sp, total: q*sp, fechaStr: getMXDateStr(), timestamp: Date.now(), uid: currentUser.uid, entregado: false, pagado: false });
+                const ex = window.state.products.find(s => (s.nombre||"").toUpperCase() === p);
                 if(!ex) await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { nombre: p, costo: co, precio: prI });
                 else await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', ex.id), { costo: co, precio: prI });
-                
-                toast("Venta guardada!");
-                document.getElementById('in-producto').value = ""; document.getElementById('in-cantidad').value = "1";
+                toast("Guardado!"); document.getElementById('in-producto').value = ""; document.getElementById('in-cantidad').value = "1";
             };
+            document.getElementById('entregas-date').value = getMXISODate();
         };
 
         window.renderControlList = () => {
             const container = document.getElementById('control-content');
-            container.innerHTML = `
-                <div class="inner-sub-nav"><button class="inner-btn active">Productos</button></div>
-                <div id="cat-items-list-container"></div>`;
-            const list = document.getElementById('cat-items-list-container');
-            const items = window.state.products.sort((a,b) => a.nombre.localeCompare(b.nombre));
-            list.innerHTML = items.map(it => `<div class="card-custom py-2 mb-1 d-flex justify-content-between align-items-center shadow-none border small px-3"><div><b>${it.nombre}</b><br><small class="text-muted">C: $${it.costo} | V: $${it.precio}</small></div><i class="fas fa-trash-can text-danger" onclick="window.openDeleteModal('products','${it.id}')"></i></div>`).join('');
+            container.innerHTML = `<div class="inner-sub-nav"><button class="inner-btn active">Catálogo</button></div><div id="cat-list"></div>`;
+            document.getElementById('cat-list').innerHTML = window.state.products.sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(it => `<div class="card-custom py-2 mb-1 d-flex justify-content-between align-items-center shadow-none border small px-3"><div><b>${it.nombre}</b><br><small class="text-muted">C: $${it.costo} | V: $${it.precio}</small></div><i class="fas fa-trash-can text-danger" onclick="window.preDelete('products','${it.id}')"></i></div>`).join('');
         };
 
-        window.openDeleteModal = (col, id) => { deleteRef = { col, id }; document.getElementById('delete-modal').style.display = 'flex'; };
+        window.preDelete = (col, id) => { deleteRef = { col, id }; document.getElementById('delete-modal').style.display = 'flex'; };
+        document.getElementById('btn-confirm-delete').onclick = async () => { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', deleteRef.col, deleteRef.id)); document.getElementById('delete-modal').style.display = 'none'; toast("Borrado"); };
         window.closeDeleteModal = () => document.getElementById('delete-modal').style.display = 'none';
-        window.closeEditModal = () => document.getElementById('edit-modal').style.display='none';
+        window.closeEditModal = () => document.getElementById('edit-modal').style.display = 'none';
+        window.resetIAUI = () => { document.getElementById('ia-res-name').value = ""; document.getElementById('ia-res-size').value = ""; document.getElementById('ia-res-price').value = ""; document.getElementById('capture-preview-ia').style.display = 'none'; document.getElementById('ia-loading').style.display = 'none'; document.getElementById('ia-form').style.display = 'block'; };
+        window.closeScanner = () => { if (currentIAStream) currentIAStream.getTracks().forEach(t => t.stop()); document.getElementById('ia-modal').style.display = 'none'; };
     </script>
 </body>
 </html>
