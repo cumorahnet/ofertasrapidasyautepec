@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ofertas Rápidas Yaute v33.0 - Motor EscanPro</title>
+    <title>Ofertas Rápidas Yaute v33.1 - Estabilidad Total</title>
     
+    <!-- Librerías Externas -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -27,6 +28,15 @@
         body { display: flex; flex-direction: column; font-family: 'Inter', system-ui, sans-serif; color: #1e293b; }
         main { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 120px; }
 
+        /* --- SPLASH SCREEN --- */
+        #splash-screen { 
+            position: fixed; inset: 0; background: white; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            z-index: 99999; opacity: 1; transition: opacity 0.5s ease;
+        }
+        .splash-loader { width: 50px; height: 50px; border: 5px solid #f1f5f9; border-top: 5px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         /* --- HEADER & NAV --- */
         header { background: var(--primary); color: white; padding: 1.2rem 1rem; position: sticky; top: 0; z-index: 1000; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .version-badge { font-size: 0.65rem; background: rgba(255,255,255,0.15); color: white; padding: 4px 12px; border-radius: 50px; font-weight: 800; border: 1px solid rgba(255,255,255,0.2); }
@@ -47,21 +57,17 @@
         .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); z-index: 8000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(8px); padding: 20px; }
         .modal-content-custom { background: white; width: 100%; max-width: 420px; border-radius: 28px; padding: 25px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); position: relative; }
 
-        /* --- SCANNER MODAL (INTEGRANDO ESCANPRO) --- */
-        #ia-modal { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; flex-direction: column; }
-        #cam-section-ia { position: relative; flex: 1; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        #cam-preview-ia { width: 100%; height: 100%; object-fit: cover; }
-        .scan-frame { width: 75%; height: 45%; border: 3px solid var(--accent); border-radius: 24px; box-shadow: 0 0 0 4000px rgba(0,0,0,0.6); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
-        #btn-snap-ia { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 80px; height: 80px; background: white; border: 8px solid rgba(59, 130, 246, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 2.2rem; cursor: pointer; z-index: 100; }
-        #ia-result-panel { background: #ffffff; padding: 20px; border-top-left-radius: 30px; border-top-right-radius: 30px; min-height: 400px; color: var(--primary); z-index: 20; box-shadow: 0 -15px 40px rgba(0,0,0,0.4); overflow-y: auto; }
-        #capture-preview-ia { width: 100%; border-radius: 14px; background: #000; margin-bottom: 15px; display: none; border: 3px solid var(--accent); max-height: 180px; object-fit: contain; }
+        /* --- SUB NAVS --- */
+        .sub-nav { display: flex; gap: 8px; margin-bottom: 20px; padding: 5px; background: #f1f5f9; border-radius: 16px; }
+        .sub-btn { border: none; background: none; padding: 10px; font-size: 0.8rem; color: #64748b; font-weight: 800; flex: 1; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; }
+        .sub-btn.active { background: white; color: var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
 
-        /* Estilos EscanPro integrados */
-        .ai-spinner { width: 40px; height: 40px; border-radius: 50%; border: 3px solid #f1f5f9; border-top-color: var(--accent); animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .inner-sub-nav { display: flex; gap: 6px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .inner-btn { white-space: nowrap; border: 1px solid #e2e8f0; background: white; padding: 8px 16px; font-size: 0.7rem; font-weight: 800; border-radius: 50px; color: #64748b; text-transform: uppercase; transition: 0.2s; }
+        .inner-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
         /* --- FINANZAS --- */
-        .stat-card { text-align: center; padding: 20px; border-radius: 22px; color: white; margin-bottom: 15px; }
+        .stat-card { text-align: center; padding: 20px; border-radius: 22px; color: white; margin-bottom: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
         .bg-gradient-primary { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
         .bg-gradient-success { background: linear-gradient(135deg, #10b981, #059669); }
         .bg-gradient-warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
@@ -72,17 +78,29 @@
         /* --- TICKET --- */
         #ticket-render { position: absolute; top: -5000px; width: 450px; background: white; padding: 40px; font-family: monospace; color: black; line-height: 1.4; border: 1px solid #eee; }
         #toast-alert { position: fixed; top: 25px; left: 50%; transform: translateX(-50%); z-index: 30000; padding: 14px 28px; border-radius: 50px; font-weight: 800; display: none; color: white; box-shadow: 0 10px 30px rgba(0,0,0,0.25); text-align: center; min-width: 280px; }
+
+        /* --- SCANNER MODAL (TRASPLANTE ESCANPRO) --- */
+        #ia-modal { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; flex-direction: column; }
+        #cam-section-ia { position: relative; flex: 1; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        #cam-preview-ia { width: 100%; height: 100%; object-fit: cover; }
+        .scan-frame { width: 75%; height: 45%; border: 3px solid var(--accent); border-radius: 24px; box-shadow: 0 0 0 4000px rgba(0,0,0,0.6); position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
+        #btn-snap-ia { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 80px; height: 80px; background: white; border: 8px solid rgba(59, 130, 246, 0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 2.2rem; cursor: pointer; z-index: 100; box-shadow: 0 0 40px rgba(0,0,0,0.5); }
+        #ia-result-panel { background: #ffffff; padding: 20px; border-top-left-radius: 30px; border-top-right-radius: 30px; min-height: 400px; color: var(--primary); z-index: 20; box-shadow: 0 -15px 40px rgba(0,0,0,0.4); overflow-y: auto; }
+        #capture-preview-ia { width: 100%; border-radius: 14px; background: #000; margin-bottom: 15px; display: none; border: 3px solid var(--accent); max-height: 180px; object-fit: contain; }
+        .ai-spinner { width: 40px; height: 40px; border-radius: 50%; border: 3px solid #f1f5f9; border-top-color: var(--accent); animation: spin 0.8s linear infinite; margin: 0 auto 10px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
     <div id="splash-screen">
         <div class="splash-loader"></div>
-        <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing: 2px; color: var(--primary);">VERSION 33.0 - ESCANPRO</div>
+        <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing: 2px; color: var(--primary);">VERSION 33.1</div>
     </div>
 
     <div id="toast-alert"></div>
 
+    <!-- MODAL EDITAR VENTA (CONTROL TOTAL) -->
     <div id="edit-modal" class="modal-overlay">
         <div class="modal-content-custom">
             <h5 class="fw-bold mb-4 text-primary">Editar Registro Pro</h5>
@@ -104,6 +122,7 @@
         </div>
     </div>
 
+    <!-- CABECERA PROFESIONAL -->
     <header>
         <div class="d-flex flex-column align-items-center">
             <div class="d-flex align-items-center">
@@ -111,11 +130,12 @@
                 <img src="logo.png" alt="Logo" style="height: 25px; width: auto; margin-left: 10px;" onerror="this.style.display='none'">
                 <div id="status-dot" class="status-dot bg-warning"></div>
             </div>
-            <div style="margin-top: 6px;"><span class="version-badge">v33.0</span></div>
+            <div style="margin-top: 6px;"><span class="version-badge">v33.1</span></div>
         </div>
     </header>
 
     <main>
+        <!-- TAB VENTAS -->
         <div id="tab-operaciones" class="tab-content">
             <div class="card-custom">
                 <div class="row g-2 mb-2">
@@ -137,11 +157,13 @@
             </div>
         </div>
 
+        <!-- TAB REPARTO -->
         <div id="tab-entregas" class="tab-content" style="display: none;">
             <div class="card-custom py-2 mb-3 text-center border-0" style="background: #f1f5f9;"><input type="date" id="entregas-date" class="form-control text-center fw-bold border-0 bg-transparent" onchange="window.renderEntregas()"></div>
             <div id="lista-entregas"></div>
         </div>
 
+        <!-- TAB GESTIÓN -->
         <div id="tab-control" class="tab-content" style="display: none;">
             <div class="sub-nav">
                 <button class="sub-btn active" id="sub-btn-fin" onclick="window.switchSubTab('finanzas')"><i class="fas fa-chart-line"></i>FINANZAS</button>
@@ -151,11 +173,9 @@
         </div>
     </main>
 
+    <!-- SCANNER IA MODAL (TRASPLANTE ESCANPRO + CÁMARA TRASERA FORZADA) -->
     <div id="ia-modal">
         <div id="cam-section-ia">
-            <div style="position: absolute; top: 20px; right: 20px; z-index: 15000; max-width: 140px;">
-                <select id="video-source-select" class="form-select form-select-sm" onchange="window.changeCameraIA()" style="background:rgba(0,0,0,0.7); color:white; border-color:var(--accent); font-size:0.65rem;"></select>
-            </div>
             <button class="btn btn-dark btn-sm rounded-pill" style="position: absolute; top: 25px; left: 20px; z-index: 15000; font-weight:800;" onclick="window.closeScanner()">✕ SALIR</button>
             <video id="cam-preview-ia" autoplay playsinline muted></video>
             <div class="scan-frame"></div>
@@ -183,6 +203,7 @@
         </div>
     </div>
 
+    <!-- TICKET RENDER -->
     <div id="ticket-render">
         <div style="text-align: center; margin-bottom: 25px;">
             <img src="logo.png" alt="Logo" style="width: 140px; height: auto;" onerror="this.style.display='none'">
@@ -206,7 +227,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { initializeFirestore, collection, doc, addDoc, updateDoc, deleteDoc, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeFirestore, collection, doc, addDoc, updateDoc, deleteDoc, getDocs, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyCR5V_yg6aLumW_D8oFPEblHZ5ox2gTs98", authDomain: "ofertas-rapidas-yautepec.firebaseapp.com", projectId: "ofertas-rapidas-yautepec", storageBucket: "ofertas-rapidas-yautepec.firebasestorage.app", messagingSenderId: "81339635207", appId: "1:81339635207:web:26d180f92224d9a036fca2" };
         const apiKeyGemini = "AIzaSyDJicNgq309eja6V0IAZI8w0j6NBYMBmjU"; 
@@ -241,6 +262,7 @@
                     const splash = document.getElementById('splash-screen');
                     if(splash) { splash.style.opacity = '0'; setTimeout(() => splash.remove(), 500); }
                     if(name === 'sales') { window.renderEntregas(); if(activeSubTab === 'finanzas') window.renderFinanceMenu(); }
+                    if(activeSubTab === 'catalogo') window.renderControlList();
                 });
             });
             setupAuto('in-tienda', 'sug-tienda', 'stores');
@@ -329,25 +351,41 @@
             toast("Sincronizado ✅"); document.getElementById('edit-modal').style.display = 'none';
         };
 
-        // --- MOTOR SCANNER (MEJORA ESCANPRO INTEGRADA) ---
+        // --- MOTOR SCANNER (CÁMARA TRASERA FORZADA + LÓGICA ESCANPRO) ---
         window.openScanner = async () => {
             document.getElementById('ia-modal').style.display = 'flex';
+            window.resetIAUI();
+            window.startCameraIA(); 
+        };
+
+        window.startCameraIA = async () => {
+            if (currentIAStream) {
+                currentIAStream.getTracks().forEach(t => t.stop());
+                currentIAStream = null;
+            }
+            // Forzamos facingMode: environment
+            const constraints = { 
+                video: { 
+                    facingMode: 'environment', 
+                    width: { ideal: 1280 }, 
+                    height: { ideal: 720 } 
+                } 
+            };
             try {
-                await navigator.mediaDevices.getUserMedia({ video: true });
-                const devices = await navigator.mediaDevices.enumerateDevices();
-                const videoDevices = devices.filter(d => d.kind === 'videoinput');
-                document.getElementById('video-source-select').innerHTML = videoDevices.map(d => `<option value="${d.deviceId}">${d.label || 'Cámara'}</option>`).join('');
-                if (videoDevices.length > 0) window.startCameraIA(videoDevices[0].deviceId);
-            } catch (e) { toast("Error cámara", "danger"); }
+                currentIAStream = await navigator.mediaDevices.getUserMedia(constraints);
+                document.getElementById('cam-preview-ia').srcObject = currentIAStream;
+            } catch (e) {
+                // Fallback si el dispositivo es estricto
+                try {
+                    currentIAStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                    document.getElementById('cam-preview-ia').srcObject = currentIAStream;
+                } catch (err) {
+                    toast("Error al activar cámara trasera", "danger");
+                    window.closeScanner();
+                }
+            }
         };
 
-        window.startCameraIA = async (deviceId) => {
-            if (currentIAStream) currentIAStream.getTracks().forEach(t => t.stop());
-            currentIAStream = await navigator.mediaDevices.getUserMedia({ video: { deviceId: { exact: deviceId }, width: 1280, height: 720 } });
-            document.getElementById('cam-preview-ia').srcObject = currentIAStream;
-        };
-
-        // Función de compresión y mejora de contraste (Tu lógica EscanPro)
         const compressAndEnhance = (v) => {
             const c = document.createElement('canvas');
             c.width = 1024; c.height = Math.round(v.videoHeight * 1024 / v.videoWidth);
@@ -374,10 +412,10 @@
 
             try {
                 const b64 = dataURL.split(',')[1];
-                const prompt = 'Extrae de esta etiqueta: 1) Nombre: marca y producto. 2) Presentación: gramaje o contenido neto. Responde JSON: {"nombre":"...","presentacion":"..."}';
+                const prompt = 'Extrae de esta etiqueta: 1) Nombre: marca y producto. 2) Presentación: gramaje o contenido neto. Responde JSON puro: {"nombre":"...","presentacion":"..."}';
                 const resp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKeyGemini}`, {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
+                    headers: {'Content-Type':'application/json'},
                     body: JSON.stringify({ contents: [{ parts: [{ inline_data: { mime_type: "image/jpeg", data: b64 } }, { text: prompt }] }] })
                 });
                 const res = await resp.json();
@@ -392,7 +430,7 @@
 
         window.transferToApp = () => {
             const n = document.getElementById('ia-res-name').value, s = document.getElementById('ia-res-size').value, p = document.getElementById('ia-res-price').value;
-            document.getElementById('in-producto').value = `${n} ${s}`.trim();
+            document.getElementById('in-producto').value = `${n} ${s}`.trim().toUpperCase();
             document.getElementById('in-precio').value = p || 0;
             window.closeScanner();
             toast("Datos cargados ✅");
@@ -406,7 +444,7 @@
 
         window.closeScanner = () => { if (currentIAStream) currentIAStream.getTracks().forEach(t => t.stop()); document.getElementById('ia-modal').style.display = 'none'; };
 
-        // --- FINANZAS RENDER ---
+        // --- FINANZAS ---
         window.renderFinanceMenu = () => {
             const container = document.getElementById('control-content');
             container.innerHTML = `
@@ -428,8 +466,8 @@
 
         window.renderFinanceResults = () => {
             const res = document.getElementById('finance-results'); if(!res) return;
-            const target = normalizeDateStr(`${parseInt(finDate.split('-')[2])}/${parseInt(finDate.split('-')[1])}/${finDate.split('-')[0]}`);
-            let filtered = window.state.sales.filter(x => normalizeDateStr(x.fechaStr) === target);
+            const target = getMXDateStr();
+            let filtered = window.state.sales.filter(x => normalizeDateStr(x.fechaStr) === normalizeDateStr(target));
             filtered = filtered.filter(x => (!finStore || x.tienda === finStore) && (!finClient || x.cliente === finClient));
 
             const totalVenta = filtered.reduce((a, b) => a + (b.total || 0), 0);
@@ -440,7 +478,7 @@
                 res.innerHTML = `<div class="stat-card bg-gradient-primary shadow"><h3>$${totalCosto.toFixed(2)}</h3><small>PAGO EN CAJA</small><div class="mt-2"><span class="badge bg-white text-primary rounded-pill">${piezas} PIEZAS</span></div></div>` + 
                 filtered.map(s => `<div class="card-custom finance-item d-flex justify-content-between py-2 small"><div><b>${s.producto}</b><br>${s.tienda}</div><div class="text-end"><b>$${((s.costo||0)*s.cantidad).toFixed(2)}</b><br><i class="fas fa-pen text-accent" onclick='window.openEditModal(${JSON.stringify(s)})'></i></div></div>`).join('');
             } else if(activeFinanceView === 'ganancias') {
-                res.innerHTML = `<div class="stat-card bg-gradient-success shadow"><h3>$${(totalVenta - totalCosto).toFixed(2)}</h3><small>UTILIDAD NETA</small></div>`;
+                res.innerHTML = `<div class="stat-card bg-gradient-success shadow"><h3>$${(totalVenta - totalCosto).toFixed(2)}</h3><small>UTILIDAD NETA HOY</small></div>`;
             } else if(activeFinanceView === 'diezmo') {
                 res.innerHTML = `<div class="stat-card bg-gradient-warning shadow"><h3>$${((totalVenta - totalCosto)*0.1).toFixed(2)}</h3><small>10% PARA EL SEÑOR</small></div>`;
             }
@@ -456,14 +494,28 @@
                 let salePrice = (c === "CRISTO") ? co : prI;
                 if(!t || !c || !p) return toast("Faltan datos", "danger");
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'sales'), { tienda: t, cliente: c, producto: p, cantidad: q, costo: co, precio: salePrice, total: q*salePrice, fechaStr: getMXDateStr(), timestamp: Date.now(), uid: currentUser.uid, entregado: false, pagado: false });
+                
                 const ex = window.state.products.find(s => (s.nombre || "").toUpperCase() === p);
                 if(!ex) await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { nombre: p, costo: co, precio: prI });
                 else await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', ex.id), { costo: co, precio: prI });
+                
                 toast("Venta guardada!");
+                document.getElementById('in-producto').value = ""; document.getElementById('in-cantidad').value = "1";
             };
         };
 
-        window.renderEntregas = () => { /* Lógica de reparto simplificada para v33 */ };
+        window.renderControlList = () => {
+            const container = document.getElementById('control-content');
+            container.innerHTML = `
+                <div class="inner-sub-nav"><button class="inner-btn active">Productos</button></div>
+                <div id="cat-items-list-container"></div>`;
+            const list = document.getElementById('cat-items-list-container');
+            const items = window.state.products.sort((a,b) => a.nombre.localeCompare(b.nombre));
+            list.innerHTML = items.map(it => `<div class="card-custom py-2 mb-1 d-flex justify-content-between align-items-center shadow-none border small px-3"><div><b>${it.nombre}</b><br><small class="text-muted">C: $${it.costo} | V: $${it.precio}</small></div><i class="fas fa-trash-can text-danger" onclick="window.openDeleteModal('products','${it.id}')"></i></div>`).join('');
+        };
+
+        window.openDeleteModal = (col, id) => { deleteRef = { col, id }; document.getElementById('delete-modal').style.display = 'flex'; };
+        window.closeDeleteModal = () => document.getElementById('delete-modal').style.display = 'none';
         window.closeEditModal = () => document.getElementById('edit-modal').style.display='none';
     </script>
 </body>
