@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v34.4 — Sistema Completo</title>
+    <title>Yaute v34.5 — Sistema Completo</title>
     <link rel="icon" href="logo.png">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -114,7 +114,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Logo Yaute" style="width:120px; height:auto; margin-bottom:24px;" onerror="this.style.display='none'">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 34.4</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 34.5</div>
 </div>
 
 <div id="toast-alert"></div>
@@ -229,11 +229,13 @@
                 <input type="date" id="pm-fecha-escaneo" class="form-control fw-bold"
                     style="font-size:0.82rem;">
             </div>
-            <div class="col-6">
+            <div class="col-6" style="position:relative;">
                 <label class="small fw-bold text-muted">TIENDA</label>
                 <input type="text" id="pm-tienda-escaneo" class="form-control text-uppercase fw-bold"
                     placeholder="TIENDA..." style="font-size:0.82rem;"
+                    oninput="filterScanTienda(this.value)"
                     onchange="localStorage.setItem('yaute_scan_tienda', this.value.toUpperCase())">
+                <div id="sug-scan-tienda" class="sug-box d-none"></div>
             </div>
         </div>
         <!-- Costo, margen y precio -->
@@ -257,11 +259,16 @@
                     placeholder="0.00" step="0.01">
             </div>
         </div>
-        <!-- Caducidad (opcional) -->
+        <!-- Caducidad (opcional) — formato libre: Dic 2026 -->
         <div class="mb-2">
-            <label class="small fw-bold text-muted">CADUCIDAD <span style="font-weight:400;">(opcional)</span></label>
-            <input type="date" id="pm-caducidad" class="form-control"
-                style="font-size:0.82rem;">
+            <label class="small fw-bold text-muted">
+                CADUCIDAD <span style="font-weight:400; font-size:0.6rem;">(opcional · ej: Dic 2026)</span>
+            </label>
+            <input type="text" id="pm-caducidad" class="form-control"
+                placeholder="Dic 2026"
+                maxlength="10"
+                style="font-size:0.88rem; text-transform:capitalize;"
+                oninput="formatCaducidad(this)">
         </div>
         <small class="text-muted d-block mb-3" style="font-size:0.62rem; text-align:center;">
             💡 Precio = costo + margen → redondeado al $10 más cercano
@@ -310,7 +317,7 @@
             <img src="logo.png" alt="Yaute" style="height:28px; margin-left:10px; border-radius:6px;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230f172a'/%3E%3Ctext x='50' y='62' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='36' font-weight='900' fill='%233b82f6'%3EORY%3C/text%3E%3C/svg%3E'; this.onerror=null;">
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
-        <div style="margin-top:6px;"><span class="version-badge">v34.4</span></div>
+        <div style="margin-top:6px;"><span class="version-badge">v34.5</span></div>
     </div>
 </header>
 
@@ -924,6 +931,36 @@ function changeGeminiKey() {
 /* ══════════════════════════════════════════════════════════════════
    SCANNER — CÁMARA
 ══════════════════════════════════════════════════════════════════ */
+function filterScanTienda(val) {
+    var box = document.getElementById('sug-scan-tienda');
+    var q   = (val || '').toUpperCase();
+    if (!q) { box.classList.add('d-none'); return; }
+    var matches = (window.state.stores || [])
+        .map(function(s){ return (s.nombre||'').toUpperCase(); })
+        .filter(function(s){ return s.includes(q); })
+        .slice(0, 6);
+    if (!matches.length) { box.classList.add('d-none'); return; }
+    box.innerHTML = matches.map(function(s){
+        return '<div class="sug-item" onclick="selectScanTienda('' + s.replace(/'/g,"\\'") + '')">' + s + '</div>';
+    }).join('');
+    box.classList.remove('d-none');
+}
+
+function selectScanTienda(val) {
+    document.getElementById('pm-tienda-escaneo').value = val;
+    document.getElementById('sug-scan-tienda').classList.add('d-none');
+    localStorage.setItem('yaute_scan_tienda', val);
+}
+
+// Cerrar sugerencias al tocar fuera
+document.addEventListener('click', function(e) {
+    var inp = document.getElementById('pm-tienda-escaneo');
+    var box = document.getElementById('sug-scan-tienda');
+    if (inp && box && !inp.contains(e.target) && !box.contains(e.target)) {
+        box.classList.add('d-none');
+    }
+});
+
 async function openScannerModal() {
     // Precargar fecha de hoy y tienda persistida antes de abrir cámara
     var hoy = new Date().toISOString().slice(0,10);
@@ -961,6 +998,24 @@ function closeScanner() {
 ══════════════════════════════════════════════════════════════════ */
 var MARGEN_DEFAULT = 20;
 
+/* Formatea la caducidad mientras el usuario escribe.
+   Acepta: "dic", "dic2", "dic 2", "dic 2026" etc.
+   Resultado: primera letra mayúscula + espacio + año */
+function formatCaducidad(input) {
+    var meses = {
+        'ene':'Ene','feb':'Feb','mar':'Mar','abr':'Abr','may':'May','jun':'Jun',
+        'jul':'Jul','ago':'Ago','sep':'Sep','oct':'Oct','nov':'Nov','dic':'Dic',
+        'jan':'Ene','aug':'Ago'
+    };
+    var raw   = input.value.replace(/[^a-zA-Z0-9 ]/g,'');
+    var parts = raw.trim().split(/\s+/);
+    var mes   = parts[0] ? parts[0].toLowerCase().slice(0,3) : '';
+    var anio  = parts[1] || '';
+    var mesF  = meses[mes] || (parts[0] ? parts[0].charAt(0).toUpperCase() + parts[0].slice(1).toLowerCase() : '');
+    if (mesF && anio) { input.value = mesF + ' ' + anio; }
+    else if (mesF)    { input.value = mesF + (raw.includes(' ') ? ' ' : ''); }
+}
+
 function redondearA10(valor) {
     var entero = Math.ceil(valor);
     var resto  = entero % 10;
@@ -990,57 +1045,54 @@ function autoSuggestVenta(costoStr) {
     var margenEl   = document.getElementById('pm-margen');
     var margen     = margenEl ? (parseFloat(margenEl.value) || MARGEN_DEFAULT) : MARGEN_DEFAULT;
     var ventaInput = document.getElementById('pm-venta');
+    // Recalcula siempre que el usuario edite costo o margen
     if (!isNaN(costo) && costo > 0) {
-        var prev    = parseFloat(ventaInput.dataset.suggested || '0');
-        var current = parseFloat(ventaInput.value || '0');
-        if (!ventaInput.value || Math.abs(current - prev) < 0.01) {
-            var sugerido = redondearA10(costo + margen);
-            ventaInput.value = sugerido.toFixed(2);
-            ventaInput.dataset.suggested = sugerido.toFixed(2);
-        }
+        var sugerido = redondearA10(costo + margen);
+        ventaInput.value = sugerido.toFixed(2);
+        ventaInput.dataset.suggested = sugerido.toFixed(2);
     }
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   SCANNER — CORRECCIÓN DE ORIENTACIÓN (portrait siempre)
-   Si el sensor entrega el frame en landscape, lo rota 90°.
+   SCANNER — CORRECCIÓN DE ORIENTACIÓN
+   Objetivo: la imagen compartida siempre queda con el texto legible
+   (lado largo vertical, letras horizontales).
+
+   Estrategia:
+   1. Capturar el frame raw en un canvas temporal sin rotación.
+   2. Leer las dimensiones REALES del canvas (no del video, que en
+      iOS puede mentir por la corrección automática del sistema).
+   3. Si el canvas es más ancho que alto (landscape) → rotar 90°.
+   4. Resultado final: siempre portrait (alto > ancho).
 ══════════════════════════════════════════════════════════════════ */
 function captureOrientado(video) {
-    const vw = video.videoWidth, vh = video.videoHeight;
-    const c   = document.createElement('canvas');
-    const ctx = c.getContext('2d');
+    var vw = video.videoWidth  || video.clientWidth;
+    var vh = video.videoHeight || video.clientHeight;
 
-    if (vh >= vw) {
-        // Frame ya en portrait — dibujar directo
-        c.width = vw; c.height = vh;
-        ctx.drawImage(video, 0, 0);
-    } else {
-        // Frame en landscape — rotar 90° sentido horario para quedar portrait
-        // El canvas resultante: ancho = vh del video, alto = vw del video
-        c.width  = vh;
-        c.height = vw;
-        ctx.save();
-        ctx.translate(c.width, 0);      // mover origen a esquina superior derecha
-        ctx.rotate(Math.PI / 2);        // rotar 90° horario
-        ctx.drawImage(video, 0, 0, vw, vh);
-        ctx.restore();
+    // Paso 1: captura raw sin transformar
+    var raw = document.createElement('canvas');
+    raw.width  = vw;
+    raw.height = vh;
+    raw.getContext('2d').drawImage(video, 0, 0, vw, vh);
+
+    // Paso 2: ¿el frame capturado es landscape?
+    if (raw.width <= raw.height) {
+        return raw;   // ya es portrait, no tocar
     }
 
-    // Seguridad final: si el canvas sigue en landscape (ancho > alto),
-    // aplicar una segunda rotación para garantizar portrait
-    if (c.width > c.height) {
-        const c2   = document.createElement('canvas');
-        const ctx2 = c2.getContext('2d');
-        c2.width   = c.height;
-        c2.height  = c.width;
-        ctx2.save();
-        ctx2.translate(c2.width, 0);
-        ctx2.rotate(Math.PI / 2);
-        ctx2.drawImage(c, 0, 0);
-        ctx2.restore();
-        return c2;
-    }
-    return c;
+    // Paso 3: rotar 90° anti-horario para que el lado largo quede vertical
+    // (anti-horario es más natural cuando el teléfono está derecho y la cámara captura sideways)
+    var rotado     = document.createElement('canvas');
+    rotado.width   = raw.height;   // el alto del original se convierte en ancho
+    rotado.height  = raw.width;    // el ancho del original se convierte en alto
+    var ctx        = rotado.getContext('2d');
+    ctx.save();
+    ctx.translate(0, rotado.height);   // origen en esquina inferior izquierda
+    ctx.rotate(-Math.PI / 2);          // rotar 90° anti-horario
+    ctx.drawImage(raw, 0, 0, raw.width, raw.height);
+    ctx.restore();
+
+    return rotado;
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -1234,6 +1286,7 @@ async function confirmPrices() {
     if (pendingExisteId) { await col('products').doc(pendingExisteId).update(data); toastScanner("✅ Producto actualizado"); }
     else                 { await col('products').add(data);                          toastScanner("✅ Producto guardado");    }
 
+    document.getElementById('pm-caducidad').value = '';
     pendingNombre = ''; pendingCanvas = null; pendingExisteId = null;
     closeScanner();
 }
@@ -1241,6 +1294,7 @@ async function confirmPrices() {
 function cancelPrices() {
     document.getElementById('price-modal').style.display = 'none';
     document.getElementById('dup-badge').classList.remove('show');
+    document.getElementById('pm-caducidad').value = '';   // limpiar caducidad
     pendingNombre = ''; pendingCanvas = null; pendingExisteId = null;
 }
 
