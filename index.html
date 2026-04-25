@@ -941,7 +941,7 @@ function filterScanTienda(val) {
         .slice(0, 6);
     if (!matches.length) { box.classList.add('d-none'); return; }
     box.innerHTML = matches.map(function(s){
-        return '<div class="sug-item" onclick="selectScanTienda('' + s.replace(/'/g,"\\'") + '')">' + s + '</div>';
+        return '<div class="sug-item sug-scan-item" data-val="' + s.replace(/"/g,'&quot;') + '">' + s + '</div>';
     }).join('');
     box.classList.remove('d-none');
 }
@@ -952,8 +952,15 @@ function selectScanTienda(val) {
     localStorage.setItem('yaute_scan_tienda', val);
 }
 
-// Cerrar sugerencias al tocar fuera
+// Event delegation para sugerencias de tienda en scanner
 document.addEventListener('click', function(e) {
+    // Seleccionar tienda al tocar una sugerencia
+    var item = e.target.closest('.sug-scan-item');
+    if (item) {
+        selectScanTienda(item.dataset.val || item.textContent.trim());
+        return;
+    }
+    // Cerrar sugerencias al tocar fuera
     var inp = document.getElementById('pm-tienda-escaneo');
     var box = document.getElementById('sug-scan-tienda');
     if (inp && box && !inp.contains(e.target) && !box.contains(e.target)) {
