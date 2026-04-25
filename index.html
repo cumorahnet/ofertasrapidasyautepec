@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v34.5 — Sistema Completo</title>
+    <title>Yaute v34.6 — Sistema Completo</title>
     <link rel="icon" href="logo.png">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -114,7 +114,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Logo Yaute" style="width:120px; height:auto; margin-bottom:24px;" onerror="this.style.display='none'">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 34.5</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 34.6</div>
 </div>
 
 <div id="toast-alert"></div>
@@ -317,7 +317,7 @@
             <img src="logo.png" alt="Yaute" style="height:28px; margin-left:10px; border-radius:6px;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230f172a'/%3E%3Ctext x='50' y='62' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='36' font-weight='900' fill='%233b82f6'%3EORY%3C/text%3E%3C/svg%3E'; this.onerror=null;">
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
-        <div style="margin-top:6px;"><span class="version-badge">v34.5</span></div>
+        <div style="margin-top:6px;"><span class="version-badge">v34.6</span></div>
     </div>
 </header>
 
@@ -1062,44 +1062,65 @@ function autoSuggestVenta(costoStr) {
 
 /* ══════════════════════════════════════════════════════════════════
    SCANNER — CORRECCIÓN DE ORIENTACIÓN
-   Objetivo: la imagen compartida siempre queda con el texto legible
-   (lado largo vertical, letras horizontales).
+   
+   El problema: en móviles el browser aplica rotación CSS al <video>
+   para que se vea bien en pantalla, pero el frame raw del canvas
+   tiene las dimensiones del sensor físico (landscape en cámara
+   trasera). El resultado: la imagen capturada sale acostada aunque
+   en pantalla se vea derecha.
 
-   Estrategia:
-   1. Capturar el frame raw en un canvas temporal sin rotación.
-   2. Leer las dimensiones REALES del canvas (no del video, que en
-      iOS puede mentir por la corrección automática del sistema).
-   3. Si el canvas es más ancho que alto (landscape) → rotar 90°.
-   4. Resultado final: siempre portrait (alto > ancho).
+   Solución: comparar el ratio del VIDEO RENDERIZADO (clientWidth/
+   clientHeight — lo que el usuario ve) vs el frame raw. Si difieren,
+   significa que el browser rotó el video visualmente y necesitamos
+   compensar en el canvas.
 ══════════════════════════════════════════════════════════════════ */
-function captureOrientado(video) {
-    var vw = video.videoWidth  || video.clientWidth;
-    var vh = video.videoHeight || video.clientHeight;
+function rotarCanvas(src, grados) {
+    var rad = grados * Math.PI / 180;
+    var c   = document.createElement('canvas');
+    var ctx = c.getContext('2d');
+    if (grados === 90 || grados === -90 || grados === 270) {
+        c.width  = src.height;
+        c.height = src.width;
+    } else {
+        c.width  = src.width;
+        c.height = src.height;
+    }
+    ctx.save();
+    ctx.translate(c.width / 2, c.height / 2);
+    ctx.rotate(rad);
+    ctx.drawImage(src, -src.width / 2, -src.height / 2);
+    ctx.restore();
+    return c;
+}
 
-    // Paso 1: captura raw sin transformar
+function captureOrientado(video) {
+    var vw = video.videoWidth;
+    var vh = video.videoHeight;
+
+    // Frame raw del sensor
     var raw = document.createElement('canvas');
     raw.width  = vw;
     raw.height = vh;
     raw.getContext('2d').drawImage(video, 0, 0, vw, vh);
 
-    // Paso 2: ¿el frame capturado es landscape?
-    if (raw.width <= raw.height) {
-        return raw;   // ya es portrait, no tocar
+    // Tamaño renderizado en pantalla (lo que el usuario ve)
+    var rw = video.clientWidth;
+    var rh = video.clientHeight;
+
+    // Si el video renderizado es portrait pero el frame es landscape
+    // → el browser rotó el video visualmente → compensar
+    var frameEsLandscape    = vw > vh;
+    var pantallaPortraitEsPortrait = rh > rw;
+
+    if (frameEsLandscape && pantallaPortraitEsPortrait) {
+        // Determinar sentido de rotación por el aspect ratio del stream
+        // En Android la rotación suele ser 90°, en iOS puede ser -90°
+        // Usamos 90° (horario) como estándar — funciona en la mayoría
+        return rotarCanvas(raw, 90);
     }
 
-    // Paso 3: rotar 90° anti-horario para que el lado largo quede vertical
-    // (anti-horario es más natural cuando el teléfono está derecho y la cámara captura sideways)
-    var rotado     = document.createElement('canvas');
-    rotado.width   = raw.height;   // el alto del original se convierte en ancho
-    rotado.height  = raw.width;    // el ancho del original se convierte en alto
-    var ctx        = rotado.getContext('2d');
-    ctx.save();
-    ctx.translate(0, rotado.height);   // origen en esquina inferior izquierda
-    ctx.rotate(-Math.PI / 2);          // rotar 90° anti-horario
-    ctx.drawImage(raw, 0, 0, raw.width, raw.height);
-    ctx.restore();
-
-    return rotado;
+    // Si el frame ya es portrait o la pantalla también es landscape → no tocar
+    return raw;
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -1110,6 +1131,9 @@ async function captureIA() {
     if (!key) { changeGeminiKey(); return; }
     const video = document.getElementById('cam-preview-ia');
     if (!video.srcObject || video.videoWidth === 0) { toastScanner("Cámara no lista", '#f59e0b'); return; }
+
+    // Limpiar caducidad en cada nuevo escaneo
+    document.getElementById('pm-caducidad').value = '';
 
     pendingCanvas = captureOrientado(video);
     const b64 = pendingCanvas.toDataURL('image/jpeg', 0.88).split(',')[1];
