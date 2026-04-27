@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Yaute v35.0 — Sistema Completo</title>
     <link rel="icon" href="logo.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Yaute">
+    <meta name="theme-color" content="#0f172a">
+    <!-- iOS: ícono para "Agregar a pantalla de inicio" -->
+    <link rel="apple-touch-icon" href="logo.png">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -299,7 +306,13 @@
             <img src="logo.png" alt="Yaute" style="height:28px; margin-left:10px; border-radius:6px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
-        <div style="margin-top:6px;"><span class="version-badge">v35.0</span></div>
+        <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
+            <span class="version-badge">v35.0</span>
+            <button id="btn-install-pwa" onclick="installPWA()"
+                style="display:none; background:rgba(59,130,246,0.25); border:1px solid rgba(59,130,246,0.5); color:white; border-radius:50px; padding:3px 12px; font-size:0.62rem; font-weight:800; cursor:pointer; align-items:center; gap:5px;">
+                <i class="fas fa-download"></i> INSTALAR APP
+            </button>
+        </div>
     </div>
 </header>
 
@@ -1364,5 +1377,44 @@ function cancelPrices() {
 ══════════════════════════════════════════════════════════════════ */
 window.onload = startSync;
 </script>
+  <script>
+    // Registrar Service Worker para PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js')
+          .then(function(reg) {
+            console.log('SW registrado:', reg.scope);
+          })
+          .catch(function(err) {
+            console.warn('SW no disponible:', err);
+          });
+      });
+    }
+
+    // Banner de instalación en Android Chrome
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      deferredPrompt = e;
+      // Mostrar botón de instalar si no está ya instalada
+      var btn = document.getElementById('btn-install-pwa');
+      if (btn) btn.style.display = 'flex';
+    });
+
+    window.addEventListener('appinstalled', function() {
+      var btn = document.getElementById('btn-install-pwa');
+      if (btn) btn.style.display = 'none';
+      deferredPrompt = null;
+    });
+
+    function installPWA() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function(result) {
+          deferredPrompt = null;
+        });
+      }
+    }
+  </script>
 </body>
 </html>
