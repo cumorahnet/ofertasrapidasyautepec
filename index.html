@@ -368,7 +368,7 @@
     <div style="border-top:3px solid #000; margin:15px 0;"></div>
     <div style="margin-bottom:25px; font-size:1.2rem; color:black;"><b>CLIENTE:</b> <span id="t-cliente"></span></div>
     <table style="width:100%; border-collapse:collapse; font-size:1.1rem; color:black;">
-        <thead><tr style="border-bottom:1.5px solid black;"><th style="text-align:left; padding:10px 0;">CANT</th><th style="text-align:left; padding:10px 0;">PRODUCTO</th><th style="text-align:right; padding:10px 0;">SUBTOTAL</th></tr></thead>
+        <thead><tr style="border-bottom:1.5px solid black;"><th style="text-align:left; padding:10px 0; padding-right:20px;">CANT</th><th style="text-align:left; padding:10px 0; padding-right:20px;">PRODUCTO</th><th style="text-align:right; padding:10px 0;">SUBTOTAL</th></tr></thead>
         <tbody id="t-items"></tbody>
     </table>
     <div style="border-top:2px dashed #000; margin:25px 0;"></div>
@@ -956,7 +956,7 @@ async function shareTicket(n) {
     let tot = 0;
     document.getElementById('t-items').innerHTML = items.map(i => {
         tot += (i.total||0);
-        return `<tr><td style="padding:10px 0">${i.cantidad}x</td><td style="padding:10px 0; text-transform:uppercase">${i.producto}</td><td style="text-align:right; padding:10px 0;">$${(i.total||0).toFixed(2)}</td></tr>`;
+        return `<tr><td style="padding:10px 0; padding-right:20px;">${i.cantidad}x</td><td style="padding:10px 0; padding-right:20px; text-transform:uppercase">${i.producto}</td><td style="text-align:right; padding:10px 0;">$${(i.total||0).toFixed(2)}</td></tr>`;
     }).join('');
     document.getElementById('t-total').innerText = '$' + tot.toFixed(2);
     const canvas = await html2canvas(document.getElementById('ticket-render'), { scale:2, backgroundColor:'#ffffff' });
