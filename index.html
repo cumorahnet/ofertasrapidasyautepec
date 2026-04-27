@@ -102,19 +102,13 @@
         #key-config-modal { position:fixed; inset:0; background:rgba(0,0,0,0.98); z-index:25000; display:none; align-items:center; justify-content:center; padding:20px; }
 
         /* Modal migración */
-        #migrate-modal { position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:22000; display:none; align-items:center; justify-content:center; padding:20px; }
-        #migrate-panel { background:white; border-radius:20px; padding:24px; width:100%; max-width:380px; }
-        #migrate-log { max-height:160px; overflow-y:auto; font-size:0.7rem; background:#f8fafc; border-radius:8px; padding:10px; margin-top:12px; color:#334155; }
-
-        .toast-msg { position:fixed; top:22px; left:50%; transform:translateX(-50%); z-index:30000; padding:12px 24px; border-radius:50px; font-weight:800; font-size:0.8rem; display:none; color:white; box-shadow:0 8px 24px rgba(0,0,0,0.25); max-width:88%; text-align:center; }
+.toast-msg { position:fixed; top:22px; left:50%; transform:translateX(-50%); z-index:30000; padding:12px 24px; border-radius:50px; font-weight:800; font-size:0.8rem; display:none; color:white; box-shadow:0 8px 24px rgba(0,0,0,0.25); max-width:88%; text-align:center; }
     </style>
 </head>
 <body>
 
 <div id="splash-screen">
-    <img src="logo.png" alt="Yaute"
-         style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;"
-         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
+    <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
     <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 35.0</div>
 </div>
@@ -280,20 +274,6 @@
     </div>
 </div>
 
-<!-- ══ MODAL MIGRACIÓN ═══════════════════════════════════════════ -->
-<div id="migrate-modal">
-    <div id="migrate-panel">
-        <h6 class="fw-bold mb-2">📦 IMPORTAR DATOS</h6>
-        <p style="font-size:0.72rem;" class="text-muted mb-3">
-            Copia <strong>clientes, tiendas y productos</strong> de la base anterior
-            (<em>ofertas-rapidas-yautepec</em>) a esta base.<br>Solo importa lo que no existe ya.
-        </p>
-        <button id="btn-start-migrate" class="btn btn-warning w-100 rounded-pill fw-bold mb-2" onclick="startMigration()">▶ INICIAR IMPORTACIÓN</button>
-        <div id="migrate-log" style="display:none;"></div>
-        <button class="btn btn-outline-secondary w-100 rounded-pill mt-2" onclick="closeMigrateModal()" style="border:none; font-size:0.8rem;">CERRAR</button>
-    </div>
-</div>
-
 <!-- ══ MODAL CONFIRMACIÓN DUPLICADO ═════════════════════════════ -->
 <div id="dup-confirm-modal" style="position:fixed; inset:0; background:rgba(0,0,0,0.88); z-index:21000; display:none; align-items:flex-end; justify-content:center; padding:16px;">
     <div style="background:white; border-radius:24px; padding:22px; width:100%; max-width:420px;">
@@ -316,9 +296,7 @@
     <div class="d-flex flex-column align-items-center">
         <div class="d-flex align-items-center">
             <h6 class="m-0 fw-bold">Ofertas Rápidas Yaute</h6>
-            <img src="logo.png" alt="Yaute"
-                 style="height:28px; margin-left:10px; border-radius:6px;"
-                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
+            <img src="logo.png" alt="Yaute" style="height:28px; margin-left:10px; border-radius:6px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px;"><span class="version-badge">v35.0</span></div>
@@ -347,16 +325,7 @@
             </div>
             <button id="btn-save-record" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow">GUARDAR REGISTRO</button>
         </div>
-        <!-- Botones de utilería -->
-        <div class="text-center mt-2 mb-1 d-flex gap-2 justify-content-center flex-wrap">
-            <button class="btn btn-outline-warning btn-sm rounded-pill fw-bold" onclick="openMigrateModal()" style="font-size:0.72rem;">
-                <i class="fas fa-database me-1"></i> IMPORTAR DATOS ANTERIORES
-            </button>
-            <button class="btn btn-outline-danger btn-sm rounded-pill fw-bold" onclick="limpiarColeccionVieja()" style="font-size:0.72rem;">
-                <i class="fas fa-trash me-1"></i> LIMPIAR COLECCIÓN VIEJA
-            </button>
-        </div>
-    </div>
+</div>
 
     <!-- TAB REPARTO -->
     <div id="tab-entregas" class="tab-content" style="display:none;">
@@ -392,9 +361,7 @@
 <!-- ══ TICKET RENDER ═════════════════════════════════════════════ -->
 <div id="ticket-render">
     <div style="text-align:center; margin-bottom:25px;">
-        <img src="logo.png" alt="Yaute"
-             style="width:120px; border-radius:10px;"
-             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
+        <img src="logo.png" alt="Yaute" style="width:120px; border-radius:10px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
         <div style="font-size:1.8rem; font-weight:900; margin-top:15px; color:black;">OFERTAS RÁPIDAS YAUTE</div>
     </div>
     <div id="t-fecha" style="text-align:center; margin-bottom:20px; font-size:1.1rem; color:black;"></div>
@@ -1389,67 +1356,12 @@ function cancelPrices() {
 /* ══════════════════════════════════════════════════════════════════
    MIGRACIÓN ONE-TIME (de ofertas-rapidas-yautepec → cuenta personal)
 ══════════════════════════════════════════════════════════════════ */
-const fbOrigen = firebase.initializeApp({
-    apiKey:'AIzaSyCR5V_yg6aLumW_D8oFPEblHZ5ox2gTs98', authDomain:'ofertas-rapidas-yautepec.firebaseapp.com',
-    projectId:'ofertas-rapidas-yautepec', storageBucket:'ofertas-rapidas-yautepec.firebasestorage.app',
-    messagingSenderId:'81339635207', appId:'1:81339635207:web:26d180f92224d9a036fca2'
-}, 'origen');
-const dbOrigen = firebase.firestore(fbOrigen);
-function colOrigen(name) { return dbOrigen.collection('artifacts').doc('yaute-v1-shared').collection('public').doc('data').collection(name); }
 
-function openMigrateModal()  { document.getElementById('migrate-modal').style.display = 'flex'; }
-function closeMigrateModal() { document.getElementById('migrate-modal').style.display = 'none'; }
-function logLine(msg, color='#334155') {
-    const log = document.getElementById('migrate-log');
-    log.style.display = 'block';
-    log.innerHTML += `<div style="color:${color}; margin-bottom:3px;">${msg}</div>`;
-    log.scrollTop = log.scrollHeight;
-}
-async function startMigration() {
-    const btn = document.getElementById('btn-start-migrate');
-    btn.disabled = true; btn.textContent = '⏳ Importando...';
-    document.getElementById('migrate-log').innerHTML = '';
-    let totales = { clients:0, stores:0, products:0 };
-    for (const colName of ['clients','stores','products']) {
-        try {
-            logLine(`— Leyendo ${colName}...`);
-            const snapO = await colOrigen(colName).get();
-            const snapD = await col(colName).get();
-            const exist = new Set(snapD.docs.map(d => (d.data().nombre||'').toUpperCase().trim()));
-            let count = 0;
-            const batch = db.batch();
-            snapO.docs.forEach(d => {
-                const data = d.data(), n = (data.nombre||'').toUpperCase().trim();
-                if (n && !exist.has(n)) { batch.set(col(colName).doc(), data); count++; }
-            });
-            await batch.commit(); totales[colName] = count;
-            logLine(`✅ ${colName}: ${count} importados`, '#10b981');
-        } catch(e) { logLine(`❌ ${colName}: ${e.message}`, '#ef4444'); }
-    }
-    logLine(`── Clientes:${totales.clients} | Tiendas:${totales.stores} | Productos:${totales.products}`, '#0f172a');
-    logLine('✔ Listo', '#3b82f6');
-    btn.textContent = '✔ COMPLETADO';
-    toast(`Importación: ${totales.clients} clientes, ${totales.stores} tiendas, ${totales.products} productos`);
-}
+
 
 /* ══════════════════════════════════════════════════════════════════
    ARRANQUE
 ══════════════════════════════════════════════════════════════════ */
-/* Limpia la colección "productos" raíz (scanner viejo) */
-async function limpiarColeccionVieja() {
-    if (!confirm('¿Borrar todos los documentos de la colección "productos" vieja?\nEsto NO afecta los productos del sistema actual.')) return;
-    try {
-        const snap = await db.collection('productos').get();
-        if (snap.empty) { toast('La colección ya estaba vacía ✅'); return; }
-        const batch = db.batch();
-        snap.docs.forEach(d => batch.delete(d.ref));
-        await batch.commit();
-        toast('✅ ' + snap.size + ' documentos eliminados de "productos"');
-    } catch(e) {
-        toast('Error: ' + e.message, 'danger');
-    }
-}
-
 window.onload = startSync;
 </script>
 </body>
