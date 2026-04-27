@@ -112,7 +112,9 @@
 <body>
 
 <div id="splash-screen">
-    <img src="logo.png" alt="Logo Yaute" style="width:120px; height:auto; margin-bottom:24px;" onerror="this.style.display='none'">
+    <img src="logo.png" alt="Yaute"
+         style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;"
+         onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
     <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 35.0</div>
 </div>
@@ -314,7 +316,9 @@
     <div class="d-flex flex-column align-items-center">
         <div class="d-flex align-items-center">
             <h6 class="m-0 fw-bold">Ofertas Rápidas Yaute</h6>
-            <img src="logo.png" alt="Yaute" style="height:28px; margin-left:10px; border-radius:6px;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230f172a'/%3E%3Ctext x='50' y='62' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='36' font-weight='900' fill='%233b82f6'%3EORY%3C/text%3E%3C/svg%3E'; this.onerror=null;">
+            <img src="logo.png" alt="Yaute"
+                 style="height:28px; margin-left:10px; border-radius:6px;"
+                 onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px;"><span class="version-badge">v35.0</span></div>
@@ -343,10 +347,13 @@
             </div>
             <button id="btn-save-record" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow">GUARDAR REGISTRO</button>
         </div>
-        <!-- Botón migración -->
-        <div class="text-center mt-2 mb-1">
+        <!-- Botones de utilería -->
+        <div class="text-center mt-2 mb-1 d-flex gap-2 justify-content-center flex-wrap">
             <button class="btn btn-outline-warning btn-sm rounded-pill fw-bold" onclick="openMigrateModal()" style="font-size:0.72rem;">
                 <i class="fas fa-database me-1"></i> IMPORTAR DATOS ANTERIORES
+            </button>
+            <button class="btn btn-outline-danger btn-sm rounded-pill fw-bold" onclick="limpiarColeccionVieja()" style="font-size:0.72rem;">
+                <i class="fas fa-trash me-1"></i> LIMPIAR COLECCIÓN VIEJA
             </button>
         </div>
     </div>
@@ -385,7 +392,9 @@
 <!-- ══ TICKET RENDER ═════════════════════════════════════════════ -->
 <div id="ticket-render">
     <div style="text-align:center; margin-bottom:25px;">
-        <img src="logo.png" alt="Yaute" style="width:120px; border-radius:10px;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' fill='%230f172a'/%3E%3Ctext x='50' y='62' text-anchor='middle' font-family='Arial Black,sans-serif' font-size='36' font-weight='900' fill='%233b82f6'%3EORY%3C/text%3E%3C/svg%3E'; this.onerror=null;">
+        <img src="logo.png" alt="Yaute"
+             style="width:120px; border-radius:10px;"
+             onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
         <div style="font-size:1.8rem; font-weight:900; margin-top:15px; color:black;">OFERTAS RÁPIDAS YAUTE</div>
     </div>
     <div id="t-fecha" style="text-align:center; margin-bottom:20px; font-size:1.1rem; color:black;"></div>
@@ -1426,6 +1435,21 @@ async function startMigration() {
 /* ══════════════════════════════════════════════════════════════════
    ARRANQUE
 ══════════════════════════════════════════════════════════════════ */
+/* Limpia la colección "productos" raíz (scanner viejo) */
+async function limpiarColeccionVieja() {
+    if (!confirm('¿Borrar todos los documentos de la colección "productos" vieja?\nEsto NO afecta los productos del sistema actual.')) return;
+    try {
+        const snap = await db.collection('productos').get();
+        if (snap.empty) { toast('La colección ya estaba vacía ✅'); return; }
+        const batch = db.batch();
+        snap.docs.forEach(d => batch.delete(d.ref));
+        await batch.commit();
+        toast('✅ ' + snap.size + ' documentos eliminados de "productos"');
+    } catch(e) {
+        toast('Error: ' + e.message, 'danger');
+    }
+}
+
 window.onload = startSync;
 </script>
 </body>
