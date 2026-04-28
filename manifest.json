@@ -2,7 +2,8 @@
   "name": "Ofertas Rápidas Yaute",
   "short_name": "Yaute",
   "description": "Sistema de ventas, scanner y ofertas rápidas Yaute",
-  "start_url": "/index.html",
+  "start_url": "/ofertasrapidasyautepec/index.html",
+  "scope": "/ofertasrapidasyautepec/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0f172a",
@@ -22,15 +23,5 @@
       "purpose": "any maskable"
     }
   ],
-  "screenshots": [],
-  "categories": ["business", "productivity"],
-  "shortcuts": [
-    {
-      "name": "Escanear",
-      "short_name": "Scan",
-      "description": "Abrir escáner de productos",
-      "url": "/index.html",
-      "icons": [{ "src": "logo.png", "sizes": "96x96" }]
-    }
-  ]
+  "categories": ["business", "productivity"]
 }
