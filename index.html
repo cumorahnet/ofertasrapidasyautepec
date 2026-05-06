@@ -1138,23 +1138,39 @@ function captureOrientado(video) {
     var vw  = video.videoWidth;
     var vh  = video.videoHeight;
 
-    // Canvas con el frame raw
+    // Detectar ángulo real de orientación del dispositivo
+    // screen.orientation.angle: 0=portrait, 90=landscape-izq, -90/270=landscape-der, 180=portrait-invertido
+    var angle = 0;
+    if (screen.orientation && screen.orientation.angle !== undefined) {
+        angle = screen.orientation.angle;
+    } else if (window.orientation !== undefined) {
+        angle = window.orientation;  // fallback iOS
+    }
+
+    // Canvas raw del sensor (siempre en las dimensiones nativas de la cámara)
     var raw = document.createElement('canvas');
     raw.width  = vw;
     raw.height = vh;
     raw.getContext('2d').drawImage(video, 0, 0, vw, vh);
 
-    // Si ya es portrait, devolver directo
-    if (vh >= vw) return raw;
+    // Si el dispositivo está en portrait (0° o 180°) → la imagen ya está bien
+    if (angle === 0 || angle === 180) return raw;
 
-    // Es landscape → rotar +90° (CW) para quedar portrait con texto legible
+    // Dispositivo en landscape → rotar para que el texto quede horizontal
     var c   = document.createElement('canvas');
     var ctx = c.getContext('2d');
-    c.width  = vh;   // ancho del canvas = alto del video
-    c.height = vw;   // alto del canvas  = ancho del video
+    c.width  = vh;
+    c.height = vw;
     ctx.save();
-    ctx.translate(c.width, 0);    // esquina superior derecha
-    ctx.rotate(Math.PI / 2);      // +90° horario
+    if (angle === 90 || angle === -270) {
+        // Landscape a la izquierda → rotar +90° CW
+        ctx.translate(c.width, 0);
+        ctx.rotate(Math.PI / 2);
+    } else {
+        // Landscape a la derecha (270° o -90°) → rotar -90° CCW
+        ctx.translate(0, c.height);
+        ctx.rotate(-Math.PI / 2);
+    }
     ctx.drawImage(raw, 0, 0, vw, vh);
     ctx.restore();
     return c;
