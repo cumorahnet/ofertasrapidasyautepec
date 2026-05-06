@@ -1045,7 +1045,14 @@ async function openScannerModal() {
 
     document.getElementById('ia-modal').style.display = 'flex';
     try {
-        scannerStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode:'environment', width:{ideal:1920}, height:{ideal:1080} } });
+        // Pedir portrait explícito al sensor (height > width)
+        scannerStream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: { ideal: 'environment' },
+                width:  { ideal: 1080 },
+                height: { ideal: 1920 }
+            }
+        });
         document.getElementById('cam-preview-ia').srcObject = scannerStream;
     } catch(e) {
         toastScanner("Error de cámara: " + e.message, '#ef4444');
@@ -1135,17 +1142,56 @@ function autoSuggestVenta(costoStr) {
    queda portrait.
 ══════════════════════════════════════════════════════════════════ */
 function captureOrientado(video) {
-    var vw  = video.videoWidth;
-    var vh  = video.videoHeight;
+    // Dimensiones reales del sensor
+    var vw = video.videoWidth;
+    var vh = video.videoHeight;
 
-    // Detectar ángulo real de orientación del dispositivo
-    // screen.orientation.angle: 0=portrait, 90=landscape-izq, -90/270=landscape-der, 180=portrait-invertido
-    var angle = 0;
-    if (screen.orientation && screen.orientation.angle !== undefined) {
-        angle = screen.orientation.angle;
-    } else if (window.orientation !== undefined) {
-        angle = window.orientation;  // fallback iOS
+    // Dimensiones del video como se ve en pantalla
+    var rw = video.clientWidth  || video.offsetWidth;
+    var rh = video.clientHeight || video.offsetHeight;
+
+    // ¿El browser presentó el video rotado? (sensor landscape, pantalla portrait)
+    var sensorLandscape  = (vw > vh);
+    var vistaPortrait    = (rh > rw);
+    var browserRoto      = sensorLandscape && vistaPortrait;
+
+    // Canvas destino siempre portrait
+    var c   = document.createElement('canvas');
+    var ctx = c.getContext('2d');
+
+    if (browserRoto) {
+        // El browser rotó el video por CSS — compensar con +90° CW
+        c.width  = vh;
+        c.height = vw;
+        ctx.save();
+        ctx.translate(c.width, 0);
+        ctx.rotate(Math.PI / 2);
+        ctx.drawImage(video, 0, 0, vw, vh);
+        ctx.restore();
+    } else {
+        // Sin rotación del browser — dibujar directo
+        c.width  = vw;
+        c.height = vh;
+        ctx.drawImage(video, 0, 0, vw, vh);
     }
+
+    // Garantía final: si el resultado sigue landscape → forzar rotación
+    if (c.width > c.height) {
+        var c2   = document.createElement('canvas');
+        var ctx2 = c2.getContext('2d');
+        c2.width  = c.height;
+        c2.height = c.width;
+        ctx2.save();
+        ctx2.translate(c2.width, 0);
+        ctx2.rotate(Math.PI / 2);
+        ctx2.drawImage(c, 0, 0);
+        ctx2.restore();
+        return c2;
+    }
+
+    return c;
+}
+
 
     // Canvas raw del sensor (siempre en las dimensiones nativas de la cámara)
     var raw = document.createElement('canvas');
