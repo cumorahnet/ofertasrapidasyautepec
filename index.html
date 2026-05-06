@@ -1147,18 +1147,19 @@ function captureOrientado(video) {
     // Si ya es portrait, devolver directo
     if (vh >= vw) return raw;
 
-    // Es landscape → rotar -90° (CCW) para quedar portrait
+    // Es landscape → rotar +90° (CW) para quedar portrait con texto legible
     var c   = document.createElement('canvas');
     var ctx = c.getContext('2d');
     c.width  = vh;   // ancho del canvas = alto del video
     c.height = vw;   // alto del canvas  = ancho del video
     ctx.save();
-    ctx.translate(0, c.height);
-    ctx.rotate(-Math.PI / 2);
+    ctx.translate(c.width, 0);    // esquina superior derecha
+    ctx.rotate(Math.PI / 2);      // +90° horario
     ctx.drawImage(raw, 0, 0, vw, vh);
     ctx.restore();
     return c;
 }
+
 
 /* ══════════════════════════════════════════════════════════════════
    SCANNER — CAPTURA + IA + DETECCIÓN DUPLICADOS
@@ -1179,7 +1180,8 @@ async function captureIA() {
     snapIcon.className = 'fas fa-spinner fa-spin fa-2x text-primary';
     document.getElementById('snap-btn').style.pointerEvents = 'none';
 
-    try {
+    // Reintento automático si Gemini responde 429 (quota por minuto)
+    const callGemini = async (intentos = 3) => {
         const res = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${key}`,
             { method:'POST', headers:{'Content-Type':'application/json'},
@@ -1190,7 +1192,18 @@ async function captureIA() {
             }
         );
         const data = await res.json();
+        if (res.status === 429 && intentos > 1) {
+            const segs = intentos === 3 ? 20 : 40;
+            toastScanner(`⏳ Muchas consultas — reintentando en ${segs}s...`, '#f59e0b');
+            await new Promise(r => setTimeout(r, segs * 1000));
+            return callGemini(intentos - 1);
+        }
         if (!res.ok) throw new Error(data.error?.message || `HTTP ${res.status}`);
+        return data;
+    };
+
+    try {
+        const data = await callGemini();
         pendingNombre = data.candidates[0].content.parts[0].text.trim().toUpperCase();
 
         // ── Detección de duplicados en 3 niveles ──────────────────────
