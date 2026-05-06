@@ -1045,13 +1045,8 @@ async function openScannerModal() {
 
     document.getElementById('ia-modal').style.display = 'flex';
     try {
-        // Pedir portrait explícito al sensor (height > width)
         scannerStream = await navigator.mediaDevices.getUserMedia({
-            video: {
-                facingMode: { ideal: 'environment' },
-                width:  { ideal: 1080 },
-                height: { ideal: 1920 }
-            }
+            video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
         });
         document.getElementById('cam-preview-ia').srcObject = scannerStream;
     } catch(e) {
@@ -1189,36 +1184,6 @@ function captureOrientado(video) {
         return c2;
     }
 
-    return c;
-}
-
-
-    // Canvas raw del sensor (siempre en las dimensiones nativas de la cámara)
-    var raw = document.createElement('canvas');
-    raw.width  = vw;
-    raw.height = vh;
-    raw.getContext('2d').drawImage(video, 0, 0, vw, vh);
-
-    // Si el dispositivo está en portrait (0° o 180°) → la imagen ya está bien
-    if (angle === 0 || angle === 180) return raw;
-
-    // Dispositivo en landscape → rotar para que el texto quede horizontal
-    var c   = document.createElement('canvas');
-    var ctx = c.getContext('2d');
-    c.width  = vh;
-    c.height = vw;
-    ctx.save();
-    if (angle === 90 || angle === -270) {
-        // Landscape a la izquierda → rotar +90° CW
-        ctx.translate(c.width, 0);
-        ctx.rotate(Math.PI / 2);
-    } else {
-        // Landscape a la derecha (270° o -90°) → rotar -90° CCW
-        ctx.translate(0, c.height);
-        ctx.rotate(-Math.PI / 2);
-    }
-    ctx.drawImage(raw, 0, 0, vw, vh);
-    ctx.restore();
     return c;
 }
 
