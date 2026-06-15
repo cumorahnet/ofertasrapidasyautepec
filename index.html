@@ -922,25 +922,30 @@ async function shareProductDetailsFromTab() {
     console.log('--- Iniciando intento de compartir desde Pestaña Productos ---');
     console.log('URL de la foto para compartir:', photoToShare);
 
+    async function loadImageBlob(src) {
+        if (!src) throw new Error('URL de imagen vacía');
+        if (src.startsWith('data:')) {
+            return dataURLtoBlob(src);
+        }
+        const response = await fetch(src, { mode: 'cors' });
+        if (!response.ok) {
+            const errorBody = await response.text();
+            throw new Error(`HTTP Error ${response.status}: ${response.statusText}. Response snippet: ${errorBody.substring(0, 100)}`);
+        }
+        return response.blob();
+    }
+
     // Intenta cargar la imagen solo si no es la imagen por defecto
     if (photoToShare && photoToShare !== defaultGif) {
         try {
-            // Usar fetch para cualquier URL, incluyendo Data URLs para simplificar
-            const response = await fetch(photoToShare);
-            if (!response.ok) {
-                // Leer el cuerpo de la respuesta para obtener más detalles del error HTTP
-                const errorBody = await response.text();
-                throw new Error(`HTTP Error ${response.status}: ${response.statusText}. Response snippet: ${errorBody.substring(0, 100)}`);
-            }
-            const blob = await response.blob();
-            // Asegurarse de que el tipo de archivo sea correcto o un fallback seguro
+            const blob = await loadImageBlob(photoToShare);
             const fileType = blob.type.startsWith('image/') ? blob.type : 'image/jpeg';
             const file = new File([blob], 'oferta_producto.jpg', { type: fileType });
             filesToShare.push(file);
             console.log('Imagen cargada exitosamente para compartir (Blob type:', blob.type, ')');
         } catch (error) {
-            console.error('Error al cargar la imagen para compartir (fetch o Data URL):', error);
-            toast("Error de red o URL inválida para la imagen. Se intentará compartir solo texto.", "danger");
+            console.error('Error al cargar la imagen para compartir:', error);
+            toast("Error al cargar la imagen para compartir. Se compartirá solo texto.", "danger");
             filesToShare = []; // Limpiar los archivos si hubo un error en la carga
         }
     } else {
