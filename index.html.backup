@@ -115,7 +115,7 @@
 <body>
 
 <div id="splash-screen">
-    <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
+    <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC9teXN2Zz4='; this.onerror=null;">
     <div class="splash-loader"></div>
     <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 35.0</div>
 </div>
@@ -348,7 +348,7 @@
     <div class="d-flex flex-column align-items-center">
         <div class="d-flex align-items-center">
             <h6 class="m-0 fw-bold">Ofertas Rápidas Yaute</h6>
-            <img src="logo.png" alt="Yaute" style="height:28px; margin-left:10px; border-radius:6px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
+            <img src="logo.png" alt="Yaute" style="height:28px; margin-left:10px; border-radius:6px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fuc2VyaWYiIGZvbnQtc2l6ZT0iNDAiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiMzYjgyZjYiPk9SWTwvdGV4dD48L3N2Zz4='; this.onerror=null;">
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
@@ -373,17 +373,55 @@
             <div class="row g-2 mb-2 align-items-end">
                 <div class="col-3"><label class="text-uppercase">Cant.</label><input type="number" id="in-cantidad" class="form-control text-center fw-bold" value="1"></div>
                 <div class="col" style="position:relative">
-                    <label class="text-uppercase d-flex justify-content-between">Producto <i class="fas fa-camera text-primary" style="font-size:1.2rem; cursor:pointer;" onclick="openScannerModal()"></i></label>
-                    <input type="text" id="in-producto" class="form-control text-uppercase" placeholder="BUSCAR ARTÍCULO..."><div id="sug-producto" class="sug-box d-none"></div>
+                    <label class="text-uppercase">Producto</label>
+                    <!-- Read-only input for selected product name -->
+                    <input type="text" id="in-producto-display" class="form-control text-uppercase" placeholder="SELECCIONA UN ARTÍCULO" readonly>
+                    <!-- Hidden input to store product ID for sale -->
+                    <input type="hidden" id="in-producto-id">
                 </div>
             </div>
             <div class="row g-2 mb-3">
-                <div class="col-6"><label class="text-uppercase">Costo Anaquel</label><input type="number" id="in-costo" class="form-control fw-bold border-danger" step="0.01"></div>
-                <div class="col-6"><label class="text-uppercase">Precio Venta</label><input type="number" id="in-precio" class="form-control fw-bold border-success" step="0.01"></div>
+                <div class="col-6"><label class="text-uppercase">Costo Anaquel</label><input type="number" id="in-costo" class="form-control fw-bold border-danger" step="0.01" readonly></div>
+                <div class="col-6"><label class="text-uppercase">Precio Venta</label><input type="number" id="in-precio" class="form-control fw-bold border-success" step="0.01" readonly></div>
             </div>
             <button id="btn-save-record" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow">GUARDAR REGISTRO</button>
         </div>
-</div>
+    </div>
+
+    <!-- TAB PRODUCTOS (Nuevo) -->
+    <div id="tab-productos" class="tab-content" style="display:none;">
+        <div class="card-custom mb-3">
+            <div class="d-flex gap-2 mb-3">
+                <input type="text" id="prod-search-input" class="form-control flex-fill" placeholder="BUSCAR PRODUCTO o ESCANEAR..." oninput="handleProductSearchInTab(this.value)">
+                <button class="btn btn-primary rounded-circle" onclick="openScannerModal()">
+                    <i class="fas fa-camera"></i>
+                </button>
+            </div>
+            <div id="prod-search-results">
+                <!-- Product list will be rendered here -->
+            </div>
+        </div>
+        <div id="prod-details-preview" class="card-custom" style="display:none;">
+            <p class="fw-bold mb-1" style="font-size:0.7rem; color:#94a3b8; letter-spacing:1px;">PRODUCTO SELECCIONADO</p>
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <img id="prod-preview-photo" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Foto"
+                     style="width:80px; height:80px; object-fit:cover; border-radius:12px; flex-shrink:0;">
+                <div>
+                    <div class="fw-bold text-uppercase" id="prod-preview-name" style="font-size:1rem; line-height:1.4;"></div>
+                    <div class="small text-muted mt-1">
+                        Costo: <span class="fw-bold text-danger" id="prod-preview-costo"></span> &middot;
+                        Venta: <span class="fw-bold text-success" id="prod-preview-precio"></span>
+                    </div>
+                    <div class="small text-muted" id="prod-preview-extra-info"></div>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-primary flex-fill rounded-pill fw-bold" onclick="addProductToSale()">AGREGAR A VENTA</button>
+                <button class="btn btn-outline-secondary flex-fill rounded-pill" onclick="clearProductSelection()">LIMPIAR</button>
+            </div>
+        </div>
+    </div>
+
 
     <!-- TAB REPARTO -->
     <div id="tab-entregas" class="tab-content" style="display:none;">
@@ -437,6 +475,7 @@
 <!-- ══ BOTTOM NAV ════════════════════════════════════════════════ -->
 <nav class="bottom-nav">
     <button class="tab-btn active" onclick="showTab('operaciones', this)"><i class="fas fa-cash-register"></i>Ventas</button>
+    <button class="tab-btn" onclick="showTab('productos', this)"><i class="fas fa-boxes"></i>Productos</button>
     <button class="tab-btn" onclick="showTab('entregas', this)"><i class="fas fa-truck"></i>Reparto</button>
     <button class="tab-btn" onclick="showTab('control', this)"><i class="fas fa-shield-halved"></i>Gestión</button>
 </nav>
@@ -479,11 +518,14 @@ let currentUser     = null;
 
 // Scanner related globals
 let scannerStream   = null;
-let pendingNombre   = '';          // Nombre extraído por la IA del escaneo actual
+let pendingNombre   = '';          // Nombre extraído por la IA del escaneo actual o del texto si se inicia desde input
 let pendingCanvas   = null;        // Canvas con la imagen del escaneo actual
 let pendingExisteId = null;        // ID del producto existente que coincide con el escaneo
 let pendingExistingProduct = null; // Objeto completo del producto existente que coincide
 let pendingScanValues = {};        // Valores (precios, tienda, caducidad, etc.) introducidos/sugeridos en price-modal para el escaneo actual
+
+// Product Tab specific globals
+let selectedProductForSale = null; // The product object selected from tab-productos for a sale
 
 
 // Finanzas fechas
@@ -554,6 +596,16 @@ function startSync() {
             }
 
             if (name === 'sales') { renderEntregas(); if (activeSubTab === 'finanzas') renderFinanceMenu(); }
+            // Re-renderizar la lista de productos en la pestaña de productos si estamos ahí
+            if (name === 'products' && document.getElementById('tab-productos').style.display !== 'none') {
+                 handleProductSearchInTab(document.getElementById('prod-search-input').value);
+                 if (selectedProductForSale && window.state.products.find(p => p.id === selectedProductForSale.id)) {
+                    // Refresh selected product info if still exists
+                    selectProductInTab(selectedProductForSale.id);
+                 } else {
+                    clearProductSelection();
+                 }
+            }
             if (name !== 'sales' && activeSubTab === 'catalogo') renderControlList();
         }, err => {
             console.error('Sync:', name, err.message);
@@ -566,9 +618,125 @@ function startSync() {
 
     setupAuto('in-tienda',   'sug-tienda',   'stores');
     setupAuto('in-cliente',  'sug-cliente',  'clients');
-    setupAuto('in-producto', 'sug-producto', 'products');
+    // REMOVED 'in-producto' from setupAuto because it's now managed by the new product tab
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   FUNCIONES ESPECÍFICAS DE LA PESTAÑA DE PRODUCTOS
+══════════════════════════════════════════════════════════════════ */
+
+function handleProductSearchInTab(value) {
+    const searchTerm = value.trim().toUpperCase();
+    const resultsContainer = document.getElementById('prod-search-results');
+    resultsContainer.innerHTML = ''; // Clear previous results
+
+    if (!searchTerm) {
+        // If search term is empty, show all products
+        renderProductSearchResults(window.state.products);
+        return;
+    }
+
+    const filteredProducts = window.state.products.filter(p =>
+        (p.nombre || '').toUpperCase().includes(searchTerm)
+    );
+    renderProductSearchResults(filteredProducts);
+}
+
+function renderProductSearchResults(products) {
+    const resultsContainer = document.getElementById('prod-search-results');
+    if (products.length === 0) {
+        resultsContainer.innerHTML = '<p class="text-center text-muted small mt-3">No se encontraron productos.</p>';
+        return;
+    }
+
+    resultsContainer.innerHTML = products.map(p => `
+        <div class="card-custom py-2 mb-1 d-flex justify-content-between align-items-center shadow-none border small px-3">
+            <div class="d-flex align-items-center gap-2">
+                ${p.foto ? `<img src="${p.foto}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;">` : `<i class="fas fa-box fa-2x text-muted me-2"></i>`}
+                <div>
+                    <div class="text-uppercase fw-bold text-dark" style="font-size:0.85rem;">${p.nombre || 'S/N'}</div>
+                    <div class="d-flex align-items-center flex-wrap gap-1" style="font-size:0.65rem;">
+                        <span class="text-muted">C: <span class="text-danger fw-bold">$${(p.costo || 0).toFixed(2)}</span></span>
+                        <span class="text-muted">V: <span class="text-success fw-bold">$${(p.precio || 0).toFixed(2)}</span></span>
+                        ${p.tiendaEscaneo ? ` <span style="background:#eff6ff;color:#2563eb;border-radius:6px;padding:1px 6px;font-weight:800;">${p.tiendaEscaneo}</span>` : ''}
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="selectProductInTab('${p.id}')">Seleccionar</button>
+        </div>
+    `).join('');
+}
+
+function selectProductInTab(productId) {
+    const product = window.state.products.find(p => p.id === productId);
+    if (!product) {
+        toastScanner("Producto no encontrado.", "danger");
+        clearProductSelection();
+        return;
+    }
+    selectedProductForSale = product;
+
+    document.getElementById('prod-preview-name').textContent  = product.nombre;
+    document.getElementById('prod-preview-costo').textContent = `$${(product.costo || 0).toFixed(2)}`;
+    document.getElementById('prod-preview-precio').textContent = `$${(product.precio || 0).toFixed(2)}`;
+    document.getElementById('prod-preview-photo').src = product.foto || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+
+    let extraInfo = [];
+    if (product.fechaEscaneo || product.tiendaEscaneo) {
+        extraInfo.push(`📅 ${product.fechaEscaneo || ''} ${product.tiendaEscaneo ? `· ${product.tiendaEscaneo}` : ''}`);
+    }
+    if (product.caducidad) {
+        extraInfo.push(`⏳ Cad: ${product.caducidad}`);
+    }
+    document.getElementById('prod-preview-extra-info').innerHTML = extraInfo.length ? extraInfo.join('<br>') : '';
+
+
+    document.getElementById('prod-details-preview').style.display = 'block';
+}
+
+function clearProductSelection() {
+    selectedProductForSale = null;
+    document.getElementById('prod-search-input').value = '';
+    document.getElementById('prod-search-results').innerHTML = ''; // Clear search results as well
+    document.getElementById('prod-details-preview').style.display = 'none';
+
+    // Clear sales form fields too, in case user goes back to Sales
+    document.getElementById('in-producto-display').value = '';
+    document.getElementById('in-producto-id').value = '';
+    document.getElementById('in-costo').value = '';
+    document.getElementById('in-precio').value = '';
+}
+
+function addProductToSale() {
+    if (!selectedProductForSale) {
+        toast("Por favor, selecciona un producto primero.", "danger");
+        return;
+    }
+    populateSalesFieldsWithProduct(selectedProductForSale);
+}
+
+// Function to populate main sales form fields and switch to sales tab
+function populateSalesFieldsWithProduct(product) {
+    if (product) {
+        document.getElementById('in-producto-display').value = product.nombre || '';
+        document.getElementById('in-producto-id').value = product.id || ''; // Store ID
+        document.getElementById('in-costo').value    = product.costo  || 0;
+        document.getElementById('in-precio').value   = product.precio || 0;
+    } else {
+        document.getElementById('in-producto-display').value = '';
+        document.getElementById('in-producto-id').value = '';
+        document.getElementById('in-costo').value    = '';
+        document.getElementById('in-precio').value   = '';
+    }
+    showTab('operaciones', document.querySelector('.tab-btn[onclick*="operaciones"]'));
+    // Ensure product search tab is clean after selection
+    clearProductSelection();
+}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   GENERIC AUTOCOMPLETE SETUP (now only for tienda/cliente)
+══════════════════════════════════════════════════════════════════ */
 function setupAuto(inpId, boxId, key) {
     const inp = document.getElementById(inpId);
     const box = document.getElementById(boxId);
@@ -586,13 +754,6 @@ function setupAuto(inpId, boxId, key) {
         const it = e.target.closest('.sug-item'); if (!it) return;
         const val = it.dataset.val.trim();
         inp.value = val; box.classList.add('d-none');
-        if (key === 'products') {
-            const p = window.state.products.find(x => (x.nombre || '').toUpperCase() === val);
-            if (p) {
-                document.getElementById('in-costo').value  = p.costo  || 0;
-                document.getElementById('in-precio').value = p.precio || 0;
-            }
-        }
     };
     document.addEventListener('click', e => {
         if (!inp.contains(e.target) && !box.contains(e.target)) box.classList.add('d-none');
@@ -608,7 +769,16 @@ function showTab(id, btn) {
     if (t) t.style.display = 'block';
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
-    if (id === 'control') switchSubTab('finanzas');
+    
+    // Specific tab initialization
+    if (id === 'control') {
+        switchSubTab('finanzas'); // Default to finanzas when control tab is opened
+    } else if (id === 'productos') {
+        document.getElementById('prod-search-input').value = ''; // Clear search
+        handleProductSearchInTab(''); // Show all products initially
+        document.getElementById('prod-details-preview').style.display = 'none'; // Hide preview
+        selectedProductForSale = null; // Clear any pending selection
+    }
 }
 
 function switchSubTab(id) {
@@ -629,24 +799,40 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-save-record').onclick = async () => {
         const t   = document.getElementById('in-tienda').value.trim().toUpperCase();
         const c   = document.getElementById('in-cliente').value.trim().toUpperCase();
-        const p   = document.getElementById('in-producto').value.trim().toUpperCase();
+        const pId = document.getElementById('in-producto-id').value; // Get ID of selected product
+        const pName = document.getElementById('in-producto-display').value.trim().toUpperCase(); // Get name from display field
         const q   = parseInt(document.getElementById('in-cantidad').value) || 1;
         const co  = parseFloat(document.getElementById('in-costo').value)  || 0;
         const prI = parseFloat(document.getElementById('in-precio').value) || 0;
         const salePrice = (c === 'CRISTO') ? co : prI;
-        if (!t || !c || !p) return toast("Faltan datos", "danger");
+        
+        if (!t || !c || !pId || !pName) { // Check for product ID or name
+            return toast("Faltan datos (tienda, cliente o producto)", "danger");
+        }
 
-        await col('sales').add({ tienda:t, cliente:c, producto:p, cantidad:q, costo:co, precio:salePrice, total:q*salePrice, fechaStr:getMXDateStr(), timestamp:Date.now(), entregado:false, pagado:false });
+        await col('sales').add({
+            tienda:t,
+            cliente:c,
+            producto:pName, // Use the name from the display field
+            productoId: pId, // Store product ID with the sale record
+            cantidad:q,
+            costo:co,
+            precio:salePrice,
+            total:q*salePrice,
+            fechaStr:getMXDateStr(),
+            timestamp:Date.now(),
+            entregado:false,
+            pagado:false
+        });
 
+        // Add/update client and store, product is now managed by the product tab
         if (!window.state.stores.some(s  => (s.nombre||'').toUpperCase()===t))  col('stores').add({ nombre:t });
         if (!window.state.clients.some(s => (s.nombre||'').toUpperCase()===c))  col('clients').add({ nombre:c });
-        const ep = window.state.products.find(s => (s.nombre||'').toUpperCase()===p);
-        if (!ep) col('products').add({ nombre:p, costo:co, precio:prI });
-        else     col('products').doc(ep.id).update({ costo:co, precio:prI });
-
+        
         toast("¡Venta guardada!");
         document.getElementById('in-cliente').value  = '';
-        document.getElementById('in-producto').value = '';
+        document.getElementById('in-producto-display').value = '';
+        document.getElementById('in-producto-id').value = '';
         document.getElementById('in-cantidad').value = '1';
         document.getElementById('in-costo').value    = '';
         document.getElementById('in-precio').value   = '';
@@ -1091,12 +1277,26 @@ async function openScannerModal() {
     if (fechaEl)  fechaEl.value  = hoy;
     if (tiendaEl) tiendaEl.value = tiendaPersistida;
 
+    // Clear previous pending info when opening scanner from the button
+    pendingNombre = '';
+    pendingCanvas = null;
+    pendingExisteId = null;
+    pendingExistingProduct = null;
+    pendingScanValues = {};
+
     document.getElementById('ia-modal').style.display = 'flex';
     try {
         scannerStream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
         });
         document.getElementById('cam-preview-ia').srcObject = scannerStream;
+        
+        // Ensure price-modal fields are clean at the start of a fresh scan
+        document.getElementById('pm-nombre').value = '';
+        document.getElementById('pm-costo').value = '';
+        document.getElementById('pm-venta').value = '';
+        document.getElementById('dup-badge').classList.remove('show');
+
     } catch(e) {
         toastScanner("Error de cámara: " + e.message, '#ef4444');
         cancelScanFlow(); // Llama a cancelScanFlow para limpiar y cerrar todo
@@ -1116,7 +1316,7 @@ function cancelScanFlow() {
     pendingExistingProduct = null;
     pendingScanValues = {};
 
-    // Limpiar campos del price-modal
+    // Limpiar campos del price-modal (asegura que no se muestren datos antiguos)
     document.getElementById('pm-nombre').value = '';
     document.getElementById('pm-costo').value = '';
     document.getElementById('pm-venta').value = '';
@@ -1127,7 +1327,8 @@ function cancelScanFlow() {
     document.getElementById('price-modal').style.display = 'none';
     document.getElementById('dup-confirm-modal').style.display = 'none';
     document.getElementById('update-confirm-modal').style.display = 'none';
-    
+    // Removed manual-product-options-modal as it's no longer needed
+
     closeScanner(); // Detener la cámara y ocultar el modal IA
 }
 
@@ -1335,7 +1536,7 @@ async function captureIA() {
                 if (prev.caducidad)    infoExtra += '<br>⏳ Caducidad: ' + prev.caducidad;
                 document.getElementById('dup-text').innerHTML =
                     '<strong>¡Ya registrado!</strong><br>"' + prev.nombre + '"<br>' +
-                    'Venta actual: <b>$' + (prev.precio||0) + '</b> | Costo actual: $' + (prev.costo||0) +
+                    'Venta actual: <b>$' + (prev.precio||0).toFixed(2) + '</b> | Costo actual: $' + (prev.costo||0).toFixed(2) +
                     infoExtra +
                     '<br><em style="font-size:0.65rem;">Puedes ajustar los precios antes de guardar.</em>';
                 badge.classList.add('show');
@@ -1474,8 +1675,9 @@ async function uploadAndSaveNewProduct(nombre, venta, costo, caducidad, fechaEsc
     if (fotoUrl)    data.foto      = fotoUrl;
     if (caducidad)  data.caducidad = caducidad;
 
-    await col('products').add(data);
+    const docRef = await col('products').add(data);
     toastScanner("✅ Producto guardado");
+    return { id: docRef.id, ...data }; // Return the full product object
 }
 
 
@@ -1494,6 +1696,7 @@ async function confirmPrices() {
 
     document.getElementById('price-modal').style.display = 'none'; // Cerrar price-modal
 
+    let finalProduct;
     if (pendingExisteId && pendingExistingProduct) {
         // Si se identificó un duplicado, almacenar los valores del escaneo
         // y mostrar el modal de confirmación de actualización
@@ -1505,12 +1708,17 @@ async function confirmPrices() {
             fechaEscaneo: fechaEscaneo,
             tiendaEscaneo: tiendaEscaneo
         };
-        openUpdateConfirmModal(pendingExistingProduct, pendingScanValues);
+        finalProduct = await openUpdateConfirmModal(pendingExistingProduct, pendingScanValues);
     } else {
         // Si es un producto nuevo, proceder directamente a subir y guardar
-        await uploadAndSaveNewProduct(nombre, venta, costo, caducidad, fechaEscaneo, tiendaEscaneo);
-        cancelScanFlow(); // Resetear todo el flujo del escáner
+        finalProduct = await uploadAndSaveNewProduct(nombre, venta, costo, caducidad, fechaEscaneo, tiendaEscaneo);
     }
+    
+    // After product is added/updated and shared, select it in the product tab
+    if (finalProduct) {
+        selectProductInTab(finalProduct.id);
+    }
+    cancelScanFlow(); // Resetear todo el flujo del escáner
 }
 
 function cancelPrices() { // Esta función ahora solo oculta el modal y llama a cancelScanFlow
@@ -1521,7 +1729,7 @@ function cancelPrices() { // Esta función ahora solo oculta el modal y llama a 
 /* ══════════════════════════════════════════════════════════════════
    NUEVO: MODAL DE CONFIRMACIÓN DE ACTUALIZACIÓN (DUPLICADO)
 ══════════════════════════════════════════════════════════════════ */
-function openUpdateConfirmModal(existingProduct, newScanValues) {
+async function openUpdateConfirmModal(existingProduct, newScanValues) {
     pendingExistingProduct = existingProduct; // Almacenar para `performUpdateFromScanner`
     pendingScanValues = newScanValues;       // Almacenar para `performUpdateFromScanner`
 
@@ -1536,9 +1744,19 @@ function openUpdateConfirmModal(existingProduct, newScanValues) {
     document.getElementById('ucm-update-details').checked = true;
 
     document.getElementById('update-confirm-modal').style.display = 'flex';
+
+    // Return a promise that resolves with the final product or null on cancel
+    return new Promise(resolve => {
+        document.getElementById('update-confirm-modal')._resolve = resolve;
+    });
 }
 
-function closeUpdateConfirmModal() { // Esta función ahora solo oculta el modal y llama a cancelScanFlow
+function closeUpdateConfirmModal() {
+    // If the modal is closed via cancel, resolve its promise with null
+    if (document.getElementById('update-confirm-modal')._resolve) {
+        document.getElementById('update-confirm-modal')._resolve(null);
+        document.getElementById('update-confirm-modal')._resolve = null;
+    }
     document.getElementById('update-confirm-modal').style.display = 'none';
     cancelScanFlow();
 }
@@ -1546,6 +1764,7 @@ function closeUpdateConfirmModal() { // Esta función ahora solo oculta el modal
 async function performUpdateFromScanner() {
     if (!pendingExistingProduct || !pendingExisteId) {
         toastScanner("Error: No hay producto existente para actualizar.", '#ef4444');
+        document.getElementById('update-confirm-modal')._resolve(null); // Resolve with null on error
         cancelScanFlow();
         return;
     }
@@ -1554,6 +1773,7 @@ async function performUpdateFromScanner() {
     const updateDetails = document.getElementById('ucm-update-details').checked;
 
     const dataToUpdate = { nombre: pendingScanValues.nombre }; // Siempre actualizar el nombre al escaneado
+    let fotoUrl = pendingExistingProduct.foto || ''; // Start with existing photo URL
 
     // Manejar actualización de foto
     if (updatePhoto && pendingCanvas) {
@@ -1561,18 +1781,15 @@ async function performUpdateFromScanner() {
             const blob = await new Promise(r => pendingCanvas.toBlob(r, 'image/jpeg', 0.82));
             const ref  = storage.ref('productos/' + Date.now() + '_' + pendingScanValues.nombre.replace(/\s+/g,'_') + '.jpg');
             await ref.put(blob);
-            dataToUpdate.foto = await ref.getDownloadURL(); // Establecer la nueva foto
+            fotoUrl = await ref.getDownloadURL(); // Establecer la nueva foto
             toastScanner("Foto actualizada.", '#10b981');
         } catch(e) {
             console.warn('Storage (actualizar foto):', e.message);
             toastScanner("Error al subir nueva foto. Se mantendrá la foto existente o ninguna.", '#f59e0b');
-            dataToUpdate.foto = pendingExistingProduct.foto || ''; // Mantener la foto existente o vacía si no hay.
+            // If photo upload fails, fotoUrl remains the existing one
         }
-    } else if (!updatePhoto) {
-        // Si no se quiere actualizar la foto, mantener la que ya existía (o ninguna)
-        dataToUpdate.foto = pendingExistingProduct.foto || '';
     }
-    // Si updatePhoto es true pero pendingCanvas es null, no se hace nada con la foto, se mantiene la existente por defecto.
+    dataToUpdate.foto = fotoUrl;
 
     // Manejar actualización de detalles (precios, tienda, caducidad)
     if (updateDetails) {
@@ -1591,8 +1808,10 @@ async function performUpdateFromScanner() {
         dataToUpdate.tiendaEscaneo = pendingExistingProduct.tiendaEscaneo;
     }
 
+    let updatedProduct = null;
     try {
         await col('products').doc(pendingExisteId).update(dataToUpdate);
+        updatedProduct = { id: pendingExisteId, ...pendingExistingProduct, ...dataToUpdate }; // Merge existing with updates
         toastScanner("✅ Producto actualizado", '#10b981');
     } catch (e) {
         console.error("Error al actualizar producto en Firestore:", e);
@@ -1600,8 +1819,14 @@ async function performUpdateFromScanner() {
     }
 
     document.getElementById('update-confirm-modal').style.display = 'none';
+    if (document.getElementById('update-confirm-modal')._resolve) {
+        document.getElementById('update-confirm-modal')._resolve(updatedProduct); // Resolve with the updated product
+        document.getElementById('update-confirm-modal')._resolve = null;
+    }
     cancelScanFlow(); // Resetear todo el flujo del escáner
+    return updatedProduct; // This return is for direct calls, promise handles modal resolution
 }
+
 
 /* ══════════════════════════════════════════════════════════════════
    MIGRACIÓN ONE-TIME (de ofertas-rapidas-yautepec → cuenta personal)
@@ -1612,7 +1837,13 @@ async function performUpdateFromScanner() {
 /* ══════════════════════════════════════════════════════════════════
    ARRANQUE
 ══════════════════════════════════════════════════════════════════ */
-window.onload = startSync;
+window.onload = () => {
+    startSync();
+    // Initialize product search tab if it's the default or opened
+    if (document.getElementById('tab-productos').style.display !== 'none') {
+        handleProductSearchInTab('');
+    }
+};
 </script>
   <script>
     // Registrar Service Worker para PWA
