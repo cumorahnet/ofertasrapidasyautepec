@@ -846,10 +846,11 @@ function dataURLtoBlob(dataurl) {
 async function attemptWebShare(text, files, title, context, isScannerToast = false) {
     const defaultToast = isScannerToast ? toastScanner : toast;
 
+    console.log(`[${context}] Intentando compartir con Web Share API...`);
     if (!navigator.share) {
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
         defaultToast(`${context}: Compartido solo texto (navegador no soporta API Web Share).`, "info");
-        console.log(`${context}: Fallback a WhatsApp para compartir texto.`);
+        console.log(`[${context}] Fallback a WhatsApp para compartir texto.`);
         return;
     }
 
@@ -858,15 +859,17 @@ async function attemptWebShare(text, files, title, context, isScannerToast = fal
         let sharedWithFiles = false;
 
         if (files && files.length > 0) {
+            console.log(`[${context}] Intentando compartir con ${files.length} archivo(s).`);
             try {
                 if (navigator.canShare && navigator.canShare({ files })) {
                     shareData.files = files;
                     sharedWithFiles = true;
+                    console.log(`[${context}] navigator.canShare({ files }) -> OK.`);
                 } else {
-                    console.log(`${context}: Este navegador no admite compartir archivos; se intentará solo texto.`);
+                    console.warn(`[${context}] Este navegador no admite compartir archivos o navigator.canShare falló; se intentará solo texto.`);
                 }
             } catch (canShareError) {
-                console.warn(`${context}: navigator.canShare falló para archivos. Se ignora y se usa texto.`, canShareError);
+                console.warn(`[${context}] Error al llamar navigator.canShare:`, canShareError);
             }
         }
 
@@ -879,15 +882,15 @@ async function attemptWebShare(text, files, title, context, isScannerToast = fal
         } else {
             defaultToast(`${context}: Producto compartido (solo texto).`, "info");
         }
-        console.log(`${context}: Compartido exitosamente.`, shareData);
+        console.log(`[${context}] Compartido exitosamente.`, shareData);
     } catch(e) {
         if (e.name === 'AbortError') {
-            console.log(`${context}: Operación de compartir cancelada por el usuario.`);
+            console.log(`[${context}] Operación de compartir cancelada por el usuario.`);
             defaultToast(`${context}: Compartir cancelado.`, "info");
             return;
         }
 
-        console.error(`${context}: Error al iniciar el compartidor del sistema:`, e);
+        console.error(`[${context}] Error al iniciar el compartidor del sistema:`, e);
         if (text) {
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
             defaultToast(`${context}: Fallback a WhatsApp para compartir texto.`, "info");
@@ -923,10 +926,15 @@ async function shareProductDetailsFromTab() {
     console.log('URL de la foto para compartir:', photoToShare);
 
     async function loadImageBlob(src) {
-        if (!src) throw new Error('URL de imagen vacía');
+        if (!src || src === defaultGif) { // Añadida comprobación para defaultGif aquí también
+            console.log('loadImageBlob: URL de imagen vacía o es el GIF por defecto. No se cargará.');
+            throw new Error('No hay imagen válida para cargar.');
+        }
         if (src.startsWith('data:')) {
+            console.log('loadImageBlob: Cargando desde Data URL.');
             return dataURLtoBlob(src);
         }
+        console.log('loadImageBlob: Cargando desde URL remota:', src);
         const response = await fetch(src, { mode: 'cors' });
         if (!response.ok) {
             const errorBody = await response.text();
@@ -944,7 +952,7 @@ async function shareProductDetailsFromTab() {
             filesToShare.push(file);
             console.log('Imagen cargada exitosamente para compartir (Blob type:', blob.type, ')');
         } catch (error) {
-            console.error('Error al cargar la imagen para compartir:', error);
+            console.error('Error al cargar la imagen para compartir (prod-tab):', error);
             toast("Error al cargar la imagen para compartir. Se compartirá solo texto.", "danger");
             filesToShare = []; // Limpiar los archivos si hubo un error en la carga
         }
@@ -1484,7 +1492,7 @@ function filterScanTienda(val) {
     box.innerHTML = matches.map(function(s){
         return '<div class="sug-item sug-scan-item" data-val="' + s.replace(/"/g,'&quot;') + '">' + s + '</div>';
     }).join('');
-    box.classList.remove('d-dnone');
+    box.classList.remove('d-none');
 }
 
 function selectScanTienda(val) {
@@ -1803,7 +1811,7 @@ async function captureIA() {
     } catch(e) {
         toastScanner("Error IA: " + e.message, '#ef4444');
     } finally {
-        snapIcon.className = 'fas fa-camera fa-2x text-primary';
+        snapIcon.className = 'fas fa-camera fa-spin fa-2x text-primary';
         document.getElementById('snap-btn').style.pointerEvents = 'auto';
     }
 }
@@ -1815,7 +1823,7 @@ function showDupConfirm(candidatos) {
     document.getElementById('dcm-escaneado').textContent = '"' + pendingNombre + '"';
     document.getElementById('dcm-candidatos').innerHTML = candidatos.map(function(p) {
         // Usar data-attributes para evitar problemas de comillas en onclick
-        var safeId     = (p.id    || '').replace(/'/g, '');
+        var safeId     = (p.id    || '').replace(/'/g,'');
         var safePrecio = parseFloat(p.precio) || 0;
         var safeCosto  = parseFloat(p.costo)  || 0;
         var safeNombre = (p.nombre || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -2018,7 +2026,7 @@ async function openUpdateConfirmModal(existingProduct, newScanValues) {
 
     document.getElementById('update-confirm-modal').style.display = 'flex';
 
-    // Return a promise that resolves with the final product or null on cancel
+    // Return a promise that resolves with the final product o_null on cancel
     return new Promise(resolve => {
         document.getElementById('update-confirm-modal')._resolve = resolve;
     });
@@ -2037,7 +2045,10 @@ function closeUpdateConfirmModal() {
 async function performUpdateFromScanner() {
     if (!pendingExistingProduct || !pendingExisteId) {
         toastScanner("Error: No hay producto existente para actualizar.", '#ef4444');
-        document.getElementById('update-confirm-modal')._resolve(null); // Resolve with null on error
+        if (document.getElementById('update-confirm-modal')._resolve) {
+            document.getElementById('update-confirm-modal')._resolve(null);
+            document.getElementById('update-confirm-modal')._resolve = null;
+        }
         cancelScanFlow();
         return;
     }
