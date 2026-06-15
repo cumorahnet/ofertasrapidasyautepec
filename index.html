@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v35.1 — Sistema Completo</title>
+    <title>Yaute v36.0 — Sistema Completo</title>
     <link rel="icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -117,7 +117,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 35.1</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 36.0</div>
 </div>
 
 <div id="toast-alert"></div>
@@ -307,7 +307,7 @@
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
-            <span class="version-badge">v35.1</span>
+            <span class="version-badge">v36.0</span>
             <button id="btn-install-pwa" onclick="installPWA()"
                 style="display:none; background:rgba(59,130,246,0.25); border:1px solid rgba(59,130,246,0.5); color:white; border-radius:50px; padding:3px 12px; font-size:0.62rem; font-weight:800; cursor:pointer; align-items:center; gap:5px;">
                 <i class="fas fa-download"></i> INSTALAR APP
@@ -318,8 +318,65 @@
 
 <!-- ══ MAIN ══════════════════════════════════════════════════════ -->
 <main>
-    <!-- TAB VENTAS -->
-    <div id="tab-operaciones" class="tab-content">
+    <!-- TAB PRODUCTOS (AHORA PRIMERA PESTAÑA) -->
+    <div id="tab-productos" class="tab-content">
+        <div class="card-custom mb-3">
+            <div class="d-flex gap-2 mb-3">
+                <input type="text" id="prod-search-input" class="form-control flex-fill" placeholder="BUSCAR PRODUCTO o ESCANEAR..." oninput="handleProductSearchInTab(this.value)">
+                <button class="btn btn-primary rounded-circle" onclick="openScannerModal()">
+                    <i class="fas fa-camera"></i>
+                </button>
+            </div>
+            <div id="prod-search-results">
+                <!-- Product list will be rendered here -->
+            </div>
+        </div>
+        <div id="prod-details-preview" class="card-custom" style="display:none;">
+            <p class="fw-bold mb-1" style="font-size:0.7rem; color:#94a3b8; letter-spacing:1px;">PRODUCTO SELECCIONADO</p>
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <img id="prod-preview-photo" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Foto"
+                     style="width:80px; height:80px; object-fit:cover; border-radius:12px; flex-shrink:0;">
+                <div style="flex-grow:1;">
+                    <label class="text-uppercase small fw-bold">Nombre</label>
+                    <textarea id="prod-edit-name" class="form-control mb-2" rows="2" style="resize:none; text-transform:uppercase; font-weight:700; font-size:0.9rem; line-height:1.4;"></textarea>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="text-uppercase small fw-bold">Costo</label>
+                            <input type="number" id="prod-edit-costo" class="form-control text-danger fw-bold" step="0.01">
+                        </div>
+                        <div class="col-6">
+                            <label class="text-uppercase small fw-bold">Venta</label>
+                            <input type="number" id="prod-edit-precio" class="form-control text-success fw-bold" step="0.01">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row g-2 mb-3">
+                <div class="col-6">
+                    <label class="text-uppercase small fw-bold">Fecha Escaneo</label>
+                    <input type="date" id="prod-edit-fecha-escaneo" class="form-control fw-bold">
+                </div>
+                <div class="col-6">
+                    <label class="text-uppercase small fw-bold">Tienda Escaneo</label>
+                    <input type="text" id="prod-edit-tienda-escaneo" class="form-control text-uppercase fw-bold">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="text-uppercase small fw-bold">Caducidad</label>
+                <input type="text" id="prod-edit-caducidad" class="form-control" placeholder="Dic 2026" maxlength="10" oninput="formatCaducidad(this)">
+            </div>
+
+            <div class="d-flex gap-2">
+                <button class="btn btn-success flex-fill rounded-pill fw-bold" onclick="saveProductChangesInTab()">GUARDAR CAMBIOS</button>
+                <button class="btn btn-outline-primary flex-fill rounded-pill" onclick="shareProductDetailsFromTab()">📲 COMPARTIR</button>
+            </div>
+            <button class="btn btn-primary w-100 rounded-pill mt-2" onclick="populateSalesFieldsWithProduct(selectedProductInProdTab)">USAR EN VENTAS</button>
+            <button class="btn btn-outline-secondary w-100 rounded-pill mt-2" onclick="clearProductSelection()" style="border:none;">REGRESAR</button>
+        </div>
+    </div>
+
+    <!-- TAB VENTAS (AHORA SEGUNDA PESTAÑA) -->
+    <div id="tab-operaciones" class="tab-content" style="display:none;">
         <div class="card-custom">
             <div class="row g-2 mb-2">
                 <div class="col-6" style="position:relative"><label class="text-uppercase">Tienda</label><input type="text" id="in-tienda" class="form-control text-uppercase fw-bold text-primary"><div id="sug-tienda" class="sug-box d-none"></div></div>
@@ -328,8 +385,9 @@
             <div class="row g-2 mb-2 align-items-end">
                 <div class="col-3"><label class="text-uppercase">Cant.</label><input type="number" id="in-cantidad" class="form-control text-center fw-bold" value="1"></div>
                 <div class="col" style="position:relative">
-                    <label class="text-uppercase d-flex justify-content-between">Producto <i class="fas fa-camera text-primary" style="font-size:1.2rem; cursor:pointer;" onclick="openScannerModal()"></i></label>
-                    <input type="text" id="in-producto" class="form-control text-uppercase" placeholder="BUSCAR ARTÍCULO..."><div id="sug-producto" class="sug-box d-none"></div>
+                    <label class="text-uppercase">Producto</label>
+                    <input type="text" id="in-producto" class="form-control text-uppercase" placeholder="BUSCAR ARTÍCULO...">
+                    <div id="sug-producto" class="sug-box d-none"></div>
                 </div>
             </div>
             <div class="row g-2 mb-3">
@@ -338,7 +396,7 @@
             </div>
             <button id="btn-save-record" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow">GUARDAR REGISTRO</button>
         </div>
-</div>
+    </div>
 
     <!-- TAB REPARTO -->
     <div id="tab-entregas" class="tab-content" style="display:none;">
@@ -363,13 +421,114 @@
     <video id="cam-preview-ia" autoplay playsinline muted></video>
     <div class="scan-guide"></div>
     <div id="cam-top-bar">
-        <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:white; border:1px solid rgba(255,255,255,0.3);" onclick="closeScanner()">✕ SALIR</button>
+        <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:white; border:1px solid rgba(255,255,255,0.3);" onclick="cancelScanFlow()">✕ SALIR</button>
         <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:#fbbf24; border:1px solid rgba(255,255,255,0.2); font-size:0.65rem;" onclick="changeGeminiKey()">⚙ API KEY</button>
     </div>
     <div id="snap-btn" onclick="captureIA()">
         <i class="fas fa-camera fa-2x text-primary" id="snap-icon"></i>
     </div>
 </div>
+
+<!-- ══ MODAL PRECIOS SCANNER ═════════════════════════════════════ -->
+<div id="price-modal">
+    <div id="price-panel">
+        <p class="fw-bold mb-1" style="font-size:0.7rem; color:#94a3b8; letter-spacing:1px;">PRODUCTO IDENTIFICADO</p>
+        <div id="dup-badge" class="badge-dup">
+            <i class="fas fa-exclamation-triangle mt-1" style="flex-shrink:0;"></i>
+            <span id="dup-text"></span>
+        </div>
+        <!-- Descripción en textarea: hace wrap automático, no se desborda -->
+        <textarea id="pm-nombre" class="form-control mb-3"
+            rows="3"
+            placeholder="Nombre del producto"
+            style="resize:none; text-transform:uppercase; font-weight:700; font-size:0.9rem; line-height:1.4; word-break:break-word; white-space:pre-wrap;"></textarea>
+        <!-- Fecha de escaneo + Tienda (persiste) -->
+        <div class="row g-2 mb-2">
+            <div class="col-6">
+                <label class="small fw-bold text-muted">FECHA ESCANEO</label>
+                <input type="date" id="pm-fecha-escaneo" class="form-control fw-bold"
+                    style="font-size:0.82rem;">
+            </div>
+            <div class="col-6" style="position:relative;">
+                <label class="small fw-bold text-muted">TIENDA</label>
+                <input type="text" id="pm-tienda-escaneo" class="form-control text-uppercase fw-bold"
+                    placeholder="TIENDA..." style="font-size:0.82rem;"
+                    oninput="filterScanTienda(this.value)"
+                    onchange="localStorage.setItem('yaute_scan_tienda', this.value.toUpperCase())">
+                <div id="sug-scan-tienda" class="sug-box d-none"></div>
+            </div>
+        </div>
+        <!-- Costo, margen y precio -->
+        <div class="row g-2 mb-2">
+            <div class="col-4">
+                <label class="small fw-bold text-muted">COSTO $</label>
+                <input type="number" id="pm-costo" class="form-control text-danger fw-bold"
+                    placeholder="0.00" step="0.01"
+                    oninput="autoSuggestVenta(this.value)">
+            </div>
+            <div class="col-3">
+                <label class="small fw-bold text-muted">MARGEN $</label>
+                <input type="number" id="pm-margen" class="form-control fw-bold text-primary"
+                    value="20" step="1" min="0"
+                    oninput="autoSuggestVenta(document.getElementById('pm-costo').value)"
+                    style="font-size:0.82rem;">
+            </div>
+            <div class="col-5">
+                <label class="small fw-bold text-muted">PRECIO VENTA $</label>
+                <input type="number" id="pm-venta" class="form-control text-success fw-bold"
+                    placeholder="0.00" step="0.01">
+            </div>
+        </div>
+        <!-- Caducidad (opcional) — formato libre: Dic 2026 -->
+        <div class="mb-2">
+            <label class="small fw-bold text-muted">
+                CADUCIDAD <span style="font-weight:400; font-size:0.6rem;">(opcional · ej: Dic 2026)</span>
+            </label>
+            <input type="text" id="pm-caducidad" class="form-control"
+                placeholder="Dic 2026"
+                maxlength="10"
+                style="font-size:0.88rem; text-transform:capitalize;"
+                oninput="formatCaducidad(this)">
+        </div>
+        <small class="text-muted d-block mb-3" style="font-size:0.62rem; text-align:center;">
+            💡 Precio = costo + margen → redondeado al $10 más cercano
+        </small>
+        <button class="btn btn-success w-100 py-3 rounded-pill fw-bold mb-2" onclick="confirmPrices()">📲 COMPARTIR Y GUARDAR</button>
+        <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="cancelPrices()" style="border:none;">CANCELAR — VOLVER A CÁMARA</button>
+    </div>
+</div>
+
+<!-- ══ MODAL CONFIRMACIÓN DUPLICADO ═════════════════════════════ -->
+<div id="dup-confirm-modal" style="position:fixed; inset:0; background:rgba(0,0,0,0.88); z-index:21000; display:none; align-items:flex-end; justify-content:center; padding:16px;">
+    <div style="background:white; border-radius:24px; padding:22px; width:100%; max-width:420px;">
+        <p class="fw-bold mb-1" style="font-size:0.7rem; color:#94a3b8; letter-spacing:1px;">⚠ POSIBLE DUPLICADO</p>
+        <p style="font-size:0.82rem; color:#0f172a; margin-bottom:14px;">
+            El producto escaneado <strong id="dcm-escaneado"></strong> coincide parcialmente con los siguientes registros. ¿Es alguno de estos?
+        </p>
+        <div id="dcm-candidatos" style="max-height:200px; overflow-y:auto; margin-bottom:14px;"></div>
+        <button class="btn btn-warning w-100 rounded-pill fw-bold mb-2" onclick="skipDuplicate()">
+            NO — ES UN PRODUCTO NUEVO
+        </button>
+        <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="closeDupConfirm()" style="border:none; font-size:0.8rem;">
+            CANCELAR — VOLVER A CÁMARA
+        </button>
+    </div>
+</div>
+
+<!-- ══ MODAL API KEY GEMINI ══════════════════════════════════════ -->
+<div id="key-config-modal">
+    <div class="card-custom w-100" style="max-width:350px; text-align:center;">
+        <h6 class="fw-bold mb-3">⚙ ACTIVAR ESCÁNER IA</h6>
+        <p style="font-size:0.7rem;" class="text-muted mb-3">
+            Pega tu API Key de Gemini.<br>Se guarda solo en este dispositivo.<br><br>
+            Obtén la tuya gratis en<br>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--accent);">aistudio.google.com</a>
+        </p>
+        <input type="password" id="user-gemini-key" class="form-control mb-3" placeholder="AIzaSy...">
+        <button class="btn btn-primary w-100 rounded-pill fw-bold" onclick="saveGeminiKey()">ACTIVAR</button>
+    </div>
+</div>
+
 
 <!-- ══ TICKET RENDER ═════════════════════════════════════════════ -->
 <div id="ticket-render">
@@ -391,7 +550,8 @@
 
 <!-- ══ BOTTOM NAV ════════════════════════════════════════════════ -->
 <nav class="bottom-nav">
-    <button class="tab-btn active" onclick="showTab('operaciones', this)"><i class="fas fa-cash-register"></i>Ventas</button>
+    <button class="tab-btn active" onclick="showTab('productos', this)"><i class="fas fa-boxes"></i>Productos</button>
+    <button class="tab-btn" onclick="showTab('operaciones', this)"><i class="fas fa-cash-register"></i>Ventas</button>
     <button class="tab-btn" onclick="showTab('entregas', this)"><i class="fas fa-truck"></i>Reparto</button>
     <button class="tab-btn" onclick="showTab('control', this)"><i class="fas fa-shield-halved"></i>Gestión</button>
 </nav>
@@ -432,11 +592,17 @@ let activeFinanceView = 'compras';
 let productSearchTerm = '';
 let currentUser     = null;
 
-// Scanner
+// Scanner related globals
 let scannerStream   = null;
-let pendingNombre   = '';
-let pendingCanvas   = null;
-let pendingExisteId = null;
+let pendingNombre   = '';          // Nombre extraído por la IA del escaneo actual
+let pendingCanvas   = null;        // Canvas con la imagen del escaneo actual
+let pendingExisteId = null;        // ID del producto existente que coincide con el escaneo
+let pendingExistingProduct = null; // Objeto completo del producto existente que coincide
+let pendingScanValues = {};        // Valores (precios, tienda, caducidad, etc.) introducidos/sugeridos en price-modal para el escaneo actual
+
+// Product Tab specific globals
+let selectedProductInProdTab = null; // The product object selected from tab-productos for display/editing
+
 
 // Finanzas fechas
 const getMXTimeParts = () => {
@@ -506,6 +672,18 @@ function startSync() {
             }
 
             if (name === 'sales') { renderEntregas(); if (activeSubTab === 'finanzas') renderFinanceMenu(); }
+            // Re-renderizar la lista de productos en la pestaña de productos si estamos ahí
+            if (name === 'products') {
+                if (document.getElementById('tab-productos').style.display !== 'none') {
+                    // Re-render search results if currently on product tab and not in detail view
+                    if (!selectedProductInProdTab) {
+                        handleProductSearchInTab(document.getElementById('prod-search-input').value);
+                    } else {
+                        // If in detail view, refresh the displayed product
+                        selectProductInTab(selectedProductInProdTab.id);
+                    }
+                }
+            }
             if (name !== 'sales' && activeSubTab === 'catalogo') renderControlList();
         }, err => {
             console.error('Sync:', name, err.message);
@@ -518,22 +696,47 @@ function startSync() {
 
     setupAuto('in-tienda',   'sug-tienda',   'stores');
     setupAuto('in-cliente',  'sug-cliente',  'clients');
-    setupAuto('in-producto', 'sug-producto', 'products');
+    setupAuto('in-producto', 'sug-producto', 'products'); // Re-enable for sales tab
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   GENERIC AUTOCOMPLETE SETUP (for tienda, cliente, and producto in ventas)
+══════════════════════════════════════════════════════════════════ */
 function setupAuto(inpId, boxId, key) {
     const inp = document.getElementById(inpId);
     const box = document.getElementById(boxId);
     if (!inp || !box) return;
+
     inp.oninput = () => {
         const val = inp.value.toUpperCase();
-        if (!val) { box.classList.add('d-none'); return; }
+        if (!val) { box.classList.add('d-none');
+            if (key === 'products') {
+                document.getElementById('in-costo').value = '';
+                document.getElementById('in-precio').value = '';
+            }
+            return;
+        }
+
         const filtered = (window.state[key] || [])
             .map(x => (x.nombre || '').toUpperCase())
             .filter(s => s.includes(val)).slice(0, 5);
+        
         box.innerHTML = filtered.map(s => `<div class="sug-item" data-val="${s}">${s}</div>`).join('');
         box.classList.toggle('d-none', filtered.length === 0);
+
+        // For products field in sales tab, try to pre-fill prices if exact match is found on type
+        if (key === 'products') {
+            const exactMatch = window.state.products.find(x => (x.nombre || '').toUpperCase() === val);
+            if (exactMatch) {
+                document.getElementById('in-costo').value  = exactMatch.costo  || 0;
+                document.getElementById('in-precio').value = exactMatch.precio || 0;
+            } else {
+                document.getElementById('in-costo').value = '';
+                document.getElementById('in-precio').value = '';
+            }
+        }
     };
+
     box.onclick = e => {
         const it = e.target.closest('.sug-item'); if (!it) return;
         const val = it.dataset.val.trim();
@@ -543,6 +746,9 @@ function setupAuto(inpId, boxId, key) {
             if (p) {
                 document.getElementById('in-costo').value  = p.costo  || 0;
                 document.getElementById('in-precio').value = p.precio || 0;
+            } else { // Should not happen if selected from suggestions, but for safety
+                document.getElementById('in-costo').value = '';
+                document.getElementById('in-precio').value = '';
             }
         }
     };
@@ -550,6 +756,298 @@ function setupAuto(inpId, boxId, key) {
         if (!inp.contains(e.target) && !box.contains(e.target)) box.classList.add('d-none');
     });
 }
+
+
+/* ══════════════════════════════════════════════════════════════════
+   FUNCIONES ESPECÍFICAS DE LA PESTAÑA DE PRODUCTOS
+══════════════════════════════════════════════════════════════════ */
+
+function handleProductSearchInTab(value) {
+    // Only update search results if not currently viewing a selected product's details
+    if (selectedProductInProdTab) return;
+
+    const searchTerm = value.trim().toUpperCase();
+    const resultsContainer = document.getElementById('prod-search-results');
+
+    // If search term is empty, show all products
+    const productsToShow = searchTerm
+        ? window.state.products.filter(p => (p.nombre || '').toUpperCase().includes(searchTerm))
+        : window.state.products;
+
+    renderProductSearchResults(productsToShow);
+}
+
+function renderProductSearchResults(products) {
+    const resultsContainer = document.getElementById('prod-search-results');
+    resultsContainer.innerHTML = ''; // Clear existing results when rendering new ones
+    
+    if (products.length === 0) {
+        resultsContainer.innerHTML = '<p class="text-center text-muted small mt-3">No se encontraron productos.</p>';
+        return;
+    }
+
+    resultsContainer.innerHTML = products.map(p => `
+        <div class="card-custom py-2 mb-1 d-flex justify-content-between align-items-center shadow-none border small px-3">
+            <div class="d-flex align-items-center gap-2">
+                ${p.foto ? `<img src="${p.foto}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;">` : `<i class="fas fa-box fa-2x text-muted me-2"></i>`}
+                <div>
+                    <div class="text-uppercase fw-bold text-dark" style="font-size:0.85rem;">${p.nombre || 'S/N'}</div>
+                    <div class="d-flex align-items-center flex-wrap gap-1" style="font-size:0.65rem;">
+                        <span class="text-muted">C: <span class="text-danger fw-bold">$${(p.costo || 0).toFixed(2)}</span></span>
+                        <span class="text-muted">V: <span class="text-success fw-bold">$${(p.precio || 0).toFixed(2)}</span></span>
+                        ${p.tiendaEscaneo ? ` <span style="background:#eff6ff;color:#2563eb;border-radius:6px;padding:1px 6px;font-weight:800;">${p.tiendaEscaneo}</span>` : ''}
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-sm btn-outline-primary rounded-pill px-3" onclick="selectProductInTab('${p.id}')">Seleccionar</button>
+        </div>
+    `).join('');
+}
+
+function selectProductInTab(productId) {
+    const product = window.state.products.find(p => p.id === productId);
+    if (!product) {
+        toastScanner("Producto no encontrado.", "danger");
+        clearProductSelection();
+        return;
+    }
+    selectedProductInProdTab = product; // Store the selected product
+
+    // Hide search input and results
+    document.getElementById('prod-search-input').style.display = 'none';
+    document.querySelector('#tab-productos .card-custom.mb-3 .btn.rounded-circle').style.display = 'none'; // Hide camera button
+    document.getElementById('prod-search-results').innerHTML = ''; // Clear search list
+
+    // Populate editable fields
+    document.getElementById('prod-edit-name').value = product.nombre || '';
+    document.getElementById('prod-edit-costo').value = (product.costo || 0).toFixed(2);
+    document.getElementById('prod-edit-precio').value = (product.precio || 0).toFixed(2);
+    // CORRECCIÓN: Usar 'prod-preview-photo' que es el ID correcto del elemento de imagen
+    document.getElementById('prod-preview-photo').src = product.foto || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+    document.getElementById('prod-edit-fecha-escaneo').value = product.fechaEscaneo ? product.fechaEscaneo.split('/').reverse().join('-') : ''; // Convert to YYYY-MM-DD
+    document.getElementById('prod-edit-tienda-escaneo').value = product.tiendaEscaneo || '';
+    document.getElementById('prod-edit-caducidad').value = product.caducidad || '';
+
+    document.getElementById('prod-details-preview').style.display = 'block';
+}
+
+function clearProductSelection() {
+    selectedProductInProdTab = null; // Clear the selected product
+    
+    // Show search input and button again
+    document.getElementById('prod-search-input').style.display = 'block';
+    document.getElementById('prod-search-input').value = '';
+    document.querySelector('#tab-productos .card-custom.mb-3 .btn.rounded-circle').style.display = 'flex'; // Show camera button
+    
+    // Reset and show all products in the search results area
+    handleProductSearchInTab('');
+    
+    document.getElementById('prod-details-preview').style.display = 'none';
+}
+
+async function saveProductChangesInTab() {
+    if (!selectedProductInProdTab) {
+        toastScanner("No hay producto seleccionado para guardar.", "danger");
+        return;
+    }
+
+    const productId = selectedProductInProdTab.id;
+    const newName = document.getElementById('prod-edit-name').value.trim().toUpperCase();
+    const newCosto = parseFloat(document.getElementById('prod-edit-costo').value) || 0;
+    const newPrecio = parseFloat(document.getElementById('prod-edit-precio').value) || 0;
+    const newFechaEscaneo = document.getElementById('prod-edit-fecha-escaneo').value; // YYYY-MM-DD
+    const newTiendaEscaneo = document.getElementById('prod-edit-tienda-escaneo').value.trim().toUpperCase();
+    const newCaducidad = document.getElementById('prod-edit-caducidad').value.trim();
+
+    if (!newName) {
+        toastScanner("El nombre del producto no puede estar vacío.", "danger");
+        return;
+    }
+
+    const dataToUpdate = {
+        nombre: newName,
+        costo: newCosto,
+        precio: newPrecio,
+        fechaEscaneo: newFechaEscaneo ? newFechaEscaneo.split('-').reverse().join('/') : '', // Convert back to DD/MM/YYYY
+        tiendaEscaneo: newTiendaEscaneo,
+        caducidad: newCaducidad
+    };
+
+    // Keep existing photo if not changed by scanner in the same flow
+    dataToUpdate.foto = selectedProductInProdTab.foto || ''; 
+
+    try {
+        await col('products').doc(productId).update(dataToUpdate);
+        toastScanner("✅ Cambios guardados", "success");
+        // Update the selected product in memory to reflect changes
+        selectedProductInProdTab = { ...selectedProductInProdTab, ...dataToUpdate };
+        // Re-render the preview with the updated data
+        selectProductInTab(productId); 
+    } catch (e) {
+        console.error("Error al guardar cambios del producto:", e);
+        toastScanner("Error al guardar cambios: " + e.message, "danger");
+    }
+}
+
+// Helper para convertir Data URL a Blob
+function dataURLtoBlob(dataurl) {
+    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), n = bstr.length, uarr = new Uint8Array(n);
+    while(n--){
+        uarr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([uarr], {type:mime});
+}
+
+// Función unificada para manejar la lógica de compartir con Web Share API
+async function attemptWebShare(text, files, title, context, isScannerToast = false) {
+    const defaultToast = isScannerToast ? toastScanner : toast;
+
+    console.log(`[${context}] Intentando compartir con Web Share API...`);
+    
+    const shareData = { title, text };
+    let sharedWithFiles = false;
+
+    if (files && files.length > 0) {
+        console.log(`[${context}] Intentando compartir con ${files.length} archivo(s). Blob types: ${files.map(f => f.type).join(', ')}`); // Added blob types log
+        try {
+            if (navigator.canShare && navigator.canShare({ files })) {
+                shareData.files = files;
+                sharedWithFiles = true;
+                console.log(`[${context}] navigator.canShare({ files }) -> OK.`);
+            } else {
+                console.warn(`[${context}] Este navegador no admite compartir archivos o navigator.canShare falló; se intentará solo texto.`);
+            }
+        } catch (canShareError) {
+            console.warn(`[${context}] Error al llamar navigator.canShare:`, canShareError);
+        }
+    } else {
+        console.log(`[${context}] No hay archivos para compartir. Se enviará solo texto.`); // New log for empty files
+    }
+
+    if (!navigator.share) {
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+        defaultToast(`${context}: Compartido solo texto (navegador no soporta API Web Share).`, "info");
+        console.log(`[${context}] Fallback a WhatsApp para compartir texto.`);
+        return;
+    }
+
+    try {
+        await navigator.share(shareData);
+
+        if (sharedWithFiles) {
+            defaultToast(`${context}: Producto compartido con imagen.`, "success");
+        } else if (files && files.length > 0) { // files existed but couldn't be shared
+            defaultToast(`${context}: Se compartió solo texto porque no se admiten archivos.`, "warning");
+        } else { // No files were even prepared
+            defaultToast(`${context}: Producto compartido (solo texto).`, "info");
+        }
+        console.log(`[${context}] Compartido exitosamente.`, shareData);
+    } catch(e) {
+        if (e.name === 'AbortError') {
+            console.log(`[${context}] Operación de compartir cancelada por el usuario.`);
+            defaultToast(`${context}: Compartir cancelado.`, "info");
+            return;
+        }
+
+        console.error(`[${context}] Error al iniciar el compartidor del sistema:`, e);
+        if (text) {
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+            defaultToast(`${context}: Fallback a WhatsApp para compartir texto.`, "info");
+        } else {
+            defaultToast(`${context}: Error al compartir. Detalles en la consola.`, "danger");
+        }
+    } finally {
+        console.log(`--- Fin intento de compartir desde ${context} ---`);
+    }
+}
+
+
+async function shareProductDetailsFromTab() {
+    if (!selectedProductInProdTab) {
+        toast("Por favor, selecciona un producto para compartir.", "danger");
+        return;
+    }
+
+    const nameToShare = document.getElementById('prod-edit-name').value.trim().toUpperCase();
+    const costToShare = parseFloat(document.getElementById('prod-edit-costo').value) || 0;
+    const priceToShare = parseFloat(document.getElementById('prod-edit-precio').value) || 0;
+    const caducidadToShare = document.getElementById('prod-edit-caducidad').value.trim();
+    const photoToShare = document.getElementById('prod-preview-photo').src;
+
+    let msgWA = `🛒 *OFERTA*\n📦 ${nameToShare}\n💰 $${priceToShare.toFixed(2)}`;
+    if (costToShare > 0) msgWA += ` (Costo: $${costToShare.toFixed(2)})`;
+    if (caducidadToShare) msgWA += `\n⏳ Caducidad: ${caducidadToShare}`;
+
+    let filesToShare = [];
+    const defaultGif = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+
+    console.log('--- Iniciando intento de compartir desde Pestaña Productos ---');
+    console.log('URL de la foto para compartir:', photoToShare);
+
+    async function loadImageBlob(src) {
+        if (!src || src === defaultGif) { // Añadida comprobación para defaultGif aquí también
+            console.log('loadImageBlob: URL de imagen vacía o es el GIF por defecto. No se cargará.');
+            throw new Error('No hay imagen válida para cargar.');
+        }
+        if (src.startsWith('data:')) {
+            console.log('loadImageBlob: Cargando desde Data URL.');
+            return dataURLtoBlob(src);
+        }
+        console.log('loadImageBlob: Cargando desde URL remota:', src);
+        const response = await fetch(src, { mode: 'cors' });
+        if (!response.ok) {
+            const errorBody = await response.text();
+            throw new Error(`HTTP Error ${response.status}: ${response.statusText}. Response snippet: ${errorBody.substring(0, 100)}`);
+        }
+        return response.blob();
+    }
+
+    // Intenta cargar la imagen solo si no es la imagen por defecto
+    if (photoToShare && photoToShare !== defaultGif) {
+        try {
+            const blob = await loadImageBlob(photoToShare);
+            // Determine a better file extension from blob.type
+            let fileExtension = 'jpg'; // Default fallback
+            if (blob.type && blob.type.includes('/')) {
+                fileExtension = blob.type.split('/')[1];
+                if (fileExtension === 'jpeg') fileExtension = 'jpg'; // Common preference
+            }
+            const fileName = `oferta_producto.${fileExtension}`;
+
+            const file = new File([blob], fileName, { type: blob.type }); // Use blob.type directly
+            filesToShare.push(file);
+            console.log('Imagen cargada exitosamente para compartir (Blob type:', blob.type, ', filename:', fileName, ')');
+        } catch (error) {
+            console.error('Error al cargar la imagen para compartir (prod-tab):', error);
+            toast("Error al cargar la imagen para compartir. Se compartirá solo texto.", "danger");
+            filesToShare = []; // Limpiar los archivos si hubo un error en la carga
+        }
+    } else {
+        console.log('No hay imagen válida para compartir (es la imagen por defecto o vacía).');
+    }
+
+    // Intentar compartir usando la función unificada
+    await attemptWebShare(msgWA, filesToShare, 'Oferta de Producto', 'Pestaña Productos');
+}
+
+
+// Function to populate main sales form fields and switch to sales tab
+function populateSalesFieldsWithProduct(product) {
+    if (product) {
+        document.getElementById('in-producto').value = product.nombre || '';
+        document.getElementById('in-costo').value    = product.costo  || 0;
+        document.getElementById('in-precio').value   = product.precio || 0;
+    } else {
+        document.getElementById('in-producto').value = '';
+        document.getElementById('in-costo').value    = '';
+        document.getElementById('in-precio').value   = '';
+    }
+    showTab('operaciones', document.querySelector('.tab-btn[onclick*="operaciones"]'));
+    // Ensure product search tab is clean after selection
+    clearProductSelection();
+}
+
 
 /* ══════════════════════════════════════════════════════════════════
    NAVEGACIÓN
@@ -560,7 +1058,28 @@ function showTab(id, btn) {
     if (t) t.style.display = 'block';
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
-    if (id === 'control') switchSubTab('finanzas');
+    
+    // Specific tab initialization
+    if (id === 'control') {
+        switchSubTab('finanzas'); // Default to finanzas when control tab is opened
+    } else if (id === 'productos') {
+        // Revisa si hay un producto seleccionado y lo muestra directamente, si no, muestra la búsqueda
+        if (selectedProductInProdTab) {
+            selectProductInTab(selectedProductInProdTab.id); // Re-populate and show details
+        } else {
+            document.getElementById('prod-search-input').style.display = 'block';
+            document.querySelector('#tab-productos .card-custom.mb-3 .btn.rounded-circle').style.display = 'flex';
+            document.getElementById('prod-search-input').value = ''; // Clear search
+            handleProductSearchInTab(''); // Show all products initially
+            document.getElementById('prod-details-preview').style.display = 'none'; // Ensure preview is hidden
+        }
+    } else if (id === 'operaciones') {
+        // When going to sales, clear product fields if no product was explicitly added from the products tab
+        if (!document.getElementById('in-producto').value) {
+            document.getElementById('in-costo').value = '';
+            document.getElementById('in-precio').value = '';
+        }
+    }
 }
 
 function switchSubTab(id) {
@@ -576,26 +1095,59 @@ function switchSubTab(id) {
 document.addEventListener('DOMContentLoaded', () => {
     const ed = document.getElementById('entregas-date');
     if (ed) ed.value = getMXISODate();
-    showTab('operaciones', document.querySelector('.tab-btn.active'));
+    showTab('productos', document.querySelector('.tab-btn[onclick*="productos"]')); // Open Products tab by default
 
     document.getElementById('btn-save-record').onclick = async () => {
         const t   = document.getElementById('in-tienda').value.trim().toUpperCase();
         const c   = document.getElementById('in-cliente').value.trim().toUpperCase();
-        const p   = document.getElementById('in-producto').value.trim().toUpperCase();
+        const pName = document.getElementById('in-producto').value.trim().toUpperCase(); // Get name from input
         const q   = parseInt(document.getElementById('in-cantidad').value) || 1;
         const co  = parseFloat(document.getElementById('in-costo').value)  || 0;
         const prI = parseFloat(document.getElementById('in-precio').value) || 0;
         const salePrice = (c === 'CRISTO') ? co : prI;
-        if (!t || !c || !p) return toast("Faltan datos", "danger");
+        
+        if (!t || !c || !pName) { // Check for product name
+            return toast("Faltan datos (tienda, cliente o producto)", "danger");
+        }
 
-        await col('sales').add({ tienda:t, cliente:c, producto:p, cantidad:q, costo:co, precio:salePrice, total:q*salePrice, fechaStr:getMXDateStr(), timestamp:Date.now(), entregado:false, pagado:false });
+        // Check if product exists, if not, add it to products collection
+        // This logic is being kept for sales flow consistency, but the primary way
+        // to create new products is now through the "Productos" tab/scanner.
+        let existingProduct = window.state.products.find(s => (s.nombre || '').toUpperCase() === pName);
+        if (!existingProduct) {
+             const newProductData = { nombre: pName, costo: co, precio: prI, fechaEscaneo: getMXDateStr() }; // Add current date as scan date for new products
+             const docRef = await col('products').add(newProductData);
+             existingProduct = { id: docRef.id, ...newProductData };
+             toastScanner("Producto añadido al catálogo.", "success");
+        } else {
+            // Update existing product if prices changed (only if not explicitly updated via scanner flow)
+            // This is a fallback to keep product data consistent if sales flow changes prices
+            if (existingProduct.costo !== co || existingProduct.precio !== prI) {
+                await col('products').doc(existingProduct.id).update({ costo: co, precio: prI });
+                toastScanner("Precios de producto actualizados en catálogo.", "info");
+            }
+        }
 
+
+        await col('sales').add({
+            tienda:t,
+            cliente:c,
+            producto:pName,
+            productoId: existingProduct ? existingProduct.id : null, // Link with product ID if found/created
+            cantidad:q,
+            costo:co,
+            precio:salePrice,
+            total:q*salePrice,
+            fechaStr:getMXDateStr(),
+            timestamp:Date.now(),
+            entregado:false,
+            pagado:false
+        });
+
+        // Add/update client and store
         if (!window.state.stores.some(s  => (s.nombre||'').toUpperCase()===t))  col('stores').add({ nombre:t });
         if (!window.state.clients.some(s => (s.nombre||'').toUpperCase()===c))  col('clients').add({ nombre:c });
-        const ep = window.state.products.find(s => (s.nombre||'').toUpperCase()===p);
-        if (!ep) col('products').add({ nombre:p, costo:co, precio:prI });
-        else     col('products').doc(ep.id).update({ costo:co, precio:prI });
-
+        
         toast("¡Venta guardada!");
         document.getElementById('in-cliente').value  = '';
         document.getElementById('in-producto').value = '';
@@ -976,8 +1528,8 @@ async function shareTicket(n) {
     canvas.toBlob(async b => {
         const file = new File([b], 'Ticket.png', { type:'image/png' });
         const msg  = `hola *${pName}* te envío tu cuenta, gracias por tu preferencia`;
-        if (navigator.share) try { await navigator.share({ files:[file], title:'Nota Yaute', text:msg }); } catch(e) {}
-        else window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+        // Usar la función unificada de compartir
+        await attemptWebShare(msg, [file], 'Nota Yaute', 'Reparto (Ticket)');
     }, 'image/png');
 }
 
@@ -1043,155 +1595,77 @@ async function openScannerModal() {
     if (fechaEl)  fechaEl.value  = hoy;
     if (tiendaEl) tiendaEl.value = tiendaPersistida;
 
+    // Clear previous pending info when opening scanner from the button
+    pendingNombre = '';
+    pendingCanvas = null;
+    pendingExisteId = null;
+    pendingExistingProduct = null;
+    pendingScanValues = {};
+
     document.getElementById('ia-modal').style.display = 'flex';
     try {
         scannerStream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
         });
         document.getElementById('cam-preview-ia').srcObject = scannerStream;
+        
+        // Ensure price-modal fields are clean at the start of a fresh scan
+        document.getElementById('pm-nombre').value = '';
+        document.getElementById('pm-costo').value = '';
+        document.getElementById('pm-venta').value = '';
+        document.getElementById('dup-badge').classList.remove('show');
+
     } catch(e) {
         toastScanner("Error de cámara: " + e.message, '#ef4444');
-        closeScanner();
+        cancelScanFlow(); // Llama a cancelScanFlow para limpiar y cerrar todo
     }
 }
-function closeScanner() {
+function closeScanner() { // Solo se encarga de detener la cámara
     if (scannerStream) scannerStream.getTracks().forEach(t => t.stop());
     scannerStream = null;
     document.getElementById('ia-modal').style.display = 'none';
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   SCANNER — PRECIO SUGERIDO
-   Regla: costo + $20 de margen fijo → redondear al múltiplo de $10
-   cercano según el residuo (< 5 → baja, >= 5 → sube):
-     costo $18 → base $38 → redondea a $40
-     costo $22 → base $42 → redondea a $40
-     costo $25 → base $45 → redondea a $50
-     costo $31 → base $51 → redondea a $50
-     costo $44 → base $64 → redondea a $60
-   El campo de margen es editable en pantalla (default $20).
-══════════════════════════════════════════════════════════════════ */
-var MARGEN_DEFAULT = 20;
+/* Nueva función para limpiar todo el estado del escáner y cerrar modales */
+function cancelScanFlow() {
+    pendingNombre = '';
+    pendingCanvas = null;
+    pendingExisteId = null;
+    pendingExistingProduct = null;
+    pendingScanValues = {};
 
-/* Formatea la caducidad mientras el usuario escribe.
-   Acepta: "dic", "dic2", "dic 2", "dic 2026" etc.
-   Resultado: primera letra mayúscula + espacio + año */
-function formatCaducidad(input) {
-    var meses = {
-        'ene':'Ene','feb':'Feb','mar':'Mar','abr':'Abr','may':'May','jun':'Jun',
-        'jul':'Jul','ago':'Ago','sep':'Sep','oct':'Oct','nov':'Nov','dic':'Dic',
-        'jan':'Ene','aug':'Ago'
-    };
-    var raw   = input.value.replace(/[^a-zA-Z0-9 ]/g,'');
-    var parts = raw.trim().split(/\s+/);
-    var mes   = parts[0] ? parts[0].toLowerCase().slice(0,3) : '';
-    var anio  = parts[1] || '';
-    var mesF  = meses[mes] || (parts[0] ? parts[0].charAt(0).toUpperCase() + parts[0].slice(1).toLowerCase() : '');
-    if (mesF && anio) { input.value = mesF + ' ' + anio; }
-    else if (mesF)    { input.value = mesF + (raw.includes(' ') ? ' ' : ''); }
-}
-
-function redondearA10(valor) {
-    var entero = Math.ceil(valor);
-    var resto  = entero % 10;
-    if (resto === 0) return entero;
-    return resto < 5 ? entero - resto : entero + (10 - resto);
-}
-
-/* Precarga precios en el panel del scanner.
-   Si el producto ya tiene precio guardado (>0) lo respeta.
-   Si no hay precio previo, calcula: costo + margen → redondeo. */
-function precargarPrecios(precio, costo) {
-    var ventaInput  = document.getElementById('pm-venta');
-    var costoInput  = document.getElementById('pm-costo');
-    costoInput.value = costo || '';
-    if (precio && parseFloat(precio) > 0) {
-        ventaInput.value = parseFloat(precio).toFixed(2);
-        ventaInput.dataset.suggested = '';
-    } else if (costo && parseFloat(costo) > 0) {
-        autoSuggestVenta(String(costo));
-    } else {
-        ventaInput.value = '';
-    }
-}
-
-function autoSuggestVenta(costoStr) {
-    var costo      = parseFloat(costoStr);
-    var margenEl   = document.getElementById('pm-margen');
-    var margen     = margenEl ? (parseFloat(margenEl.value) || MARGEN_DEFAULT) : MARGEN_DEFAULT;
-    var ventaInput = document.getElementById('pm-venta');
-    // Recalcula siempre que el usuario edite costo o margen
-    if (!isNaN(costo) && costo > 0) {
-        var sugerido = redondearA10(costo + margen);
-        ventaInput.value = sugerido.toFixed(2);
-        ventaInput.dataset.suggested = sugerido.toFixed(2);
-    }
-}
-
-/* ══════════════════════════════════════════════════════════════════
-   SCANNER — CORRECCIÓN DE ORIENTACIÓN
-   
-   Solución: capturar el frame tal cual sale del sensor y luego
-   aplicar siempre -90° si es landscape, sin detección condicional.
-   Se ofrecen dos canvases (original y rotado) y se elige el que
-   queda portrait.
-══════════════════════════════════════════════════════════════════ */
-function captureOrientado(video) {
-    // Dimensiones reales del sensor
-    var vw = video.videoWidth;
-    var vh = video.videoHeight;
-
-    // Dimensiones del video como se ve en pantalla
-    var rw = video.clientWidth  || video.offsetWidth;
-    var rh = video.clientHeight || video.offsetHeight;
-
-    // ¿El browser presentó el video rotado? (sensor landscape, pantalla portrait)
-    var sensorLandscape  = (vw > vh);
-    var vistaPortrait    = (rh > rw);
-    var browserRoto      = sensorLandscape && vistaPortrait;
-
-    // Canvas destino siempre portrait
-    var c   = document.createElement('canvas');
-    var ctx = c.getContext('2d');
-
-    if (browserRoto) {
-        // El browser rotó el video por CSS — compensar con +90° CW
-        c.width  = vh;
-        c.height = vw;
-        ctx.save();
-        ctx.translate(c.width, 0);
-        ctx.rotate(Math.PI / 2);
-        ctx.drawImage(video, 0, 0, vw, vh);
-        ctx.restore();
-    } else {
-        // Sin rotación del browser — dibujar directo
-        c.width  = vw;
-        c.height = vh;
-        ctx.drawImage(video, 0, 0, vw, vh);
+    // Detener la transmisión de la cámara si está activa
+    if (scannerStream) {
+        scannerStream.getTracks().forEach(t => t.stop());
+        scannerStream = null;
     }
 
-    // Garantía final: si el resultado sigue landscape → forzar rotación
-    if (c.width > c.height) {
-        var c2   = document.createElement('canvas');
-        var ctx2 = c2.getContext('2d');
-        c2.width  = c.height;
-        c2.height = c.width;
-        ctx2.save();
-        ctx2.translate(c2.width, 0);
-        ctx2.rotate(Math.PI / 2);
-        ctx2.drawImage(c, 0, 0);
-        ctx2.restore();
-        return c2;
-    }
+    // Ocultar todos los modales relacionados con el escáner
+    document.getElementById('ia-modal').style.display = 'none';
+    document.getElementById('price-modal').style.display = 'none';
+    document.getElementById('dup-confirm-modal').style.display = 'none';
+    // document.getElementById('update-confirm-modal').style.display = 'none'; // Este modal ya no existe
 
-    return c;
+    // Limpiar campos en el modal de precios para un nuevo escaneo
+    document.getElementById('pm-nombre').value = '';
+    document.getElementById('pm-costo').value = '';
+    document.getElementById('pm-margen').value = '20'; // Resetear a margen por defecto
+    document.getElementById('pm-venta').value = '';
+    document.getElementById('pm-caducidad').value = '';
+    document.getElementById('dup-badge').classList.remove('show'); // Ocultar el badge de duplicado
+    document.getElementById('sug-scan-tienda').classList.add('d-none'); // Ocultar sugerencias de tienda
+
+    // También cerrar el modal de configuración de la clave si está abierto
+    document.getElementById('key-config-modal').style.display = 'none';
+
+    toastScanner("Escaneo cancelado.", "info");
 }
 
-
-/* ══════════════════════════════════════════════════════════════════
-   SCANNER — CAPTURA + IA + DETECCIÓN DUPLICADOS
-══════════════════════════════════════════════════════════════════ */
+// ══════════════════════════════════════════════════════════════════
+// SCANNERS — CORE (IA y lógica de detección)
+// ══════════════════════════════════════════════════════════════════
 let model = null; // Globar variable for Gemini Vision Pro model
+const RESIZE_WIDTH = 800;    // Ancho a redimensionar si es necesario
 
 // Función para inicializar Gemini
 async function initGeminiVision() {
@@ -1204,7 +1678,7 @@ async function initGeminiVision() {
     try {
         const { GoogleGenerativeAI } = await import('https://esm.run/@google/generative-ai');
         const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-        model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" }); // Usar modelo de texto a imagen
+        model = genAI.getGenerativeModel({ model: "gemini-2.5-flash-lite" });
         console.log("Gemini Vision Pro inicializado.");
     } catch (e) {
         console.error("Error al inicializar Gemini Vision Pro:", e);
@@ -1227,53 +1701,101 @@ function dataUriToGenerativePart(dataUri) {
     };
 }
 
-
+// Capturar imagen desde la cámara para el análisis IA
 async function captureIA() {
-    if (!model) { // Verificar si el modelo está inicializado
+    if (!model) {
         toastScanner("La IA no está lista. Verifica tu API Key.", '#ef4444');
-        changeGeminiKey(); // Abre el modal de la API Key si no está listo
+        changeGeminiKey(); // Abre el modal de la API Key
         return;
     }
 
-    const key   = localStorage.getItem('yaute_key_v3310');
-    if (!key) { changeGeminiKey(); return; }
     const video = document.getElementById('cam-preview-ia');
-    if (!video.srcObject || video.videoWidth === 0) { toastScanner("Cámara no lista", '#f59e0b'); return; }
+    pendingCanvas = document.createElement('canvas'); // Usamos pendingCanvas global
+    let context = pendingCanvas.getContext('2d'); // Usar 'let' para reasignar si se redimensiona
 
-    // Limpiar caducidad en cada nuevo escaneo
-    document.getElementById('pm-caducidad').value = '';
+    // Obtener la región de interés (el cuadrado de escaneo) para capturar solo esa parte.
+    const videoWidth = video.videoWidth;
+    const videoHeight = video.videoHeight;
 
-    pendingCanvas = captureOrientado(video);
-    const b64 = pendingCanvas.toDataURL('image/jpeg', 0.88).split(',')[1]; // Calidad fija
+    const captureBox = document.querySelector('.scan-guide');
+    const boxRect = captureBox.getBoundingClientRect(); // Obtener dimensiones de la guía visual
+    const videoDisplayWidth = video.offsetWidth;
+    const videoDisplayHeight = video.offsetHeight;
 
-    const snapIcon = document.getElementById('snap-icon');
-    snapIcon.className = 'fas fa-spinner fa-spin fa-2x text-primary';
-    document.getElementById('snap-btn').style.pointerEvents = 'none';
+    const videoRatio = videoWidth / videoHeight;
+    const containerRatio = videoDisplayWidth / videoDisplayHeight;
 
-    // Reintento automático si Gemini responde 429 (quota por minuto)
-    const callGemini = async (intentos = 3) => {
-        try {
-            const result = await model.generateContent([
-                dataUriToGenerativePart(pendingCanvas.toDataURL('image/jpeg', 0.88)), // Convertir a generative part
-                { text:"Eres un lector experto de etiquetas de productos de consumo en México. Analiza la imagen y extrae: 1) Marca comercial, 2) Nombre del producto, 3) Presentación (gramaje, volumen, número de piezas, sabor o variante si aparece). Responde SOLO con el resultado en UNA LÍNEA en MAYÚSCULAS con el formato: MARCA NOMBRE PRESENTACIÓN. Sin explicaciones, sin puntos, sin saltos de línea." }
-            ]);
-            const response = await result.response;
-            const text = response.text();
-            return { candidates: [{ content: { parts: [{ text: text }] } }] }; // Formato de respuesta compatible
-        } catch (error) {
-            if (error.status === 429 && intentos > 1) { // Error de cuota
-                const segs = intentos === 3 ? 20 : 40;
-                toastScanner(`⏳ Muchas consultas — reintentando en ${segs}s...`, '#f59e0b');
-                await new Promise(r => setTimeout(r, segs * 1000));
-                return callGemini(intentos - 1);
-            }
-            throw error; // Re-lanza otros errores o si no hay más intentos
-        }
-    };
+    let renderedVideoWidth, renderedVideoHeight;
+    let startX = 0, startY = 0;
+
+    if (videoRatio > containerRatio) { // Video es más ancho que el contenedor
+        renderedVideoHeight = videoDisplayHeight;
+        renderedVideoWidth = renderedVideoHeight * videoRatio;
+        startX = (videoDisplayWidth - renderedVideoWidth) / 2;
+    } else { // Video es más alto que el contenedor o tienen el mismo ratio
+        renderedVideoWidth = videoDisplayWidth;
+        renderedVideoHeight = renderedVideoWidth / videoRatio;
+        startY = (videoDisplayHeight - renderedVideoHeight) / 2;
+    }
+
+    // Ahora, calcular las coordenadas del scan-guide relativas al video renderizado.
+    const guideX = boxRect.left - startX;
+    const guideY = boxRect.top - startY;
+    const guideWidth = boxRect.width;
+    const guideHeight = boxRect.height;
+
+    // Convertir a coordenadas del stream original
+    let sx = guideX * (videoWidth / renderedVideoWidth);
+    let sy = guideY * (videoHeight / renderedVideoHeight);
+    let sWidth = guideWidth * (videoWidth / renderedVideoWidth);
+    let sHeight = guideHeight * (videoHeight / renderedVideoHeight);
+
+    // Asegurarse de que los valores no sean negativos o excedan las dimensiones del video
+    sx = Math.max(0, sx);
+    sy = Math.max(0, sy);
+    sWidth = Math.min(sWidth, videoWidth - sx);
+    sHeight = Math.min(sHeight, videoHeight - sy);
+
+    pendingCanvas.width = sWidth;
+    pendingCanvas.height = sHeight;
+
+    context.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, sWidth, sHeight);
+
+    // Simplificar el proceso de redimensionamiento
+    let finalCanvas = pendingCanvas;
+    
+    // Si el canvas es demasiado grande (usamos el ancho como referencia principal)
+    if (pendingCanvas.width > RESIZE_WIDTH) { // RESIZE_WIDTH defined as 800
+        const ratio = RESIZE_WIDTH / pendingCanvas.width;
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = RESIZE_WIDTH;
+        tempCanvas.height = pendingCanvas.height * ratio;
+        const tempContext = tempCanvas.getContext('2d');
+        tempContext.drawImage(pendingCanvas, 0, 0, tempCanvas.width, tempCanvas.height);
+        finalCanvas = tempCanvas;
+    }
+    
+    // Convertir a Data URL con una calidad fija
+    const dataUri = finalCanvas.toDataURL('image/jpeg', 0.8); // Fixed quality 0.8
+    
+    // Convertir a Generative Part para Gemini
+    const imagePart = dataUriToGenerativePart(dataUri);
+
+    toastScanner("Analizando imagen...", "var(--accent)");
+    document.getElementById('snap-icon').classList.replace('fa-camera', 'fa-spinner');
+    document.getElementById('snap-icon').classList.add('fa-spin');
 
     try {
-        const data = await callGemini();
-        pendingNombre = data.candidates[0].content.parts[0].text.trim().toUpperCase();
+        // Mejorar el prompt para extraer información relevante
+        const prompt = "Eres un lector experto de etiquetas de productos de consumo en México. Analiza la imagen y extrae: 1) Marca comercial, 2) Nombre del producto, 3) Presentación (gramaje, volumen, número de piezas, sabor o variante si aparece). Responde SOLO con el resultado en UNA LÍNEA en MAYÚSCULAS con el formato: MARCA NOMBRE PRESENTACIÓN. Sin explicaciones, sin puntos, sin saltos de línea."
+        const result = await model.generateContent([prompt, imagePart]);
+        const response = await result.response;
+        let text = response.text();
+        console.log("Respuesta cruda de Gemini:", text);
+
+        // Intentar parsear el JSON - esta parte ya no es necesaria con el prompt directo a texto
+        // Simplemente usar el texto como el nombre del producto
+        pendingNombre = text.trim().toUpperCase();
 
         // ── Detección de duplicados en 3 niveles ──────────────────────
         // Nivel 1: coincidencia exacta
@@ -1410,37 +1932,66 @@ async function confirmPrices() {
     document.getElementById('price-modal').style.display = 'none';
 
     // 1. Web Share API — incluir caducidad si existe
-    if (pendingCanvas && navigator.canShare) {
-        try {
-            const blob = await new Promise(r => pendingCanvas.toBlob(r, 'image/jpeg', 0.88));
-            const file = new File([blob], 'oferta.jpg', { type:'image/jpeg' });
-            let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + nombre + '\n💰 $' + venta;
-            if (caducidad)  msgWA += '\n⏳ Cad: ' + caducidad;
-            if (navigator.canShare({ files:[file] })) await navigator.share({ files:[file], text: msgWA });
-        } catch(e) { if (e.name !== 'AbortError') console.warn('Share:', e.message); }
-    }
-
-    // 2. Subir foto a Storage
-    let fotoUrl = '';
+    // Se usa attemptWebShare para una lógica unificada
+    let filesToShare = [];
+    let photoURL = '';
     if (pendingCanvas) {
         try {
-            const blob = await new Promise(r => pendingCanvas.toBlob(r, 'image/jpeg', 0.82));
+            toastScanner("Subiendo imagen...", "var(--accent)");
+            const blob = await new Promise(r => pendingCanvas.toBlob(r, 'image/jpeg', 0.88));
             const ref  = storage.ref('productos/' + Date.now() + '_' + nombre.replace(/\s+/g,'_') + '.jpg');
-            await ref.put(blob); fotoUrl = await ref.getDownloadURL();
-        } catch(e) { console.warn('Storage:', e.message); }
+            await ref.put(blob); 
+            photoURL = await ref.getDownloadURL();
+            const file = new File([blob], 'oferta.jpg', { type:'image/jpeg' });
+            filesToShare.push(file);
+            toastScanner("Imagen subida.", "success");
+        } catch(e) { 
+            console.warn('Storage or Share (image part):', e.message); 
+            toastScanner("Error al subir o preparar imagen. Se compartirá solo texto.", "warning");
+        }
     }
-
+    
     // 3. Guardar / actualizar en Firestore
     const data = { nombre, costo, precio: venta, fechaEscaneo, tiendaEscaneo };
-    if (fotoUrl)    data.foto      = fotoUrl;
+    if (photoURL)   data.foto = photoURL;
     if (caducidad)  data.caducidad = caducidad;
 
-    if (pendingExisteId) { await col('products').doc(pendingExisteId).update(data); toastScanner("✅ Producto actualizado"); }
-    else                 { await col('products').add(data);                          toastScanner("✅ Producto guardado");    }
+    try {
+        if (pendingExisteId) { 
+            await col('products').doc(pendingExisteId).update(data); 
+            toastScanner("✅ Producto actualizado", "success"); 
+        }
+        else { 
+            const newDocRef = await col('products').add(data);
+            pendingExisteId = newDocRef.id; // Almacenar el ID del nuevo producto
+            toastScanner("✅ Producto guardado", "success");    
+        }
 
-    document.getElementById('pm-caducidad').value = '';
-    pendingNombre = ''; pendingCanvas = null; pendingExisteId = null;
-    closeScanner();
+        // Asegurarse de que el nombre de la tienda exista en la colección de tiendas
+        if (tiendaEscaneo && !window.state.stores.some(s => (s.nombre || '').toUpperCase() === tiendaEscaneo)) {
+            await col('stores').add({ nombre: tiendaEscaneo });
+        }
+
+        // Después de guardar, si el producto existe/se creó, actualizar la vista detallada
+        selectedProductInProdTab = { id: pendingExisteId, ...data }; // Update selected product data
+        selectProductInTab(pendingExisteId); // Re-render the detailed view
+
+        // Finalmente, compartir el mensaje
+        let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + nombre + '\n💰 $' + venta.toFixed(2);
+        if (costo > 0) msgWA += ` (Costo: $${costo.toFixed(2)})`;
+        if (caducidad) msgWA += '\n⏳ Cad: ' + caducidad;
+        await attemptWebShare(msgWA, filesToShare, 'Nueva/Actualizada Oferta', 'Escáner', true);
+        
+    } catch (e) {
+        console.error("Error al guardar/actualizar producto:", e);
+        toastScanner("Error al guardar/actualizar: " + e.message, "danger");
+    } finally {
+        document.getElementById('pm-caducidad').value = '';
+        pendingNombre = ''; 
+        pendingCanvas = null; 
+        pendingExisteId = null;
+        closeScanner(); // Cerrar el modal del escáner al finalizar
+    }
 }
 
 function cancelPrices() {
@@ -1448,7 +1999,9 @@ function cancelPrices() {
     document.getElementById('dup-badge').classList.remove('show');
     document.getElementById('pm-caducidad').value = '';   // limpiar caducidad
     pendingNombre = ''; pendingCanvas = null; pendingExisteId = null;
-    closeScanner();
+    closeScanner(); // Cerrar el modal del escáner
+    // Asegurarse de que la búsqueda se muestre de nuevo en la pestaña productos
+    clearProductSelection();
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -1470,7 +2023,7 @@ window.onload = startSync;
         // Si tu app se carga desde https://tu-dominio.com/ofertasrapidasyautepec/index.html,
         // el scope debe ser '/ofertasrapidasyautepec/'
         // Si tu app se carga desde https://tu-dominio.com/index.html, el scope debe ser '/'
-        navigator.serviceWorker.register('sw.js', { // Eliminado el path absoluto '/ofertasrapidasyautepec/'
+        navigator.serviceWorker.register('sw.js', { 
             scope: './' // Usar './' para el scope relativo al directorio actual del HTML
           })
           .then(function(reg) {
