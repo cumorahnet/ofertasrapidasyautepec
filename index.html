@@ -579,6 +579,10 @@ function col(name) {
              .collection('public').doc('data').collection(name);
 }
 
+// Global default GIF for images that are not set
+const defaultGif = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+
+
 /* ══════════════════════════════════════════════════════════════════
    ESTADO GLOBAL
 ══════════════════════════════════════════════════════════════════ */
@@ -823,7 +827,7 @@ function selectProductInTab(productId) {
     document.getElementById('prod-edit-costo').value = (product.costo || 0).toFixed(2);
     document.getElementById('prod-edit-precio').value = (product.precio || 0).toFixed(2);
     // CORRECCIÓN: Usar 'prod-preview-photo' que es el ID correcto del elemento de imagen
-    document.getElementById('prod-preview-photo').src = product.foto || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+    document.getElementById('prod-preview-photo').src = product.foto || defaultGif;
     document.getElementById('prod-edit-fecha-escaneo').value = product.fechaEscaneo ? product.fechaEscaneo.split('/').reverse().join('-') : ''; // Convert to YYYY-MM-DD
     document.getElementById('prod-edit-tienda-escaneo').value = product.tiendaEscaneo || '';
     document.getElementById('prod-edit-caducidad').value = product.caducidad || '';
@@ -962,6 +966,32 @@ async function attemptWebShare(text, files, title, context, isScannerToast = fal
     }
 }
 
+// FUNCION MEJORADA CON TRY-CATCH PARA LOADIMAGEBLOB
+async function loadImageBlob(src) {
+    if (!src || src === defaultGif) {
+        console.log('[loadImageBlob] URL de imagen vacía o es el GIF por defecto. No se cargará.');
+        throw new Error('No hay imagen válida para cargar.');
+    }
+    if (src.startsWith('data:')) {
+        console.log('[loadImageBlob] Cargando desde Data URL.');
+        return dataURLtoBlob(src);
+    }
+    console.log('[loadImageBlob] Intentando cargar desde URL remota:', src);
+    try {
+        const response = await fetch(src, { mode: 'cors' });
+        if (!response.ok) {
+            const errorBody = await response.text();
+            console.error(`[loadImageBlob] Falló la respuesta HTTP para ${src}: ${response.status} ${response.statusText}. Cuerpo: ${errorBody.substring(0, 200)}`);
+            throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
+        }
+        console.log(`[loadImageBlob] Respuesta OK para ${src}. Convirtiendo a blob...`);
+        return response.blob();
+    } catch (fetchError) {
+        console.error(`[loadImageBlob] Error durante fetch para ${src}:`, fetchError);
+        throw new Error(`Error de red al cargar la imagen: ${fetchError.message}`);
+    }
+}
+
 
 async function shareProductDetailsFromTab() {
     if (!selectedProductInProdTab) {
@@ -980,28 +1010,9 @@ async function shareProductDetailsFromTab() {
     if (caducidadToShare) msgWA += `\n⏳ Caducidad: ${caducidadToShare}`;
 
     let filesToShare = [];
-    const defaultGif = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 
     console.log('--- Iniciando intento de compartir desde Pestaña Productos ---');
     console.log('URL de la foto para compartir:', photoToShare);
-
-    async function loadImageBlob(src) {
-        if (!src || src === defaultGif) { // Añadida comprobación para defaultGif aquí también
-            console.log('loadImageBlob: URL de imagen vacía o es el GIF por defecto. No se cargará.');
-            throw new Error('No hay imagen válida para cargar.');
-        }
-        if (src.startsWith('data:')) {
-            console.log('loadImageBlob: Cargando desde Data URL.');
-            return dataURLtoBlob(src);
-        }
-        console.log('loadImageBlob: Cargando desde URL remota:', src);
-        const response = await fetch(src, { mode: 'cors' });
-        if (!response.ok) {
-            const errorBody = await response.text();
-            throw new Error(`HTTP Error ${response.status}: ${response.statusText}. Response snippet: ${errorBody.substring(0, 100)}`);
-        }
-        return response.blob();
-    }
 
     // Intenta cargar la imagen solo si no es la imagen por defecto
     if (photoToShare && photoToShare !== defaultGif) {
@@ -1659,6 +1670,7 @@ function cancelScanFlow() {
     document.getElementById('key-config-modal').style.display = 'none';
 
     toastScanner("Escaneo cancelado.", "info");
+    clearProductSelection(); // AÑADIDO: Limpiar selección en pestaña productos
 }
 
 // ══════════════════════════════════════════════════════════════════
