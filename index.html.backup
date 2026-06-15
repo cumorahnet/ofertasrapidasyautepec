@@ -348,7 +348,7 @@
     <div class="d-flex flex-column align-items-center">
         <div class="d-flex align-items-center">
             <h6 class="m-0 fw-bold">Ofertas Rápidas Yaute</h6>
-            <img src="logo.png" alt="Yaute" style="height:28px; margin-left:10px; border-radius:6px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fuc2VyaWYiIGZvbnQtc2l6ZT0iNDAiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiMzYjgyZjYiPk9SWTwvdGV4dD48L3N2Zz4='; this.onerror=null;">
+            <img src="logo.png" alt="Yaute" style="height:28px; margin-left:10px; border-radius:6px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
@@ -381,19 +381,41 @@
             <div class="d-flex align-items-center gap-3 mb-3">
                 <img id="prod-preview-photo" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Foto"
                      style="width:80px; height:80px; object-fit:cover; border-radius:12px; flex-shrink:0;">
-                <div>
-                    <div class="fw-bold text-uppercase" id="prod-preview-name" style="font-size:1rem; line-height:1.4;"></div>
-                    <div class="small text-muted mt-1">
-                        Costo: <span class="fw-bold text-danger" id="prod-preview-costo"></span> &middot;
-                        Venta: <span class="fw-bold text-success" id="prod-preview-precio"></span>
+                <div style="flex-grow:1;">
+                    <label class="text-uppercase small fw-bold">Nombre</label>
+                    <textarea id="prod-edit-name" class="form-control mb-2" rows="2" style="resize:none; text-transform:uppercase; font-weight:700; font-size:0.9rem; line-height:1.4;"></textarea>
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label class="text-uppercase small fw-bold">Costo</label>
+                            <input type="number" id="prod-edit-costo" class="form-control text-danger fw-bold" step="0.01">
+                        </div>
+                        <div class="col-6">
+                            <label class="text-uppercase small fw-bold">Venta</label>
+                            <input type="number" id="prod-edit-precio" class="form-control text-success fw-bold" step="0.01">
+                        </div>
                     </div>
-                    <div class="small text-muted" id="prod-preview-extra-info"></div>
                 </div>
             </div>
-            <div class="d-flex gap-2">
-                <button class="btn btn-primary flex-fill rounded-pill fw-bold" onclick="addProductToSale()">AGREGAR A VENTA</button>
-                <button class="btn btn-outline-secondary flex-fill rounded-pill" onclick="clearProductSelection()">LIMPIAR</button>
+            <div class="row g-2 mb-3">
+                <div class="col-6">
+                    <label class="text-uppercase small fw-bold">Fecha Escaneo</label>
+                    <input type="date" id="prod-edit-fecha-escaneo" class="form-control fw-bold">
+                </div>
+                <div class="col-6">
+                    <label class="text-uppercase small fw-bold">Tienda Escaneo</label>
+                    <input type="text" id="prod-edit-tienda-escaneo" class="form-control text-uppercase fw-bold">
+                </div>
             </div>
+            <div class="mb-3">
+                <label class="text-uppercase small fw-bold">Caducidad</label>
+                <input type="text" id="prod-edit-caducidad" class="form-control" placeholder="Dic 2026" maxlength="10" oninput="formatCaducidad(this)">
+            </div>
+
+            <div class="d-flex gap-2">
+                <button class="btn btn-success flex-fill rounded-pill fw-bold" onclick="saveProductChangesInTab()">GUARDAR CAMBIOS</button>
+                <button class="btn btn-outline-primary flex-fill rounded-pill" onclick="shareProductDetailsFromTab()">📲 COMPARTIR</button>
+            </div>
+            <button class="btn btn-outline-secondary w-100 rounded-pill mt-2" onclick="clearProductSelection()" style="border:none;">REGRESAR</button>
         </div>
     </div>
 
@@ -408,7 +430,6 @@
                 <div class="col-3"><label class="text-uppercase">Cant.</label><input type="number" id="in-cantidad" class="form-control text-center fw-bold" value="1"></div>
                 <div class="col" style="position:relative">
                     <label class="text-uppercase">Producto</label>
-                    <!-- Input de producto con autocompletado para ventas -->
                     <input type="text" id="in-producto" class="form-control text-uppercase" placeholder="BUSCAR ARTÍCULO...">
                     <div id="sug-producto" class="sug-box d-none"></div>
                 </div>
@@ -597,14 +618,13 @@ function startSync() {
             // Re-renderizar la lista de productos en la pestaña de productos si estamos ahí
             if (name === 'products') {
                 if (document.getElementById('tab-productos').style.display !== 'none') {
-                    handleProductSearchInTab(document.getElementById('prod-search-input').value);
-                }
-                // Also update selected product in product tab if it was an update
-                if (selectedProductInProdTab && window.state.products.find(p => p.id === selectedProductInProdTab.id)) {
-                   selectProductInTab(selectedProductInProdTab.id); // Re-render preview with latest data
-                } else {
-                   // If selected product was deleted or no longer matches criteria, clear selection
-                   clearProductSelection();
+                    // Re-render search results if currently on product tab and not in detail view
+                    if (!selectedProductInProdTab) {
+                        handleProductSearchInTab(document.getElementById('prod-search-input').value);
+                    } else {
+                        // If in detail view, refresh the displayed product
+                        selectProductInTab(selectedProductInProdTab.id);
+                    }
                 }
             }
             if (name !== 'sales' && activeSubTab === 'catalogo') renderControlList();
@@ -686,9 +706,11 @@ function setupAuto(inpId, boxId, key) {
 ══════════════════════════════════════════════════════════════════ */
 
 function handleProductSearchInTab(value) {
+    // Only update search results if not currently viewing a selected product's details
+    if (selectedProductInProdTab) return;
+
     const searchTerm = value.trim().toUpperCase();
     const resultsContainer = document.getElementById('prod-search-results');
-    resultsContainer.innerHTML = ''; // Clear previous results
 
     // If search term is empty, show all products
     const productsToShow = searchTerm
@@ -700,6 +722,8 @@ function handleProductSearchInTab(value) {
 
 function renderProductSearchResults(products) {
     const resultsContainer = document.getElementById('prod-search-results');
+    resultsContainer.innerHTML = ''; // Clear existing results when rendering new ones
+    
     if (products.length === 0) {
         resultsContainer.innerHTML = '<p class="text-center text-muted small mt-3">No se encontraron productos.</p>';
         return;
@@ -732,38 +756,131 @@ function selectProductInTab(productId) {
     }
     selectedProductInProdTab = product; // Store the selected product
 
-    document.getElementById('prod-preview-name').textContent  = product.nombre;
-    document.getElementById('prod-preview-costo').textContent = `$${(product.costo || 0).toFixed(2)}`;
-    document.getElementById('prod-preview-precio').textContent = `$${(product.precio || 0).toFixed(2)}`;
-    document.getElementById('prod-preview-photo').src = product.foto || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+    // Hide search input and results
+    document.getElementById('prod-search-input').style.display = 'none';
+    document.querySelector('#tab-productos .card-custom.mb-3 .btn.rounded-circle').style.display = 'none'; // Hide camera button
+    document.getElementById('prod-search-results').innerHTML = ''; // Clear search list
 
-    let extraInfo = [];
-    if (product.fechaEscaneo || product.tiendaEscaneo) {
-        extraInfo.push(`📅 ${product.fechaEscaneo || ''} ${product.tiendaEscaneo ? `· ${product.tiendaEscaneo}` : ''}`);
-    }
-    if (product.caducidad) {
-        extraInfo.push(`⏳ Cad: ${product.caducidad}`);
-    }
-    document.getElementById('prod-preview-extra-info').innerHTML = extraInfo.length ? extraInfo.join('<br>') : '';
-
+    // Populate editable fields
+    document.getElementById('prod-edit-name').value = product.nombre || '';
+    document.getElementById('prod-edit-costo').value = (product.costo || 0).toFixed(2);
+    document.getElementById('prod-edit-precio').value = (product.precio || 0).toFixed(2);
+    document.getElementById('prod-edit-photo').src = product.foto || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+    document.getElementById('prod-edit-fecha-escaneo').value = product.fechaEscaneo ? product.fechaEscaneo.split('/').reverse().join('-') : ''; // Convert to YYYY-MM-DD
+    document.getElementById('prod-edit-tienda-escaneo').value = product.tiendaEscaneo || '';
+    document.getElementById('prod-edit-caducidad').value = product.caducidad || '';
 
     document.getElementById('prod-details-preview').style.display = 'block';
 }
 
 function clearProductSelection() {
     selectedProductInProdTab = null; // Clear the selected product
+    
+    // Show search input and button again
+    document.getElementById('prod-search-input').style.display = 'block';
     document.getElementById('prod-search-input').value = '';
-    handleProductSearchInTab(''); // Show all products again
+    document.querySelector('#tab-productos .card-custom.mb-3 .btn.rounded-circle').style.display = 'flex'; // Show camera button
+    
+    // Reset and show all products in the search results area
+    handleProductSearchInTab('');
+    
     document.getElementById('prod-details-preview').style.display = 'none';
 }
 
-function addProductToSale() {
+async function saveProductChangesInTab() {
     if (!selectedProductInProdTab) {
-        toast("Por favor, selecciona un producto primero.", "danger");
+        toastScanner("No hay producto seleccionado para guardar.", "danger");
         return;
     }
-    populateSalesFieldsWithProduct(selectedProductInProdTab);
+
+    const productId = selectedProductInProdTab.id;
+    const newName = document.getElementById('prod-edit-name').value.trim().toUpperCase();
+    const newCosto = parseFloat(document.getElementById('prod-edit-costo').value) || 0;
+    const newPrecio = parseFloat(document.getElementById('prod-edit-precio').value) || 0;
+    const newFechaEscaneo = document.getElementById('prod-edit-fecha-escaneo').value; // YYYY-MM-DD
+    const newTiendaEscaneo = document.getElementById('prod-edit-tienda-escaneo').value.trim().toUpperCase();
+    const newCaducidad = document.getElementById('prod-edit-caducidad').value.trim();
+
+    if (!newName) {
+        toastScanner("El nombre del producto no puede estar vacío.", "danger");
+        return;
+    }
+
+    const dataToUpdate = {
+        nombre: newName,
+        costo: newCosto,
+        precio: newPrecio,
+        fechaEscaneo: newFechaEscaneo ? newFechaEscaneo.split('-').reverse().join('/') : '', // Convert back to DD/MM/YYYY
+        tiendaEscaneo: newTiendaEscaneo,
+        caducidad: newCaducidad
+    };
+
+    // Keep existing photo if not changed by scanner in the same flow
+    dataToUpdate.foto = selectedProductInProdTab.foto || ''; 
+
+    try {
+        await col('products').doc(productId).update(dataToUpdate);
+        toastScanner("✅ Cambios guardados", "success");
+        // Update the selected product in memory to reflect changes
+        selectedProductInProdTab = { ...selectedProductInProdTab, ...dataToUpdate };
+        // Re-render the preview with the updated data
+        selectProductInTab(productId); 
+    } catch (e) {
+        console.error("Error al guardar cambios del producto:", e);
+        toastScanner("Error al guardar cambios: " + e.message, "danger");
+    }
 }
+
+async function shareProductDetailsFromTab() {
+    if (!selectedProductInProdTab) {
+        toast("Por favor, selecciona un producto para compartir.", "danger");
+        return;
+    }
+
+    // Get current values from the editable fields for sharing
+    const nameToShare = document.getElementById('prod-edit-name').value.trim().toUpperCase();
+    const costToShare = parseFloat(document.getElementById('prod-edit-costo').value) || 0;
+    const priceToShare = parseFloat(document.getElementById('prod-edit-precio').value) || 0;
+    const caducidadToShare = document.getElementById('prod-edit-caducidad').value.trim();
+    const photoToShare = document.getElementById('prod-edit-photo').src; // Get current displayed photo
+
+    if (navigator.canShare) {
+        try {
+            let msgWA = `🛒 *OFERTA*\n📦 ${nameToShare}\n💰 $${priceToShare.toFixed(2)}`;
+            if (costToShare > 0) msgWA += ` (Costo: $${costToShare.toFixed(2)})`;
+            if (caducidadToShare) msgWA += `\n⏳ Caducidad: ${caducidadToShare}`;
+
+            // Attempt to fetch the image and share as a file
+            if (photoToShare && photoToShare !== 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=') {
+                const response = await fetch(photoToShare);
+                const blob = await response.blob();
+                const file = new File([blob], 'oferta_producto.jpg', { type: blob.type });
+
+                if (navigator.canShare({ files: [file], text: msgWA })) {
+                    await navigator.share({ files: [file], title: 'Oferta de Producto', text: msgWA });
+                } else {
+                    // Fallback if sharing files is not supported, share text only
+                    await navigator.share({ title: 'Oferta de Producto', text: msgWA });
+                }
+            } else {
+                 // If no photo, just share text
+                 await navigator.share({ title: 'Oferta de Producto', text: msgWA });
+            }
+        } catch(e) {
+            if (e.name !== 'AbortError') { // User cancelled share operation
+                console.warn('Error al compartir:', e.message);
+                toast("Error al compartir.", "danger");
+            }
+        }
+    } else {
+        // Fallback for browsers that don't support Web Share API
+        let msgWA = `🛒 *OFERTA*\n📦 ${nameToShare}\n💰 $${priceToShare.toFixed(2)}`;
+        if (costToShare > 0) msgWA += ` (Costo: $${costToShare.toFixed(2)})`;
+        if (caducidadToShare) msgWA += `\n⏳ Caducidad: ${caducidadToShare}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(msgWA)}`, '_blank');
+    }
+}
+
 
 // Function to populate main sales form fields and switch to sales tab
 function populateSalesFieldsWithProduct(product) {
@@ -796,10 +913,15 @@ function showTab(id, btn) {
     if (id === 'control') {
         switchSubTab('finanzas'); // Default to finanzas when control tab is opened
     } else if (id === 'productos') {
-        document.getElementById('prod-search-input').value = ''; // Clear search
-        handleProductSearchInTab(''); // Show all products initially
-        document.getElementById('prod-details-preview').style.display = 'none'; // Hide preview
-        selectedProductInProdTab = null; // Clear any pending selection
+        // Only re-initialize if not currently viewing a selected product's details
+        if (!selectedProductInProdTab || document.getElementById('prod-details-preview').style.display === 'none') {
+             document.getElementById('prod-search-input').style.display = 'block';
+             document.querySelector('#tab-productos .card-custom.mb-3 .btn.rounded-circle').style.display = 'flex';
+             document.getElementById('prod-search-input').value = ''; // Clear search
+             handleProductSearchInTab(''); // Show all products initially
+             document.getElementById('prod-details-preview').style.display = 'none'; // Hide preview
+             selectedProductInProdTab = null; // Ensure selection is cleared
+        }
     } else if (id === 'operaciones') {
         // When going to sales, clear product fields if no product was explicitly added from the products tab
         if (!document.getElementById('in-producto').value) {
@@ -840,7 +962,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Check if product exists, if not, add it to products collection
         let existingProduct = window.state.products.find(s => (s.nombre || '').toUpperCase() === pName);
         if (!existingProduct) {
-             const newProductData = { nombre: pName, costo: co, precio: prI };
+             const newProductData = { nombre: pName, costo: co, precio: prI, fechaEscaneo: getMXDateStr() }; // Add current date as scan date for new products
              const docRef = await col('products').add(newProductData);
              existingProduct = { id: docRef.id, ...newProductData };
              toastScanner("Producto añadido al catálogo.", "success");
@@ -1252,7 +1374,7 @@ async function shareTicket(n) {
     const canvas = await html2canvas(document.getElementById('ticket-render'), { scale:2, backgroundColor:'#ffffff' });
     canvas.toBlob(async b => {
         const file = new File([b], 'Ticket.png', { type:'image/png' });
-        const msg  = `hola *${pName}* te envío tu cuenta, gracias por tu preferencia`;
+        const msg  = `hola *${pName}* te envío tu cuenta, gracias por su preferencia`;
         if (navigator.share) try { await navigator.share({ files:[file], title:'Nota Yaute', text:msg }); } catch(e) {}
         else window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     }, 'image/png');
@@ -1698,7 +1820,7 @@ async function uploadAndSaveNewProduct(nombre, venta, costo, caducidad, fechaEsc
             const file = new File([blob], 'oferta.jpg', { type:'image/jpeg' });
             let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + nombre + '\n💰 $' + venta.toFixed(2);
             if (caducidad)  msgWA += '\n⏳ Caducidad: ' + caducidad;
-            if (navigator.canShare({ files:[file] })) await navigator.share({ files:[file], text: msgWA });
+            if (navigator.canShare({ files:[file] })) await navigator.share({ files:[file], title:'Oferta de Producto', text: msgWA });
         } catch(e) { if (e.name !== 'AbortError') console.warn('Share:', e.message); }
     }
 
@@ -1756,7 +1878,7 @@ async function confirmPrices() {
         finalProduct = await uploadAndSaveNewProduct(nombre, venta, costo, caducidad, fechaEscaneo, tiendaEscaneo);
     }
     
-    // After product is added/updated and shared, select it in the product tab
+    // After product is added/updated, select it in the product tab to show details
     if (finalProduct) {
         selectProductInTab(finalProduct.id);
     }

@@ -765,7 +765,8 @@ function selectProductInTab(productId) {
     document.getElementById('prod-edit-name').value = product.nombre || '';
     document.getElementById('prod-edit-costo').value = (product.costo || 0).toFixed(2);
     document.getElementById('prod-edit-precio').value = (product.precio || 0).toFixed(2);
-    document.getElementById('prod-edit-photo').src = product.foto || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+    // CORRECCIÓN: Usar 'prod-preview-photo' que es el ID correcto del elemento de imagen
+    document.getElementById('prod-preview-photo').src = product.foto || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
     document.getElementById('prod-edit-fecha-escaneo').value = product.fechaEscaneo ? product.fechaEscaneo.split('/').reverse().join('-') : ''; // Convert to YYYY-MM-DD
     document.getElementById('prod-edit-tienda-escaneo').value = product.tiendaEscaneo || '';
     document.getElementById('prod-edit-caducidad').value = product.caducidad || '';
@@ -842,7 +843,8 @@ async function shareProductDetailsFromTab() {
     const costToShare = parseFloat(document.getElementById('prod-edit-costo').value) || 0;
     const priceToShare = parseFloat(document.getElementById('prod-edit-precio').value) || 0;
     const caducidadToShare = document.getElementById('prod-edit-caducidad').value.trim();
-    const photoToShare = document.getElementById('prod-edit-photo').src; // Get current displayed photo
+    // CORRECCIÓN: Usar 'prod-preview-photo' que es el ID correcto del elemento de imagen
+    const photoToShare = document.getElementById('prod-preview-photo').src; // Get current displayed photo
 
     if (navigator.canShare) {
         try {
@@ -913,14 +915,15 @@ function showTab(id, btn) {
     if (id === 'control') {
         switchSubTab('finanzas'); // Default to finanzas when control tab is opened
     } else if (id === 'productos') {
-        // Only re-initialize if not currently viewing a selected product's details
-        if (!selectedProductInProdTab || document.getElementById('prod-details-preview').style.display === 'none') {
-             document.getElementById('prod-search-input').style.display = 'block';
-             document.querySelector('#tab-productos .card-custom.mb-3 .btn.rounded-circle').style.display = 'flex';
-             document.getElementById('prod-search-input').value = ''; // Clear search
-             handleProductSearchInTab(''); // Show all products initially
-             document.getElementById('prod-details-preview').style.display = 'none'; // Hide preview
-             selectedProductInProdTab = null; // Ensure selection is cleared
+        // CORRECCIÓN: Revisa si hay un producto seleccionado y lo muestra directamente, si no, muestra la búsqueda
+        if (selectedProductInProdTab) {
+            selectProductInTab(selectedProductInProdTab.id); // Re-populate and show details
+        } else {
+            document.getElementById('prod-search-input').style.display = 'block';
+            document.querySelector('#tab-productos .card-custom.mb-3 .btn.rounded-circle').style.display = 'flex';
+            document.getElementById('prod-search-input').value = ''; // Clear search
+            handleProductSearchInTab(''); // Show all products initially
+            document.getElementById('prod-details-preview').style.display = 'none'; // Ensure preview is hidden
         }
     } else if (id === 'operaciones') {
         // When going to sales, clear product fields if no product was explicitly added from the products tab
