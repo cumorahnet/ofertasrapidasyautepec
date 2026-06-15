@@ -838,47 +838,59 @@ async function shareProductDetailsFromTab() {
         return;
     }
 
-    // Get current values from the editable fields for sharing
     const nameToShare = document.getElementById('prod-edit-name').value.trim().toUpperCase();
     const costToShare = parseFloat(document.getElementById('prod-edit-costo').value) || 0;
     const priceToShare = parseFloat(document.getElementById('prod-edit-precio').value) || 0;
     const caducidadToShare = document.getElementById('prod-edit-caducidad').value.trim();
-    // CORRECCIÓN: Usar 'prod-preview-photo' que es el ID correcto del elemento de imagen
-    const photoToShare = document.getElementById('prod-preview-photo').src; // Get current displayed photo
+    const photoToShare = document.getElementById('prod-preview-photo').src;
+
+    let msgWA = `🛒 *OFERTA*\n📦 ${nameToShare}\n💰 $${priceToShare.toFixed(2)}`;
+    if (costToShare > 0) msgWA += ` (Costo: $${costToShare.toFixed(2)})`;
+    if (caducidadToShare) msgWA += `\n⏳ Caducidad: ${caducidadToShare}`;
 
     if (navigator.canShare) {
-        try {
-            let msgWA = `🛒 *OFERTA*\n📦 ${nameToShare}\n💰 $${priceToShare.toFixed(2)}`;
-            if (costToShare > 0) msgWA += ` (Costo: $${costToShare.toFixed(2)})`;
-            if (caducidadToShare) msgWA += `\n⏳ Caducidad: ${caducidadToShare}`;
+        let filesToShare = [];
+        let imageShareAttempted = false; // Flag para saber si intentamos cargar una imagen
 
-            // Attempt to fetch the image and share as a file
-            if (photoToShare && photoToShare !== 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=') {
+        // Paso 1: Intentar cargar y preparar el archivo de imagen
+        if (photoToShare && photoToShare !== 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=') {
+            imageShareAttempted = true;
+            try {
                 const response = await fetch(photoToShare);
+                if (!response.ok) {
+                    throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
+                }
                 const blob = await response.blob();
                 const file = new File([blob], 'oferta_producto.jpg', { type: blob.type });
+                filesToShare.push(file);
+            } catch (fetchError) {
+                console.warn('Error al cargar la imagen para compartir:', fetchError.message);
+                toast("Error al cargar la imagen. Compartiendo solo texto.", "danger");
+                // No se retorna, se procede a intentar compartir el texto.
+            }
+        }
 
-                if (navigator.canShare({ files: [file], text: msgWA })) {
-                    await navigator.share({ files: [file], title: 'Oferta de Producto', text: msgWA });
-                } else {
-                    // Fallback if sharing files is not supported, share text only
-                    await navigator.share({ title: 'Oferta de Producto', text: msgWA });
-                }
+        // Paso 2: Intentar compartir (con o sin imagen)
+        try {
+            if (filesToShare.length > 0 && navigator.canShare({ files: filesToShare, text: msgWA })) {
+                await navigator.share({ files: filesToShare, title: 'Oferta de Producto', text: msgWA });
+            } else if (!imageShareAttempted || filesToShare.length === 0) {
+                // Si no se intentó cargar una imagen, o la imagen falló en la carga, intentar solo texto
+                await navigator.share({ title: 'Oferta de Producto', text: msgWA });
             } else {
-                 // If no photo, just share text
-                 await navigator.share({ title: 'Oferta de Producto', text: msgWA });
+                // Esto significa que filesToShare tiene contenido, pero navigator.canShare({files, text}) es falso
+                // lo que indica que el dispositivo no soporta compartir archivos a pesar de estar listos.
+                await navigator.share({ title: 'Oferta de Producto', text: msgWA });
+                toast("Su dispositivo no soporta compartir imágenes directamente. Se compartió el texto.", "warning");
             }
         } catch(e) {
-            if (e.name !== 'AbortError') { // User cancelled share operation
-                console.warn('Error al compartir:', e.message);
-                toast("Error al compartir.", "danger");
+            if (e.name !== 'AbortError') { // El usuario canceló la operación de compartir
+                console.warn('Error al iniciar el compartidor del sistema:', e.message);
+                toast("No se pudo abrir el compartidor del sistema.", "danger");
             }
         }
     } else {
-        // Fallback for browsers that don't support Web Share API
-        let msgWA = `🛒 *OFERTA*\n📦 ${nameToShare}\n💰 $${priceToShare.toFixed(2)}`;
-        if (costToShare > 0) msgWA += ` (Costo: $${costToShare.toFixed(2)})`;
-        if (caducidadToShare) msgWA += `\n⏳ Caducidad: ${caducidadToShare}`;
+        // Fallback para navegadores que no soportan la Web Share API
         window.open(`https://wa.me/?text=${encodeURIComponent(msgWA)}`, '_blank');
     }
 }

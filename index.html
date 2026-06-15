@@ -853,7 +853,12 @@ async function shareProductDetailsFromTab() {
         let imageShareAttempted = false; // Flag para saber si intentamos cargar una imagen
 
         // Paso 1: Intentar cargar y preparar el archivo de imagen
-        if (photoToShare && photoToShare !== 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=') {
+        // La condición `photoToShare !== 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='` ya filtra la imagen por defecto.
+        // Ahora, se verifica si es una URL http/https o una Data URL válida y no la predeterminada.
+        
+        console.log('URL de la foto para compartir:', photoToShare); // Debugging line
+
+        if (photoToShare && photoToShare.startsWith('http')) {
             imageShareAttempted = true;
             try {
                 const response = await fetch(photoToShare);
@@ -864,22 +869,47 @@ async function shareProductDetailsFromTab() {
                 const file = new File([blob], 'oferta_producto.jpg', { type: blob.type });
                 filesToShare.push(file);
             } catch (fetchError) {
-                console.warn('Error al cargar la imagen para compartir:', fetchError.message);
-                toast("Error al cargar la imagen. Compartiendo solo texto.", "danger");
-                // No se retorna, se procede a intentar compartir el texto.
+                console.warn('Error al cargar la imagen para compartir (fetch):', fetchError.message);
+                toast("Error al cargar la imagen (red o URL inválida). Compartiendo solo texto.", "danger");
+                // Continuar para intentar compartir solo texto
+            }
+        } else if (photoToShare && photoToShare.startsWith('data:') && photoToShare !== 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=') {
+            imageShareAttempted = true;
+            try {
+                // Parsear Data URL a Blob directamente
+                const parts = photoToShare.split(';');
+                const mimeType = parts[0].split(':')[1];
+                const base64Data = parts[1].split(',')[1];
+                const binaryString = atob(base64Data);
+                const len = binaryString.length;
+                const bytes = new Uint8Array(len);
+                for (let i = 0; i < len; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                const blob = new Blob([bytes], { type: mimeType });
+                const file = new File([blob], 'oferta_producto.jpg', { type: mimeType });
+                filesToShare.push(file);
+            } catch (dataUrlError) {
+                console.warn('Error al procesar Data URL para compartir:', dataUrlError.message);
+                toast("Error al procesar la imagen para compartir. Compartiendo solo texto.", "danger");
+                // Continuar para intentar compartir solo texto
             }
         }
+
 
         // Paso 2: Intentar compartir (con o sin imagen)
         try {
             if (filesToShare.length > 0 && navigator.canShare({ files: filesToShare, text: msgWA })) {
                 await navigator.share({ files: filesToShare, title: 'Oferta de Producto', text: msgWA });
             } else if (!imageShareAttempted || filesToShare.length === 0) {
-                // Si no se intentó cargar una imagen, o la imagen falló en la carga, intentar solo texto
+                // Si no se intentó cargar una imagen (imageShareAttempted es false)
+                // O si se intentó pero filesToShare está vacío (falló la carga/procesamiento)
                 await navigator.share({ title: 'Oferta de Producto', text: msgWA });
+                // No hay toast aquí porque es el comportamiento esperado de fallback o de no-imagen
             } else {
-                // Esto significa que filesToShare tiene contenido, pero navigator.canShare({files, text}) es falso
-                // lo que indica que el dispositivo no soporta compartir archivos a pesar de estar listos.
+                // Este caso es cuando filesToShare.length > 0 (imagen cargada/procesada)
+                // pero navigator.canShare({ files, text }) es falso.
+                // Es decir, el API de compartir no puede manejar archivos junto con texto.
                 await navigator.share({ title: 'Oferta de Producto', text: msgWA });
                 toast("Su dispositivo no soporta compartir imágenes directamente. Se compartió el texto.", "warning");
             }
