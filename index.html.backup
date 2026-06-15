@@ -298,6 +298,51 @@
     </div>
 </div>
 
+<!-- ══ MODAL ACTUALIZAR DUPLICADO (NUEVO) ═══════════════════════════════ -->
+<div id="update-confirm-modal" class="modal-overlay">
+    <div class="modal-content-custom">
+        <p class="fw-bold mb-1" style="font-size:0.7rem; color:#94a3b8; letter-spacing:1px;">DETECCIÓN DE PRODUCTO</p>
+        <h5 class="fw-bold mb-3" style="color:var(--primary);">¿Actualizar Producto Existente?</h5>
+
+        <div class="mb-3 p-3" style="background:#f8fafc; border-radius:14px; border:1px solid #e2e8f0;">
+            <p class="small fw-bold text-muted mb-1">Escaneado:</p>
+            <div class="fw-bold text-uppercase" id="ucm-scanned-name" style="font-size:0.9rem; line-height:1.4;"></div>
+        </div>
+
+        <div class="mb-4 p-3" style="background:#f8fafc; border-radius:14px; border:1px solid #e2e8f0;">
+            <p class="small fw-bold text-muted mb-1">Producto Existente:</p>
+            <div class="d-flex align-items-center gap-3">
+                <img id="ucm-existing-photo" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="Foto"
+                     style="width:60px; height:60px; object-fit:cover; border-radius:10px; flex-shrink:0;">
+                <div>
+                    <div class="fw-bold text-uppercase" id="ucm-existing-name" style="font-size:0.9rem; line-height:1.4;"></div>
+                    <div class="small text-muted mt-1">
+                        Costo: <span class="fw-bold text-danger" id="ucm-existing-costo"></span> &middot;
+                        Venta: <span class="fw-bold text-success" id="ucm-existing-precio"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" id="ucm-update-photo" checked>
+            <label class="form-check-label fw-bold" for="ucm-update-photo" style="font-size:0.9rem;">Actualizar fotografía</label>
+            <p class="text-muted small ms-4 mb-0">Usar la foto del escaneo actual.</p>
+        </div>
+        <div class="form-check form-switch mb-4">
+            <input class="form-check-input" type="checkbox" id="ucm-update-details" checked>
+            <label class="form-check-label fw-bold" for="ucm-update-details" style="font-size:0.9rem;">Actualizar precios y datos</label>
+            <p class="text-muted small ms-4 mb-0">Usar los precios, tienda y caducidad del escaneo.</p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button class="btn btn-light flex-fill rounded-pill" onclick="closeUpdateConfirmModal()">CANCELAR</button>
+            <button class="btn btn-primary flex-fill rounded-pill fw-bold" onclick="performUpdateFromScanner()">CONFIRMAR</button>
+        </div>
+    </div>
+</div>
+
+
 <!-- ══ HEADER ════════════════════════════════════════════════════ -->
 <header>
     <div class="d-flex flex-column align-items-center">
@@ -363,7 +408,7 @@
     <video id="cam-preview-ia" autoplay playsinline muted></video>
     <div class="scan-guide"></div>
     <div id="cam-top-bar">
-        <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:white; border:1px solid rgba(255,255,255,0.3);" onclick="closeScanner()">✕ SALIR</button>
+        <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:white; border:1px solid rgba(255,255,255,0.3);" onclick="cancelScanFlow()">✕ SALIR</button>
         <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:#fbbf24; border:1px solid rgba(255,255,255,0.2); font-size:0.65rem;" onclick="changeGeminiKey()">⚙ API KEY</button>
     </div>
     <div id="snap-btn" onclick="captureIA()">
@@ -432,11 +477,14 @@ let activeFinanceView = 'compras';
 let productSearchTerm = '';
 let currentUser     = null;
 
-// Scanner
+// Scanner related globals
 let scannerStream   = null;
-let pendingNombre   = '';
-let pendingCanvas   = null;
-let pendingExisteId = null;
+let pendingNombre   = '';          // Nombre extraído por la IA del escaneo actual
+let pendingCanvas   = null;        // Canvas con la imagen del escaneo actual
+let pendingExisteId = null;        // ID del producto existente que coincide con el escaneo
+let pendingExistingProduct = null; // Objeto completo del producto existente que coincide
+let pendingScanValues = {};        // Valores (precios, tienda, caducidad, etc.) introducidos/sugeridos en price-modal para el escaneo actual
+
 
 // Finanzas fechas
 const getMXTimeParts = () => {
@@ -1051,14 +1099,38 @@ async function openScannerModal() {
         document.getElementById('cam-preview-ia').srcObject = scannerStream;
     } catch(e) {
         toastScanner("Error de cámara: " + e.message, '#ef4444');
-        closeScanner();
+        cancelScanFlow(); // Llama a cancelScanFlow para limpiar y cerrar todo
     }
 }
-function closeScanner() {
+function closeScanner() { // Solo se encarga de detener la cámara
     if (scannerStream) scannerStream.getTracks().forEach(t => t.stop());
     scannerStream = null;
     document.getElementById('ia-modal').style.display = 'none';
 }
+
+/* Nueva función para limpiar todo el estado del escáner y cerrar modales */
+function cancelScanFlow() {
+    pendingNombre = '';
+    pendingCanvas = null;
+    pendingExisteId = null;
+    pendingExistingProduct = null;
+    pendingScanValues = {};
+
+    // Limpiar campos del price-modal
+    document.getElementById('pm-nombre').value = '';
+    document.getElementById('pm-costo').value = '';
+    document.getElementById('pm-venta').value = '';
+    document.getElementById('pm-caducidad').value = '';
+    document.getElementById('dup-badge').classList.remove('show');
+
+    // Ocultar todos los modales relacionados con el escáner si están abiertos
+    document.getElementById('price-modal').style.display = 'none';
+    document.getElementById('dup-confirm-modal').style.display = 'none';
+    document.getElementById('update-confirm-modal').style.display = 'none';
+    
+    closeScanner(); // Detener la cámara y ocultar el modal IA
+}
+
 
 /* ══════════════════════════════════════════════════════════════════
    SCANNER — PRECIO SUGERIDO
@@ -1107,7 +1179,7 @@ function precargarPrecios(precio, costo) {
     costoInput.value = costo || '';
     if (precio && parseFloat(precio) > 0) {
         ventaInput.value = parseFloat(precio).toFixed(2);
-        ventaInput.dataset.suggested = '';
+        ventaInput.dataset.suggested = ''; // Clear suggested if using existing
     } else if (costo && parseFloat(costo) > 0) {
         autoSuggestVenta(String(costo));
     } else {
@@ -1246,39 +1318,45 @@ async function captureIA() {
             return palabrasEsc.filter(w => pg.includes(w)).length >= 2;
         });
 
-        document.getElementById('pm-nombre').value = pendingNombre;
+        document.getElementById('pm-nombre').value = pendingNombre; // Siempre mostrar el nombre escaneado en price-modal
 
-        if (candidatos.length === 1 && (candidatos[0].nombre||'').toUpperCase().trim() === pendingNombre) {
-            // Coincidencia exacta → panel directo con badge
-            pendingExisteId = candidatos[0].id;
-            precargarPrecios(candidatos[0].precio, candidatos[0].costo);
-            const badge = document.getElementById('dup-badge');
-            var prev = candidatos[0];
-            var infoExtra = '';
-            if (prev.fechaEscaneo) infoExtra += '<br>📅 Escaneado: ' + prev.fechaEscaneo;
-            if (prev.tiendaEscaneo) infoExtra += ' · ' + prev.tiendaEscaneo;
-            if (prev.caducidad)    infoExtra += '<br>⏳ Cad: ' + prev.caducidad;
-            document.getElementById('dup-text').innerHTML =
-                '<strong>¡Ya registrado!</strong><br>"' + prev.nombre + '"<br>' +
-                'Venta: <b>$' + (prev.precio||0) + '</b> | Costo: $' + (prev.costo||0) +
-                infoExtra +
-                '<br><em style="font-size:0.65rem;">Precios precargados, puedes modificar.</em>';
-            badge.classList.add('show');
-            document.getElementById('price-modal').style.display = 'flex';
-        } else if (candidatos.length >= 1) {
-            // Similares → preguntar al usuario
-            pendingExisteId = null;
-            document.getElementById('pm-venta').value = '';
-            document.getElementById('pm-costo').value = '';
-            document.getElementById('dup-badge').classList.remove('show');
-            showDupConfirm(candidatos);
+        if (candidatos.length >= 1) { // Cualquier tipo de duplicado encontrado
+            // Priorizar coincidencia exacta si existe
+            const exactMatch = candidatos.find(p => (p.nombre||'').toUpperCase().trim() === pendingNombre);
+            if (exactMatch) {
+                pendingExisteId = exactMatch.id;
+                pendingExistingProduct = exactMatch;
+                precargarPrecios(exactMatch.precio, exactMatch.costo); // Precargar precios del producto existente
+                const badge = document.getElementById('dup-badge');
+                var prev = exactMatch; // Usar el producto de coincidencia exacta para la info del badge
+                var infoExtra = '';
+                if (prev.fechaEscaneo) infoExtra += '<br>📅 Escaneado: ' + prev.fechaEscaneo;
+                if (prev.tiendaEscaneo) infoExtra += ' · ' + prev.tiendaEscaneo;
+                if (prev.caducidad)    infoExtra += '<br>⏳ Caducidad: ' + prev.caducidad;
+                document.getElementById('dup-text').innerHTML =
+                    '<strong>¡Ya registrado!</strong><br>"' + prev.nombre + '"<br>' +
+                    'Venta actual: <b>$' + (prev.precio||0) + '</b> | Costo actual: $' + (prev.costo||0) +
+                    infoExtra +
+                    '<br><em style="font-size:0.65rem;">Puedes ajustar los precios antes de guardar.</em>';
+                badge.classList.add('show');
+                document.getElementById('price-modal').style.display = 'flex'; // Abrir price-modal
+            } else {
+                // Coincidencias similares, dejar que el usuario elija
+                pendingExisteId = null; // No hay ID específico seleccionado todavía
+                pendingExistingProduct = null;
+                document.getElementById('pm-venta').value = ''; // Limpiar para una nueva entrada/sugerencia
+                document.getElementById('pm-costo').value = ''; // Limpiar para una nueva entrada/sugerencia
+                document.getElementById('dup-badge').classList.remove('show');
+                showDupConfirm(candidatos); // Este modal eventualmente llevará a price-modal o al flujo de nuevo producto
+            }
         } else {
-            // Producto nuevo
+            // Producto completamente nuevo (sin duplicados)
             pendingExisteId = null;
-            document.getElementById('pm-venta').value = '';
-            document.getElementById('pm-costo').value = '';
+            pendingExistingProduct = null;
+            document.getElementById('pm-venta').value = ''; // Limpiar para una nueva entrada/sugerencia
+            document.getElementById('pm-costo').value = ''; // Limpiar para una nueva entrada/sugerencia
             document.getElementById('dup-badge').classList.remove('show');
-            document.getElementById('price-modal').style.display = 'flex';
+            document.getElementById('price-modal').style.display = 'flex'; // Abrir price-modal
         }
 
     } catch(e) {
@@ -1296,7 +1374,7 @@ function showDupConfirm(candidatos) {
     document.getElementById('dcm-escaneado').textContent = '"' + pendingNombre + '"';
     document.getElementById('dcm-candidatos').innerHTML = candidatos.map(function(p) {
         // Usar data-attributes para evitar problemas de comillas en onclick
-        var safeId    = (p.id    || '').replace(/'/g, '');
+        var safeId     = (p.id    || '').replace(/'/g, '');
         var safePrecio = parseFloat(p.precio) || 0;
         var safeCosto  = parseFloat(p.costo)  || 0;
         var safeNombre = (p.nombre || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -1304,10 +1382,10 @@ function showDupConfirm(candidatos) {
                ' style="background:#f8fafc; border:2px solid #e2e8f0; border-radius:12px; padding:12px 14px; margin-bottom:8px; cursor:pointer;">' +
                '<div style="font-weight:800; font-size:0.85rem; color:#0f172a; text-transform:uppercase;">' + safeNombre + '</div>' +
                '<div style="font-size:0.72rem; color:#64748b; margin-top:2px;">' +
-               'Venta: <span style="color:#10b981; font-weight:700;">$' + safePrecio + '</span> &nbsp;|&nbsp; ' +
-               'Costo: <span style="color:#ef4444; font-weight:700;">$' + safeCosto + '</span></div>' +
+               'Venta actual: <span style="color:#10b981; font-weight:700;">$' + safePrecio.toFixed(2) + '</span> &nbsp;|&nbsp; ' +
+               'Costo actual: <span style="color:#ef4444; font-weight:700;">$' + safeCosto.toFixed(2) + '</span></div>' +
                ((p.fechaEscaneo || p.tiendaEscaneo) ? '<div style="font-size:0.62rem; color:#94a3b8; margin-top:2px;">📅 ' + (p.fechaEscaneo||'') + (p.tiendaEscaneo ? ' · '+p.tiendaEscaneo : '') + '</div>' : '') +
-               (p.caducidad ? '<div style="font-size:0.62rem; color:#f59e0b; margin-top:1px;">⏳ Cad: ' + p.caducidad + '</div>' : '') +
+               (p.caducidad ? '<div style="font-size:0.62rem; color:#f59e0b; margin-top:1px;">⏳ Caducidad: ' + p.caducidad + '</div>' : '') +
                '<div style="font-size:0.65rem; color:#3b82f6; margin-top:4px; font-weight:700;">✓ SÍ, ES ESTE PRODUCTO</div>' +
                '</div>';
     }).join('');
@@ -1321,12 +1399,25 @@ function showDupConfirm(candidatos) {
 
 function selectDuplicate(id, precio, costo) {
     pendingExisteId = id;
-    precargarPrecios(precio, costo);
-    var p = window.state.products.find(function(x){ return x.id === id; });
+    pendingExistingProduct = window.state.products.find(x => x.id === id); // Guardar el objeto completo
+    if (!pendingExistingProduct) {
+        toastScanner("Error: Producto existente no encontrado.", '#ef4444');
+        return;
+    }
+    
+    // El pm-nombre ya debe estar seteado desde captureIA con el nombre escaneado
+    precargarPrecios(precio, costo); // Precargar los precios del producto existente
+    
+    var p = pendingExistingProduct; // Usar pendingExistingProduct para la información del badge
     if (p) {
         var badge = document.getElementById('dup-badge');
         document.getElementById('dup-text').innerHTML =
-            '<strong>Seleccionado:</strong> "' + p.nombre + '"<br>Precios precargados, puedes modificar.';
+            '<strong>Seleccionado:</strong> "' + p.nombre + '"<br>' +
+            'Venta actual: <b>$' + (p.precio||0).toFixed(2) + '</b> | Costo actual: $' + (p.costo||0).toFixed(2) +
+            (p.fechaEscaneo || p.tiendaEscaneo ? '<div style="font-size:0.65rem; margin-top:2px;">📅 Escaneado: ' + (p.fechaEscaneo||'') + (p.tiendaEscaneo ? ' · '+p.tiendaEscaneo : '') + '</div>' : '') +
+            (p.caducidad ? '<div style="font-size:0.65rem; color:#f59e0b; margin-top:1px;">⏳ Caducidad: ' + p.caducidad + '</div>' : '') +
+            '<br><em style="font-size:0.65rem;">Puedes ajustar los precios antes de guardar.</em>';
+
         badge.classList.add('show');
     }
     document.getElementById('dup-confirm-modal').style.display = 'none';
@@ -1335,43 +1426,35 @@ function selectDuplicate(id, precio, costo) {
 
 function skipDuplicate() {
     pendingExisteId = null;
+    pendingExistingProduct = null; // Limpiar también esta variable
     document.getElementById('dup-badge').classList.remove('show');
+    // document.getElementById('pm-nombre') ya tiene el nombre escaneado
+    // document.getElementById('pm-costo') y 'pm-venta' se limpian o se precargan si es un producto nuevo.
     document.getElementById('pm-venta').value = '';
     document.getElementById('pm-costo').value = '';
+    autoSuggestVenta(document.getElementById('pm-costo').value); // Volver a sugerir precio de venta
     document.getElementById('dup-confirm-modal').style.display = 'none';
     document.getElementById('price-modal').style.display = 'flex';
 }
 
-function closeDupConfirm() {
+function closeDupConfirm() { // Esta función ahora solo oculta el modal y llama a cancelScanFlow
     document.getElementById('dup-confirm-modal').style.display = 'none';
-    pendingNombre = ''; pendingCanvas = null; pendingExisteId = null;
+    cancelScanFlow();
 }
 
 /* ══════════════════════════════════════════════════════════════════
    SCANNER — CONFIRMAR PRECIOS (compartir + Storage + Firestore)
 ══════════════════════════════════════════════════════════════════ */
-async function confirmPrices() {
-    const nombre        = document.getElementById('pm-nombre').value.replace(/\n/g,' ').trim().toUpperCase();
-    const venta         = parseFloat(document.getElementById('pm-venta').value)  || 0;
-    const costo         = parseFloat(document.getElementById('pm-costo').value)  || 0;
-    const caducidad     = (document.getElementById('pm-caducidad').value   || '').trim();
-    const fechaEscaneo  = (document.getElementById('pm-fecha-escaneo').value || '').trim();
-    const tiendaEscaneo = (document.getElementById('pm-tienda-escaneo').value|| '').trim().toUpperCase();
 
-    if (!nombre) { toastScanner("Nombre vacío", '#ef4444'); return; }
-
-    // Persistir tienda para el próximo escaneo
-    if (tiendaEscaneo) localStorage.setItem('yaute_scan_tienda', tiendaEscaneo);
-
-    document.getElementById('price-modal').style.display = 'none';
-
-    // 1. Web Share API — incluir caducidad si existe
+// Función auxiliar para subir foto y guardar un producto NUEVO
+async function uploadAndSaveNewProduct(nombre, venta, costo, caducidad, fechaEscaneo, tiendaEscaneo) {
+    // 1. Web Share API
     if (pendingCanvas && navigator.canShare) {
         try {
             const blob = await new Promise(r => pendingCanvas.toBlob(r, 'image/jpeg', 0.88));
             const file = new File([blob], 'oferta.jpg', { type:'image/jpeg' });
-            let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + nombre + '\n💰 $' + venta;
-            if (caducidad)  msgWA += '\n⏳ Cad: ' + caducidad;
+            let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + nombre + '\n💰 $' + venta.toFixed(2);
+            if (caducidad)  msgWA += '\n⏳ Caducidad: ' + caducidad;
             if (navigator.canShare({ files:[file] })) await navigator.share({ files:[file], text: msgWA });
         } catch(e) { if (e.name !== 'AbortError') console.warn('Share:', e.message); }
     }
@@ -1386,24 +1469,138 @@ async function confirmPrices() {
         } catch(e) { console.warn('Storage:', e.message); }
     }
 
-    // 3. Guardar / actualizar en Firestore
+    // 3. Guardar en Firestore
     const data = { nombre, costo, precio: venta, fechaEscaneo, tiendaEscaneo };
     if (fotoUrl)    data.foto      = fotoUrl;
     if (caducidad)  data.caducidad = caducidad;
 
-    if (pendingExisteId) { await col('products').doc(pendingExisteId).update(data); toastScanner("✅ Producto actualizado"); }
-    else                 { await col('products').add(data);                          toastScanner("✅ Producto guardado");    }
-
-    document.getElementById('pm-caducidad').value = '';
-    pendingNombre = ''; pendingCanvas = null; pendingExisteId = null;
-    closeScanner();
+    await col('products').add(data);
+    toastScanner("✅ Producto guardado");
 }
 
-function cancelPrices() {
+
+async function confirmPrices() {
+    const nombre        = document.getElementById('pm-nombre').value.replace(/\n/g,' ').trim().toUpperCase();
+    const venta         = parseFloat(document.getElementById('pm-venta').value)  || 0;
+    const costo         = parseFloat(document.getElementById('pm-costo').value)  || 0;
+    const caducidad     = (document.getElementById('pm-caducidad').value   || '').trim();
+    const fechaEscaneo  = (document.getElementById('pm-fecha-escaneo').value || '').trim();
+    const tiendaEscaneo = (document.getElementById('pm-tienda-escaneo').value|| '').trim().toUpperCase();
+
+    if (!nombre) { toastScanner("Nombre vacío", '#ef4444'); return; }
+
+    // Persistir tienda para el próximo escaneo
+    if (tiendaEscaneo) localStorage.setItem('yaute_scan_tienda', tiendaEscaneo);
+
+    document.getElementById('price-modal').style.display = 'none'; // Cerrar price-modal
+
+    if (pendingExisteId && pendingExistingProduct) {
+        // Si se identificó un duplicado, almacenar los valores del escaneo
+        // y mostrar el modal de confirmación de actualización
+        pendingScanValues = {
+            nombre: nombre,
+            costo: costo,
+            precio: venta,
+            caducidad: caducidad,
+            fechaEscaneo: fechaEscaneo,
+            tiendaEscaneo: tiendaEscaneo
+        };
+        openUpdateConfirmModal(pendingExistingProduct, pendingScanValues);
+    } else {
+        // Si es un producto nuevo, proceder directamente a subir y guardar
+        await uploadAndSaveNewProduct(nombre, venta, costo, caducidad, fechaEscaneo, tiendaEscaneo);
+        cancelScanFlow(); // Resetear todo el flujo del escáner
+    }
+}
+
+function cancelPrices() { // Esta función ahora solo oculta el modal y llama a cancelScanFlow
     document.getElementById('price-modal').style.display = 'none';
-    document.getElementById('dup-badge').classList.remove('show');
-    document.getElementById('pm-caducidad').value = '';   // limpiar caducidad
-    pendingNombre = ''; pendingCanvas = null; pendingExisteId = null;
+    cancelScanFlow();
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   NUEVO: MODAL DE CONFIRMACIÓN DE ACTUALIZACIÓN (DUPLICADO)
+══════════════════════════════════════════════════════════════════ */
+function openUpdateConfirmModal(existingProduct, newScanValues) {
+    pendingExistingProduct = existingProduct; // Almacenar para `performUpdateFromScanner`
+    pendingScanValues = newScanValues;       // Almacenar para `performUpdateFromScanner`
+
+    document.getElementById('ucm-scanned-name').textContent  = pendingNombre;
+    document.getElementById('ucm-existing-name').textContent = existingProduct.nombre;
+    document.getElementById('ucm-existing-costo').textContent  = `$${(existingProduct.costo || 0).toFixed(2)}`;
+    document.getElementById('ucm-existing-precio').textContent = `$${(existingProduct.precio || 0).toFixed(2)}`;
+    document.getElementById('ucm-existing-photo').src = existingProduct.foto || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+
+    // Opciones por defecto: actualizar foto si hay un canvas nuevo, actualizar detalles
+    document.getElementById('ucm-update-photo').checked = !!pendingCanvas;
+    document.getElementById('ucm-update-details').checked = true;
+
+    document.getElementById('update-confirm-modal').style.display = 'flex';
+}
+
+function closeUpdateConfirmModal() { // Esta función ahora solo oculta el modal y llama a cancelScanFlow
+    document.getElementById('update-confirm-modal').style.display = 'none';
+    cancelScanFlow();
+}
+
+async function performUpdateFromScanner() {
+    if (!pendingExistingProduct || !pendingExisteId) {
+        toastScanner("Error: No hay producto existente para actualizar.", '#ef4444');
+        cancelScanFlow();
+        return;
+    }
+
+    const updatePhoto   = document.getElementById('ucm-update-photo').checked;
+    const updateDetails = document.getElementById('ucm-update-details').checked;
+
+    const dataToUpdate = { nombre: pendingScanValues.nombre }; // Siempre actualizar el nombre al escaneado
+
+    // Manejar actualización de foto
+    if (updatePhoto && pendingCanvas) {
+        try {
+            const blob = await new Promise(r => pendingCanvas.toBlob(r, 'image/jpeg', 0.82));
+            const ref  = storage.ref('productos/' + Date.now() + '_' + pendingScanValues.nombre.replace(/\s+/g,'_') + '.jpg');
+            await ref.put(blob);
+            dataToUpdate.foto = await ref.getDownloadURL(); // Establecer la nueva foto
+            toastScanner("Foto actualizada.", '#10b981');
+        } catch(e) {
+            console.warn('Storage (actualizar foto):', e.message);
+            toastScanner("Error al subir nueva foto. Se mantendrá la foto existente o ninguna.", '#f59e0b');
+            dataToUpdate.foto = pendingExistingProduct.foto || ''; // Mantener la foto existente o vacía si no hay.
+        }
+    } else if (!updatePhoto) {
+        // Si no se quiere actualizar la foto, mantener la que ya existía (o ninguna)
+        dataToUpdate.foto = pendingExistingProduct.foto || '';
+    }
+    // Si updatePhoto es true pero pendingCanvas es null, no se hace nada con la foto, se mantiene la existente por defecto.
+
+    // Manejar actualización de detalles (precios, tienda, caducidad)
+    if (updateDetails) {
+        dataToUpdate.costo        = pendingScanValues.costo;
+        dataToUpdate.precio       = pendingScanValues.precio;
+        dataToUpdate.caducidad    = pendingScanValues.caducidad;
+        dataToUpdate.fechaEscaneo = pendingScanValues.fechaEscaneo;
+        dataToUpdate.tiendaEscaneo = pendingScanValues.tiendaEscaneo;
+        toastScanner("Detalles actualizados.", '#10b981');
+    } else {
+        // Mantener los detalles existentes
+        dataToUpdate.costo        = pendingExistingProduct.costo;
+        dataToUpdate.precio       = pendingExistingProduct.precio;
+        dataToUpdate.caducidad    = pendingExistingProduct.caducidad;
+        dataToUpdate.fechaEscaneo = pendingExistingProduct.fechaEscaneo;
+        dataToUpdate.tiendaEscaneo = pendingExistingProduct.tiendaEscaneo;
+    }
+
+    try {
+        await col('products').doc(pendingExisteId).update(dataToUpdate);
+        toastScanner("✅ Producto actualizado", '#10b981');
+    } catch (e) {
+        console.error("Error al actualizar producto en Firestore:", e);
+        toastScanner("Error al actualizar producto en Firestore.", '#ef4444');
+    }
+
+    document.getElementById('update-confirm-modal').style.display = 'none';
+    cancelScanFlow(); // Resetear todo el flujo del escáner
 }
 
 /* ══════════════════════════════════════════════════════════════════
