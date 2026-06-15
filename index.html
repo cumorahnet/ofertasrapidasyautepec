@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v36.1 — Sistema Completo</title>
+    <title>Yaute v36.2 — Sistema Completo</title>
     <link rel="icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -117,7 +117,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 36.1</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 36.2</div>
 </div>
 
 <div id="toast-alert"></div>
@@ -352,7 +352,7 @@
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
-            <span class="version-badge">v36.1</span>
+            <span class="version-badge">v36.2</span>
             <button id="btn-install-pwa" onclick="installPWA()"
                 style="display:none; background:rgba(59,130,246,0.25); border:1px solid rgba(59,130,246,0.5); color:white; border-radius:50px; padding:3px 12px; font-size:0.62rem; font-weight:800; cursor:pointer; align-items:center; gap:5px;">
                 <i class="fas fa-download"></i> INSTALAR APP
@@ -1606,7 +1606,6 @@ function cancelScanFlow() {
 // SCANNERS — CORE (IA y lógica de detección)
 // ══════════════════════════════════════════════════════════════════
 let model = null; // Globar variable for Gemini Vision Pro model
-const MAX_FILE_SIZE_KB = 400; // Máximo tamaño de imagen para Gemini Vision Pro
 const RESIZE_WIDTH = 800;    // Ancho a redimensionar si es necesario
 
 // Función para inicializar Gemini
@@ -1653,35 +1652,17 @@ async function captureIA() {
 
     const video = document.getElementById('cam-preview-ia');
     pendingCanvas = document.createElement('canvas'); // Usamos pendingCanvas global
-    const context = pendingCanvas.getContext('2d');
-    
+    let context = pendingCanvas.getContext('2d'); // Usar 'let' para reasignar si se redimensiona
+
     // Obtener la región de interés (el cuadrado de escaneo) para capturar solo esa parte.
-    // Esto simula un recorte antes de enviar a la IA.
     const videoWidth = video.videoWidth;
     const videoHeight = video.videoHeight;
-    const aspectRatio = videoWidth / videoHeight;
 
     const captureBox = document.querySelector('.scan-guide');
     const boxRect = captureBox.getBoundingClientRect(); // Obtener dimensiones de la guía visual
-    const bodyRect = document.body.getBoundingClientRect();
-
-    // Calcular las coordenadas relativas al video
-    // Ajustar por el tamaño del video en pantalla vs. el tamaño real del stream
     const videoDisplayWidth = video.offsetWidth;
     const videoDisplayHeight = video.offsetHeight;
 
-    const scaleX = videoWidth / videoDisplayWidth;
-    const scaleY = videoHeight / videoDisplayHeight;
-
-    let sx, sy, sWidth, sHeight;
-
-    // Calcular las dimensiones y posición del recorte en el contexto del video real
-    // Esto es un cálculo complejo porque el `object-fit: cover` del video hace que
-    // el video se escale para cubrir el contenedor, lo que significa que partes
-    // pueden estar fuera de vista, o el video podría no ocupar todo el ancho/alto
-    // de su elemento HTML si su aspect ratio no coincide.
-
-    // Primero, encontrar la relación de aspecto del video y del contenedor del video.
     const videoRatio = videoWidth / videoHeight;
     const containerRatio = videoDisplayWidth / videoDisplayHeight;
 
@@ -1705,10 +1686,10 @@ async function captureIA() {
     const guideHeight = boxRect.height;
 
     // Convertir a coordenadas del stream original
-    sx = guideX * (videoWidth / renderedVideoWidth);
-    sy = guideY * (videoHeight / renderedVideoHeight);
-    sWidth = guideWidth * (videoWidth / renderedVideoWidth);
-    sHeight = guideHeight * (videoHeight / renderedVideoHeight);
+    let sx = guideX * (videoWidth / renderedVideoWidth);
+    let sy = guideY * (videoHeight / renderedVideoHeight);
+    let sWidth = guideWidth * (videoWidth / renderedVideoWidth);
+    let sHeight = guideHeight * (videoHeight / renderedVideoHeight);
 
     // Asegurarse de que los valores no sean negativos o excedan las dimensiones del video
     sx = Math.max(0, sx);
@@ -1721,33 +1702,22 @@ async function captureIA() {
 
     context.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, sWidth, sHeight);
 
-    // Redimensionar si es demasiado grande para reducir la latencia de la API
-    let dataUri = pendingCanvas.toDataURL('image/jpeg', 0.9); // Calidad inicial 0.9
-    let blob = dataURLtoBlob(dataUri);
-
-    // Bucle para reducir calidad/tamaño si excede el límite
-    while (blob.size / 1024 > MAX_FILE_SIZE_KB && pendingCanvas.width > 200) {
-        // Reducir la calidad
-        let quality = 0.9;
-        do {
-            dataUri = pendingCanvas.toDataURL('image/jpeg', quality);
-            blob = dataURLtoBlob(dataUri);
-            quality -= 0.1;
-        } while (blob.size / 1024 > MAX_FILE_SIZE_KB && quality > 0.1);
-
-        // Si sigue siendo muy grande, reducir las dimensiones del canvas
-        if (blob.size / 1024 > MAX_FILE_SIZE_KB) {
-            const tempCanvas = document.createElement('canvas');
-            const tempContext = tempCanvas.getContext('2d');
-            tempCanvas.width = pendingCanvas.width * 0.8; // Reducir un 20%
-            tempCanvas.height = pendingCanvas.height * 0.8;
-            tempContext.drawImage(pendingCanvas, 0, 0, tempCanvas.width, tempCanvas.height);
-            pendingCanvas = tempCanvas; // Reemplazar el canvas
-            context = pendingCanvas.getContext('2d'); // Actualizar contexto
-        }
-        dataUri = pendingCanvas.toDataURL('image/jpeg', 0.9);
-        blob = dataURLtoBlob(dataUri);
+    // Simplificar el proceso de redimensionamiento
+    let finalCanvas = pendingCanvas;
+    
+    // Si el canvas es demasiado grande (usamos el ancho como referencia principal)
+    if (pendingCanvas.width > RESIZE_WIDTH) { // RESIZE_WIDTH defined as 800
+        const ratio = RESIZE_WIDTH / pendingCanvas.width;
+        const tempCanvas = document.createElement('canvas');
+        tempCanvas.width = RESIZE_WIDTH;
+        tempCanvas.height = pendingCanvas.height * ratio;
+        const tempContext = tempCanvas.getContext('2d');
+        tempContext.drawImage(pendingCanvas, 0, 0, tempCanvas.width, tempCanvas.height);
+        finalCanvas = tempCanvas;
     }
+    
+    // Convertir a Data URL con una calidad fija
+    const dataUri = finalCanvas.toDataURL('image/jpeg', 0.8); // Fixed quality 0.8
     
     // Convertir a Generative Part para Gemini
     const imagePart = dataUriToGenerativePart(dataUri);
