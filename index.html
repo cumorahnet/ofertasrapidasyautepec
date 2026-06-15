@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v36.0 — Sistema Completo</title>
+    <title>Yaute v36.1 — Sistema Completo</title>
     <link rel="icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -117,7 +117,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 36.0</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 36.1</div>
 </div>
 
 <div id="toast-alert"></div>
@@ -352,7 +352,7 @@
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
-            <span class="version-badge">v36.0</span>
+            <span class="version-badge">v36.1</span>
             <button id="btn-install-pwa" onclick="installPWA()"
                 style="display:none; background:rgba(59,130,246,0.25); border:1px solid rgba(59,130,246,0.5); color:white; border-radius:50px; padding:3px 12px; font-size:0.62rem; font-weight:800; cursor:pointer; align-items:center; gap:5px;">
                 <i class="fas fa-download"></i> INSTALAR APP
@@ -1575,4 +1575,198 @@ function cancelScanFlow() {
     pendingExistingProduct = null;
     pendingScanValues = {};
 
-    // Limpiar campos del price-modal (ase
+    // Detener la transmisión de la cámara si está activa
+    if (scannerStream) {
+        scannerStream.getTracks().forEach(t => t.stop());
+        scannerStream = null;
+    }
+
+    // Ocultar todos los modales relacionados con el escáner
+    document.getElementById('ia-modal').style.display = 'none';
+    document.getElementById('price-modal').style.display = 'none';
+    document.getElementById('dup-confirm-modal').style.display = 'none';
+    document.getElementById('update-confirm-modal').style.display = 'none';
+    
+    // Limpiar campos en el modal de precios para un nuevo escaneo
+    document.getElementById('pm-nombre').value = '';
+    document.getElementById('pm-costo').value = '';
+    document.getElementById('pm-margen').value = '20'; // Resetear a margen por defecto
+    document.getElementById('pm-venta').value = '';
+    document.getElementById('pm-caducidad').value = '';
+    document.getElementById('dup-badge').classList.remove('show'); // Ocultar el badge de duplicado
+    document.getElementById('sug-scan-tienda').classList.add('d-none'); // Ocultar sugerencias de tienda
+
+    // También cerrar el modal de configuración de la clave si está abierto
+    document.getElementById('key-config-modal').style.display = 'none';
+
+    toastScanner("Escaneo cancelado.", "info");
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SCANNERS — CORE (IA y lógica de detección)
+// ══════════════════════════════════════════════════════════════════
+let model = null; // Globar variable for Gemini Vision Pro model
+const MAX_FILE_SIZE_KB = 400; // Máximo tamaño de imagen para Gemini Vision Pro
+const RESIZE_WIDTH = 800;    // Ancho a redimensionar si es necesario
+
+// Función para inicializar Gemini
+async function initGeminiVision() {
+    const GEMINI_API_KEY = localStorage.getItem('yaute_key_v3310');
+    if (!GEMINI_API_KEY) {
+        // La modal de configuración de la clave se muestra en startSync si no existe
+        return; // No intentes inicializar si no hay clave
+    }
+    if (model) return; // Ya inicializado
+    try {
+        const { GoogleGenerativeAI } = await import('https://esm.run/@google/generative-ai');
+        const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+        model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
+        console.log("Gemini Vision Pro inicializado.");
+    } catch (e) {
+        console.error("Error al inicializar Gemini Vision Pro:", e);
+        toastScanner("Error al cargar IA: " + e.message, '#ef4444');
+    }
+}
+
+// Cargar el modelo al inicio si ya hay una API key
+document.addEventListener('DOMContentLoaded', initGeminiVision);
+
+// Convertir Data URI a una estructura FileData para Gemini
+function dataUriToGenerativePart(dataUri) {
+    const [header, data] = dataUri.split(',');
+    const mimeType = header.match(/:(.*?);/)[1];
+    return {
+        inlineData: {
+            data: data,
+            mimeType: mimeType
+        }
+    };
+}
+
+// Capturar imagen desde la cámara para el análisis IA
+async function captureIA() {
+    if (!model) {
+        toastScanner("La IA no está lista. Verifica tu API Key.", '#ef4444');
+        changeGeminiKey(); // Abre el modal de la API Key
+        return;
+    }
+
+    const video = document.getElementById('cam-preview-ia');
+    pendingCanvas = document.createElement('canvas'); // Usamos pendingCanvas global
+    const context = pendingCanvas.getContext('2d');
+    
+    // Obtener la región de interés (el cuadrado de escaneo) para capturar solo esa parte.
+    // Esto simula un recorte antes de enviar a la IA.
+    const videoWidth = video.videoWidth;
+    const videoHeight = video.videoHeight;
+    const aspectRatio = videoWidth / videoHeight;
+
+    const captureBox = document.querySelector('.scan-guide');
+    const boxRect = captureBox.getBoundingClientRect(); // Obtener dimensiones de la guía visual
+    const bodyRect = document.body.getBoundingClientRect();
+
+    // Calcular las coordenadas relativas al video
+    // Ajustar por el tamaño del video en pantalla vs. el tamaño real del stream
+    const videoDisplayWidth = video.offsetWidth;
+    const videoDisplayHeight = video.offsetHeight;
+
+    const scaleX = videoWidth / videoDisplayWidth;
+    const scaleY = videoHeight / videoDisplayHeight;
+
+    let sx, sy, sWidth, sHeight;
+
+    // Calcular las dimensiones y posición del recorte en el contexto del video real
+    // Esto es un cálculo complejo porque el `object-fit: cover` del video hace que
+    // el video se escale para cubrir el contenedor, lo que significa que partes
+    // pueden estar fuera de vista, o el video podría no ocupar todo el ancho/alto
+    // de su elemento HTML si su aspect ratio no coincide.
+
+    // Primero, encontrar la relación de aspecto del video y del contenedor del video.
+    const videoRatio = videoWidth / videoHeight;
+    const containerRatio = videoDisplayWidth / videoDisplayHeight;
+
+    let renderedVideoWidth, renderedVideoHeight;
+    let startX = 0, startY = 0;
+
+    if (videoRatio > containerRatio) { // Video es más ancho que el contenedor
+        renderedVideoHeight = videoDisplayHeight;
+        renderedVideoWidth = renderedVideoHeight * videoRatio;
+        startX = (videoDisplayWidth - renderedVideoWidth) / 2;
+    } else { // Video es más alto que el contenedor o tienen el mismo ratio
+        renderedVideoWidth = videoDisplayWidth;
+        renderedVideoHeight = renderedVideoWidth / videoRatio;
+        startY = (videoDisplayHeight - renderedVideoHeight) / 2;
+    }
+
+    // Ahora, calcular las coordenadas del scan-guide relativas al video renderizado.
+    const guideX = boxRect.left - startX;
+    const guideY = boxRect.top - startY;
+    const guideWidth = boxRect.width;
+    const guideHeight = boxRect.height;
+
+    // Convertir a coordenadas del stream original
+    sx = guideX * (videoWidth / renderedVideoWidth);
+    sy = guideY * (videoHeight / renderedVideoHeight);
+    sWidth = guideWidth * (videoWidth / renderedVideoWidth);
+    sHeight = guideHeight * (videoHeight / renderedVideoHeight);
+
+    // Asegurarse de que los valores no sean negativos o excedan las dimensiones del video
+    sx = Math.max(0, sx);
+    sy = Math.max(0, sy);
+    sWidth = Math.min(sWidth, videoWidth - sx);
+    sHeight = Math.min(sHeight, videoHeight - sy);
+
+    pendingCanvas.width = sWidth;
+    pendingCanvas.height = sHeight;
+
+    context.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, sWidth, sHeight);
+
+    // Redimensionar si es demasiado grande para reducir la latencia de la API
+    let dataUri = pendingCanvas.toDataURL('image/jpeg', 0.9); // Calidad inicial 0.9
+    let blob = dataURLtoBlob(dataUri);
+
+    // Bucle para reducir calidad/tamaño si excede el límite
+    while (blob.size / 1024 > MAX_FILE_SIZE_KB && pendingCanvas.width > 200) {
+        // Reducir la calidad
+        let quality = 0.9;
+        do {
+            dataUri = pendingCanvas.toDataURL('image/jpeg', quality);
+            blob = dataURLtoBlob(dataUri);
+            quality -= 0.1;
+        } while (blob.size / 1024 > MAX_FILE_SIZE_KB && quality > 0.1);
+
+        // Si sigue siendo muy grande, reducir las dimensiones del canvas
+        if (blob.size / 1024 > MAX_FILE_SIZE_KB) {
+            const tempCanvas = document.createElement('canvas');
+            const tempContext = tempCanvas.getContext('2d');
+            tempCanvas.width = pendingCanvas.width * 0.8; // Reducir un 20%
+            tempCanvas.height = pendingCanvas.height * 0.8;
+            tempContext.drawImage(pendingCanvas, 0, 0, tempCanvas.width, tempCanvas.height);
+            pendingCanvas = tempCanvas; // Reemplazar el canvas
+            context = pendingCanvas.getContext('2d'); // Actualizar contexto
+        }
+        dataUri = pendingCanvas.toDataURL('image/jpeg', 0.9);
+        blob = dataURLtoBlob(dataUri);
+    }
+    
+    // Convertir a Generative Part para Gemini
+    const imagePart = dataUriToGenerativePart(dataUri);
+
+    toastScanner("Analizando imagen...", "var(--accent)");
+    document.getElementById('snap-icon').classList.replace('fa-camera', 'fa-spinner');
+    document.getElementById('snap-icon').classList.add('fa-spin');
+
+    try {
+        // Mejorar el prompt para extraer información relevante
+        const prompt = "Dada una foto de un producto en un anaquel, identifica con precisión el *nombre completo del producto* (evitando solo marcas genéricas o empaques), su *precio* (si es claramente visible y único, solo el valor numérico sin símbolo de moneda), y su *caducidad* (si está presente). Prioriza la descripción del producto sobre el precio o caducidad si solo se puede extraer un dato. Formato JSON: { 'nombre': '...', 'precio': ..., 'caducidad': '...' }. Si algún dato no es visible, déjalo como null. Asegúrate de que el JSON sea válido y no haya texto adicional.";
+        const result = await model.generateContent([prompt, imagePart]);
+        const response = await result.response;
+        let text = response.text();
+        console.log("Respuesta cruda de Gemini:", text);
+
+        // Intentar parsear el JSON
+        let parsedResult;
+        try {
+            text = text.trim();
+            // Algunas veces Gemini puede envolver el JSON en markdown, intentar quitarlo
+            if (text.startsWith('
