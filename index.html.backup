@@ -832,6 +832,74 @@ async function saveProductChangesInTab() {
     }
 }
 
+// Helper para convertir Data URL a Blob
+function dataURLtoBlob(dataurl) {
+    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), n = bstr.length, uarr = new Uint8Array(n);
+    while(n--){
+        uarr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([uarr], {type:mime});
+}
+
+// Función unificada para manejar la lógica de compartir con Web Share API
+async function attemptWebShare(text, files, title, context, isScannerToast = false) {
+    const defaultToast = isScannerToast ? toastScanner : toast;
+
+    if (!navigator.share) {
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+        defaultToast(`${context}: Compartido solo texto (navegador no soporta API Web Share).`, "info");
+        console.log(`${context}: Fallback a WhatsApp para compartir texto.`);
+        return;
+    }
+
+    try {
+        const shareData = { title, text };
+        let sharedWithFiles = false;
+
+        if (files && files.length > 0) {
+            try {
+                if (navigator.canShare && navigator.canShare({ files })) {
+                    shareData.files = files;
+                    sharedWithFiles = true;
+                } else {
+                    console.log(`${context}: Este navegador no admite compartir archivos; se intentará solo texto.`);
+                }
+            } catch (canShareError) {
+                console.warn(`${context}: navigator.canShare falló para archivos. Se ignora y se usa texto.`, canShareError);
+            }
+        }
+
+        await navigator.share(shareData);
+
+        if (sharedWithFiles) {
+            defaultToast(`${context}: Producto compartido con imagen.`, "success");
+        } else if (files && files.length > 0) {
+            defaultToast(`${context}: Se compartió solo texto porque no se admiten archivos.`, "warning");
+        } else {
+            defaultToast(`${context}: Producto compartido (solo texto).`, "info");
+        }
+        console.log(`${context}: Compartido exitosamente.`, shareData);
+    } catch(e) {
+        if (e.name === 'AbortError') {
+            console.log(`${context}: Operación de compartir cancelada por el usuario.`);
+            defaultToast(`${context}: Compartir cancelado.`, "info");
+            return;
+        }
+
+        console.error(`${context}: Error al iniciar el compartidor del sistema:`, e);
+        if (text) {
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+            defaultToast(`${context}: Fallback a WhatsApp para compartir texto.`, "info");
+        } else {
+            defaultToast(`${context}: Error al compartir. Detalles en la consola.`, "danger");
+        }
+    } finally {
+        console.log(`--- Fin intento de compartir desde ${context} ---`);
+    }
+}
+
+
 async function shareProductDetailsFromTab() {
     if (!selectedProductInProdTab) {
         toast("Por favor, selecciona un producto para compartir.", "danger");
@@ -848,81 +916,44 @@ async function shareProductDetailsFromTab() {
     if (costToShare > 0) msgWA += ` (Costo: $${costToShare.toFixed(2)})`;
     if (caducidadToShare) msgWA += `\n⏳ Caducidad: ${caducidadToShare}`;
 
-    if (navigator.canShare) {
-        let filesToShare = [];
-        let imageShareAttempted = false; // Flag para saber si intentamos cargar una imagen
+    let filesToShare = [];
+    const defaultGif = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 
-        // Paso 1: Intentar cargar y preparar el archivo de imagen
-        // La condición `photoToShare !== 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='` ya filtra la imagen por defecto.
-        // Ahora, se verifica si es una URL http/https o una Data URL válida y no la predeterminada.
-        
-        console.log('URL de la foto para compartir:', photoToShare); // Debugging line
+    console.log('--- Iniciando intento de compartir desde Pestaña Productos ---');
+    console.log('URL de la foto para compartir:', photoToShare);
 
-        if (photoToShare && photoToShare.startsWith('http')) {
-            imageShareAttempted = true;
-            try {
-                const response = await fetch(photoToShare);
-                if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status} ${response.statusText}`);
-                }
-                const blob = await response.blob();
-                const file = new File([blob], 'oferta_producto.jpg', { type: blob.type });
-                filesToShare.push(file);
-            } catch (fetchError) {
-                console.warn('Error al cargar la imagen para compartir (fetch):', fetchError.message);
-                toast("Error al cargar la imagen (red o URL inválida). Compartiendo solo texto.", "danger");
-                // Continuar para intentar compartir solo texto
-            }
-        } else if (photoToShare && photoToShare.startsWith('data:') && photoToShare !== 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=') {
-            imageShareAttempted = true;
-            try {
-                // Parsear Data URL a Blob directamente
-                const parts = photoToShare.split(';');
-                const mimeType = parts[0].split(':')[1];
-                const base64Data = parts[1].split(',')[1];
-                const binaryString = atob(base64Data);
-                const len = binaryString.length;
-                const bytes = new Uint8Array(len);
-                for (let i = 0; i < len; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-                const blob = new Blob([bytes], { type: mimeType });
-                const file = new File([blob], 'oferta_producto.jpg', { type: mimeType });
-                filesToShare.push(file);
-            } catch (dataUrlError) {
-                console.warn('Error al procesar Data URL para compartir:', dataUrlError.message);
-                toast("Error al procesar la imagen para compartir. Compartiendo solo texto.", "danger");
-                // Continuar para intentar compartir solo texto
-            }
+    async function loadImageBlob(src) {
+        if (!src) throw new Error('URL de imagen vacía');
+        if (src.startsWith('data:')) {
+            return dataURLtoBlob(src);
         }
+        const response = await fetch(src, { mode: 'cors' });
+        if (!response.ok) {
+            const errorBody = await response.text();
+            throw new Error(`HTTP Error ${response.status}: ${response.statusText}. Response snippet: ${errorBody.substring(0, 100)}`);
+        }
+        return response.blob();
+    }
 
-
-        // Paso 2: Intentar compartir (con o sin imagen)
+    // Intenta cargar la imagen solo si no es la imagen por defecto
+    if (photoToShare && photoToShare !== defaultGif) {
         try {
-            if (filesToShare.length > 0 && navigator.canShare({ files: filesToShare, text: msgWA })) {
-                await navigator.share({ files: filesToShare, title: 'Oferta de Producto', text: msgWA });
-            } else if (!imageShareAttempted || filesToShare.length === 0) {
-                // Si no se intentó cargar una imagen (imageShareAttempted es false)
-                // O si se intentó pero filesToShare está vacío (falló la carga/procesamiento)
-                await navigator.share({ title: 'Oferta de Producto', text: msgWA });
-                // No hay toast aquí porque es el comportamiento esperado de fallback o de no-imagen
-            } else {
-                // Este caso es cuando filesToShare.length > 0 (imagen cargada/procesada)
-                // pero navigator.canShare({ files, text }) es falso.
-                // Es decir, el API de compartir no puede manejar archivos junto con texto.
-                await navigator.share({ title: 'Oferta de Producto', text: msgWA });
-                toast("Su dispositivo no soporta compartir imágenes directamente. Se compartió el texto.", "warning");
-            }
-        } catch(e) {
-            if (e.name !== 'AbortError') { // El usuario canceló la operación de compartir
-                console.warn('Error al iniciar el compartidor del sistema:', e.message);
-                toast("No se pudo abrir el compartidor del sistema.", "danger");
-            }
+            const blob = await loadImageBlob(photoToShare);
+            const fileType = blob.type.startsWith('image/') ? blob.type : 'image/jpeg';
+            const file = new File([blob], 'oferta_producto.jpg', { type: fileType });
+            filesToShare.push(file);
+            console.log('Imagen cargada exitosamente para compartir (Blob type:', blob.type, ')');
+        } catch (error) {
+            console.error('Error al cargar la imagen para compartir:', error);
+            toast("Error al cargar la imagen para compartir. Se compartirá solo texto.", "danger");
+            filesToShare = []; // Limpiar los archivos si hubo un error en la carga
         }
     } else {
-        // Fallback para navegadores que no soportan la Web Share API
-        window.open(`https://wa.me/?text=${encodeURIComponent(msgWA)}`, '_blank');
+        console.log('No hay imagen válida para compartir (es la imagen por defecto o vacía).');
     }
+
+    // Intentar compartir usando la función unificada
+    await attemptWebShare(msgWA, filesToShare, 'Oferta de Producto', 'Pestaña Productos');
 }
 
 
@@ -1420,8 +1451,8 @@ async function shareTicket(n) {
     canvas.toBlob(async b => {
         const file = new File([b], 'Ticket.png', { type:'image/png' });
         const msg  = `hola *${pName}* te envío tu cuenta, gracias por su preferencia`;
-        if (navigator.share) try { await navigator.share({ files:[file], title:'Nota Yaute', text:msg }); } catch(e) {}
-        else window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+        // Usar la función unificada de compartir
+        await attemptWebShare(msg, [file], 'Nota Yaute', 'Reparto (Ticket)');
     }, 'image/png');
 }
 
@@ -1453,7 +1484,7 @@ function filterScanTienda(val) {
     box.innerHTML = matches.map(function(s){
         return '<div class="sug-item sug-scan-item" data-val="' + s.replace(/"/g,'&quot;') + '">' + s + '</div>';
     }).join('');
-    box.classList.remove('d-none');
+    box.classList.remove('d-dnone');
 }
 
 function selectScanTienda(val) {
@@ -1856,27 +1887,60 @@ function closeDupConfirm() { // Esta función ahora solo oculta el modal y llama
    SCANNER — CONFIRMAR PRECIOS (compartir + Storage + Firestore)
 ══════════════════════════════════════════════════════════════════ */
 
-// Función auxiliar para subir foto y guardar un producto NUEVO
-async function uploadAndSaveNewProduct(nombre, venta, costo, caducidad, fechaEscaneo, tiendaEscaneo) {
-    // 1. Web Share API
-    if (pendingCanvas && navigator.canShare) {
+async function shareScannerProductDetails(nombre, venta, costo, caducidad, photoBlob) {
+    let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + nombre + '\n💰 $' + venta.toFixed(2);
+    if (caducidad) msgWA += '\n⏳ Caducidad: ' + caducidad;
+
+    let filesToShare = [];
+    console.log('--- Iniciando intento de compartir desde Escáner (confirmPrices) ---');
+
+    if (photoBlob) {
         try {
-            const blob = await new Promise(r => pendingCanvas.toBlob(r, 'image/jpeg', 0.88));
-            const file = new File([blob], 'oferta.jpg', { type:'image/jpeg' });
-            let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + nombre + '\n💰 $' + venta.toFixed(2);
-            if (caducidad)  msgWA += '\n⏳ Caducidad: ' + caducidad;
-            if (navigator.canShare({ files:[file] })) await navigator.share({ files:[file], title:'Oferta de Producto', text: msgWA });
-        } catch(e) { if (e.name !== 'AbortError') console.warn('Share:', e.message); }
+            const file = new File([photoBlob], 'oferta.jpg', { type: photoBlob.type });
+            filesToShare.push(file);
+            console.log('Imagen del escáner preparada exitosamente para compartir (Blob type:', photoBlob.type, ')');
+        } catch (error) {
+            console.error('Error al preparar la imagen del escáner para compartir:', error);
+            toastScanner("Error al preparar la imagen del escáner para compartir. Se intentará solo texto.", "danger");
+            filesToShare = [];
+        }
+    } else {
+        console.log('No hay imagen del escáner para compartir.');
     }
 
-    // 2. Subir foto a Storage
+    // Usar la función unificada de compartir
+    await attemptWebShare(msgWA, filesToShare, 'Oferta de Producto', 'Escáner', true);
+}
+
+
+// Función auxiliar para subir foto y guardar un producto NUEVO
+async function uploadAndSaveNewProduct(nombre, venta, costo, caducidad, fechaEscaneo, tiendaEscaneo) {
     let fotoUrl = '';
+    let photoBlob = null;
+
+    // Primero, intenta obtener el blob de la foto si está disponible desde el escáner
     if (pendingCanvas) {
         try {
-            const blob = await new Promise(r => pendingCanvas.toBlob(r, 'image/jpeg', 0.82));
+            photoBlob = await new Promise(r => pendingCanvas.toBlob(r, 'image/jpeg', 0.88));
+        } catch (e) {
+            console.warn('Error al convertir pendingCanvas a Blob para la subida y compartido:', e);
+        }
+    }
+
+    // 1. Web Share API (usando la nueva función unificada)
+    await shareScannerProductDetails(nombre, venta, costo, caducidad, photoBlob);
+
+    // 2. Subir foto a Storage
+    if (photoBlob) {
+        try {
             const ref  = storage.ref('productos/' + Date.now() + '_' + nombre.replace(/\s+/g,'_') + '.jpg');
-            await ref.put(blob); fotoUrl = await ref.getDownloadURL();
-        } catch(e) { console.warn('Storage:', e.message); }
+            await ref.put(photoBlob);
+            fotoUrl = await ref.getDownloadURL();
+            console.log('Foto subida a Storage:', fotoUrl);
+        } catch(e) {
+            console.warn('Error al subir foto a Firebase Storage:', e.message);
+            toastScanner("Error al subir foto a Firebase. Producto guardado sin foto.", '#f59e0b');
+        }
     }
 
     // 3. Guardar en Firestore
@@ -1983,13 +2047,25 @@ async function performUpdateFromScanner() {
 
     const dataToUpdate = { nombre: pendingScanValues.nombre }; // Siempre actualizar el nombre al escaneado
     let fotoUrl = pendingExistingProduct.foto || ''; // Start with existing photo URL
+    let photoBlob = null; // Para compartir desde el escáner
 
-    // Manejar actualización de foto
-    if (updatePhoto && pendingCanvas) {
+    if (pendingCanvas) {
         try {
-            const blob = await new Promise(r => pendingCanvas.toBlob(r, 'image/jpeg', 0.82));
+            photoBlob = await new Promise(r => pendingCanvas.toBlob(r, 'image/jpeg', 0.82));
+        } catch (e) {
+            console.warn('Error al convertir pendingCanvas a Blob para actualización:', e);
+        }
+    }
+    
+    // Compartir el producto actualizado con el blob si está disponible
+    await shareScannerProductDetails(pendingScanValues.nombre, pendingScanValues.precio, pendingScanValues.costo, pendingScanValues.caducidad, photoBlob);
+
+
+    // Manejar actualización de foto en Firebase Storage
+    if (updatePhoto && photoBlob) {
+        try {
             const ref  = storage.ref('productos/' + Date.now() + '_' + pendingScanValues.nombre.replace(/\s+/g,'_') + '.jpg');
-            await ref.put(blob);
+            await ref.put(photoBlob);
             fotoUrl = await ref.getDownloadURL(); // Establecer la nueva foto
             toastScanner("Foto actualizada.", '#10b981');
         } catch(e) {
