@@ -115,7 +115,7 @@
 <body>
 
 <div id="splash-screen">
-    <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC9teXN2Zz4='; this.onerror=null;">
+    <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
     <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 35.0</div>
 </div>
@@ -363,33 +363,8 @@
 
 <!-- ══ MAIN ══════════════════════════════════════════════════════ -->
 <main>
-    <!-- TAB VENTAS -->
-    <div id="tab-operaciones" class="tab-content">
-        <div class="card-custom">
-            <div class="row g-2 mb-2">
-                <div class="col-6" style="position:relative"><label class="text-uppercase">Tienda</label><input type="text" id="in-tienda" class="form-control text-uppercase fw-bold text-primary"><div id="sug-tienda" class="sug-box d-none"></div></div>
-                <div class="col-6" style="position:relative"><label class="text-uppercase">Cliente</label><input type="text" id="in-cliente" class="form-control text-uppercase"><div id="sug-cliente" class="sug-box d-none"></div></div>
-            </div>
-            <div class="row g-2 mb-2 align-items-end">
-                <div class="col-3"><label class="text-uppercase">Cant.</label><input type="number" id="in-cantidad" class="form-control text-center fw-bold" value="1"></div>
-                <div class="col" style="position:relative">
-                    <label class="text-uppercase">Producto</label>
-                    <!-- Read-only input for selected product name -->
-                    <input type="text" id="in-producto-display" class="form-control text-uppercase" placeholder="SELECCIONA UN ARTÍCULO" readonly>
-                    <!-- Hidden input to store product ID for sale -->
-                    <input type="hidden" id="in-producto-id">
-                </div>
-            </div>
-            <div class="row g-2 mb-3">
-                <div class="col-6"><label class="text-uppercase">Costo Anaquel</label><input type="number" id="in-costo" class="form-control fw-bold border-danger" step="0.01" readonly></div>
-                <div class="col-6"><label class="text-uppercase">Precio Venta</label><input type="number" id="in-precio" class="form-control fw-bold border-success" step="0.01" readonly></div>
-            </div>
-            <button id="btn-save-record" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow">GUARDAR REGISTRO</button>
-        </div>
-    </div>
-
-    <!-- TAB PRODUCTOS (Nuevo) -->
-    <div id="tab-productos" class="tab-content" style="display:none;">
+    <!-- TAB PRODUCTOS (AHORA PRIMERA PESTAÑA) -->
+    <div id="tab-productos" class="tab-content">
         <div class="card-custom mb-3">
             <div class="d-flex gap-2 mb-3">
                 <input type="text" id="prod-search-input" class="form-control flex-fill" placeholder="BUSCAR PRODUCTO o ESCANEAR..." oninput="handleProductSearchInTab(this.value)">
@@ -422,6 +397,29 @@
         </div>
     </div>
 
+    <!-- TAB VENTAS (AHORA SEGUNDA PESTAÑA) -->
+    <div id="tab-operaciones" class="tab-content" style="display:none;">
+        <div class="card-custom">
+            <div class="row g-2 mb-2">
+                <div class="col-6" style="position:relative"><label class="text-uppercase">Tienda</label><input type="text" id="in-tienda" class="form-control text-uppercase fw-bold text-primary"><div id="sug-tienda" class="sug-box d-none"></div></div>
+                <div class="col-6" style="position:relative"><label class="text-uppercase">Cliente</label><input type="text" id="in-cliente" class="form-control text-uppercase"><div id="sug-cliente" class="sug-box d-none"></div></div>
+            </div>
+            <div class="row g-2 mb-2 align-items-end">
+                <div class="col-3"><label class="text-uppercase">Cant.</label><input type="number" id="in-cantidad" class="form-control text-center fw-bold" value="1"></div>
+                <div class="col" style="position:relative">
+                    <label class="text-uppercase">Producto</label>
+                    <!-- Input de producto con autocompletado para ventas -->
+                    <input type="text" id="in-producto" class="form-control text-uppercase" placeholder="BUSCAR ARTÍCULO...">
+                    <div id="sug-producto" class="sug-box d-none"></div>
+                </div>
+            </div>
+            <div class="row g-2 mb-3">
+                <div class="col-6"><label class="text-uppercase">Costo Anaquel</label><input type="number" id="in-costo" class="form-control fw-bold border-danger" step="0.01"></div>
+                <div class="col-6"><label class="text-uppercase">Precio Venta</label><input type="number" id="in-precio" class="form-control fw-bold border-success" step="0.01"></div>
+            </div>
+            <button id="btn-save-record" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow">GUARDAR REGISTRO</button>
+        </div>
+    </div>
 
     <!-- TAB REPARTO -->
     <div id="tab-entregas" class="tab-content" style="display:none;">
@@ -474,8 +472,8 @@
 
 <!-- ══ BOTTOM NAV ════════════════════════════════════════════════ -->
 <nav class="bottom-nav">
-    <button class="tab-btn active" onclick="showTab('operaciones', this)"><i class="fas fa-cash-register"></i>Ventas</button>
-    <button class="tab-btn" onclick="showTab('productos', this)"><i class="fas fa-boxes"></i>Productos</button>
+    <button class="tab-btn active" onclick="showTab('productos', this)"><i class="fas fa-boxes"></i>Productos</button>
+    <button class="tab-btn" onclick="showTab('operaciones', this)"><i class="fas fa-cash-register"></i>Ventas</button>
     <button class="tab-btn" onclick="showTab('entregas', this)"><i class="fas fa-truck"></i>Reparto</button>
     <button class="tab-btn" onclick="showTab('control', this)"><i class="fas fa-shield-halved"></i>Gestión</button>
 </nav>
@@ -518,14 +516,14 @@ let currentUser     = null;
 
 // Scanner related globals
 let scannerStream   = null;
-let pendingNombre   = '';          // Nombre extraído por la IA del escaneo actual o del texto si se inicia desde input
+let pendingNombre   = '';          // Nombre extraído por la IA del escaneo actual
 let pendingCanvas   = null;        // Canvas con la imagen del escaneo actual
 let pendingExisteId = null;        // ID del producto existente que coincide con el escaneo
 let pendingExistingProduct = null; // Objeto completo del producto existente que coincide
 let pendingScanValues = {};        // Valores (precios, tienda, caducidad, etc.) introducidos/sugeridos en price-modal para el escaneo actual
 
 // Product Tab specific globals
-let selectedProductForSale = null; // The product object selected from tab-productos for a sale
+let selectedProductInProdTab = null; // The product object selected from tab-productos for display/editing
 
 
 // Finanzas fechas
@@ -597,14 +595,17 @@ function startSync() {
 
             if (name === 'sales') { renderEntregas(); if (activeSubTab === 'finanzas') renderFinanceMenu(); }
             // Re-renderizar la lista de productos en la pestaña de productos si estamos ahí
-            if (name === 'products' && document.getElementById('tab-productos').style.display !== 'none') {
-                 handleProductSearchInTab(document.getElementById('prod-search-input').value);
-                 if (selectedProductForSale && window.state.products.find(p => p.id === selectedProductForSale.id)) {
-                    // Refresh selected product info if still exists
-                    selectProductInTab(selectedProductForSale.id);
-                 } else {
-                    clearProductSelection();
-                 }
+            if (name === 'products') {
+                if (document.getElementById('tab-productos').style.display !== 'none') {
+                    handleProductSearchInTab(document.getElementById('prod-search-input').value);
+                }
+                // Also update selected product in product tab if it was an update
+                if (selectedProductInProdTab && window.state.products.find(p => p.id === selectedProductInProdTab.id)) {
+                   selectProductInTab(selectedProductInProdTab.id); // Re-render preview with latest data
+                } else {
+                   // If selected product was deleted or no longer matches criteria, clear selection
+                   clearProductSelection();
+                }
             }
             if (name !== 'sales' && activeSubTab === 'catalogo') renderControlList();
         }, err => {
@@ -618,8 +619,67 @@ function startSync() {
 
     setupAuto('in-tienda',   'sug-tienda',   'stores');
     setupAuto('in-cliente',  'sug-cliente',  'clients');
-    // REMOVED 'in-producto' from setupAuto because it's now managed by the new product tab
+    setupAuto('in-producto', 'sug-producto', 'products'); // Re-enable for sales tab
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   GENERIC AUTOCOMPLETE SETUP (for tienda, cliente, and producto in ventas)
+══════════════════════════════════════════════════════════════════ */
+function setupAuto(inpId, boxId, key) {
+    const inp = document.getElementById(inpId);
+    const box = document.getElementById(boxId);
+    if (!inp || !box) return;
+
+    inp.oninput = () => {
+        const val = inp.value.toUpperCase();
+        if (!val) { box.classList.add('d-none');
+            if (key === 'products') {
+                document.getElementById('in-costo').value = '';
+                document.getElementById('in-precio').value = '';
+            }
+            return;
+        }
+
+        const filtered = (window.state[key] || [])
+            .map(x => (x.nombre || '').toUpperCase())
+            .filter(s => s.includes(val)).slice(0, 5);
+        
+        box.innerHTML = filtered.map(s => `<div class="sug-item" data-val="${s}">${s}</div>`).join('');
+        box.classList.toggle('d-none', filtered.length === 0);
+
+        // For products field in sales tab, try to pre-fill prices if exact match is found on type
+        if (key === 'products') {
+            const exactMatch = window.state.products.find(x => (x.nombre || '').toUpperCase() === val);
+            if (exactMatch) {
+                document.getElementById('in-costo').value  = exactMatch.costo  || 0;
+                document.getElementById('in-precio').value = exactMatch.precio || 0;
+            } else {
+                document.getElementById('in-costo').value = '';
+                document.getElementById('in-precio').value = '';
+            }
+        }
+    };
+
+    box.onclick = e => {
+        const it = e.target.closest('.sug-item'); if (!it) return;
+        const val = it.dataset.val.trim();
+        inp.value = val; box.classList.add('d-none');
+        if (key === 'products') {
+            const p = window.state.products.find(x => (x.nombre || '').toUpperCase() === val);
+            if (p) {
+                document.getElementById('in-costo').value  = p.costo  || 0;
+                document.getElementById('in-precio').value = p.precio || 0;
+            } else { // Should not happen if selected from suggestions, but for safety
+                document.getElementById('in-costo').value = '';
+                document.getElementById('in-precio').value = '';
+            }
+        }
+    };
+    document.addEventListener('click', e => {
+        if (!inp.contains(e.target) && !box.contains(e.target)) box.classList.add('d-none');
+    });
+}
+
 
 /* ══════════════════════════════════════════════════════════════════
    FUNCIONES ESPECÍFICAS DE LA PESTAÑA DE PRODUCTOS
@@ -630,16 +690,12 @@ function handleProductSearchInTab(value) {
     const resultsContainer = document.getElementById('prod-search-results');
     resultsContainer.innerHTML = ''; // Clear previous results
 
-    if (!searchTerm) {
-        // If search term is empty, show all products
-        renderProductSearchResults(window.state.products);
-        return;
-    }
+    // If search term is empty, show all products
+    const productsToShow = searchTerm
+        ? window.state.products.filter(p => (p.nombre || '').toUpperCase().includes(searchTerm))
+        : window.state.products;
 
-    const filteredProducts = window.state.products.filter(p =>
-        (p.nombre || '').toUpperCase().includes(searchTerm)
-    );
-    renderProductSearchResults(filteredProducts);
+    renderProductSearchResults(productsToShow);
 }
 
 function renderProductSearchResults(products) {
@@ -674,7 +730,7 @@ function selectProductInTab(productId) {
         clearProductSelection();
         return;
     }
-    selectedProductForSale = product;
+    selectedProductInProdTab = product; // Store the selected product
 
     document.getElementById('prod-preview-name').textContent  = product.nombre;
     document.getElementById('prod-preview-costo').textContent = `$${(product.costo || 0).toFixed(2)}`;
@@ -695,36 +751,28 @@ function selectProductInTab(productId) {
 }
 
 function clearProductSelection() {
-    selectedProductForSale = null;
+    selectedProductInProdTab = null; // Clear the selected product
     document.getElementById('prod-search-input').value = '';
-    document.getElementById('prod-search-results').innerHTML = ''; // Clear search results as well
+    handleProductSearchInTab(''); // Show all products again
     document.getElementById('prod-details-preview').style.display = 'none';
-
-    // Clear sales form fields too, in case user goes back to Sales
-    document.getElementById('in-producto-display').value = '';
-    document.getElementById('in-producto-id').value = '';
-    document.getElementById('in-costo').value = '';
-    document.getElementById('in-precio').value = '';
 }
 
 function addProductToSale() {
-    if (!selectedProductForSale) {
+    if (!selectedProductInProdTab) {
         toast("Por favor, selecciona un producto primero.", "danger");
         return;
     }
-    populateSalesFieldsWithProduct(selectedProductForSale);
+    populateSalesFieldsWithProduct(selectedProductInProdTab);
 }
 
 // Function to populate main sales form fields and switch to sales tab
 function populateSalesFieldsWithProduct(product) {
     if (product) {
-        document.getElementById('in-producto-display').value = product.nombre || '';
-        document.getElementById('in-producto-id').value = product.id || ''; // Store ID
+        document.getElementById('in-producto').value = product.nombre || '';
         document.getElementById('in-costo').value    = product.costo  || 0;
         document.getElementById('in-precio').value   = product.precio || 0;
     } else {
-        document.getElementById('in-producto-display').value = '';
-        document.getElementById('in-producto-id').value = '';
+        document.getElementById('in-producto').value = '';
         document.getElementById('in-costo').value    = '';
         document.getElementById('in-precio').value   = '';
     }
@@ -733,32 +781,6 @@ function populateSalesFieldsWithProduct(product) {
     clearProductSelection();
 }
 
-
-/* ══════════════════════════════════════════════════════════════════
-   GENERIC AUTOCOMPLETE SETUP (now only for tienda/cliente)
-══════════════════════════════════════════════════════════════════ */
-function setupAuto(inpId, boxId, key) {
-    const inp = document.getElementById(inpId);
-    const box = document.getElementById(boxId);
-    if (!inp || !box) return;
-    inp.oninput = () => {
-        const val = inp.value.toUpperCase();
-        if (!val) { box.classList.add('d-none'); return; }
-        const filtered = (window.state[key] || [])
-            .map(x => (x.nombre || '').toUpperCase())
-            .filter(s => s.includes(val)).slice(0, 5);
-        box.innerHTML = filtered.map(s => `<div class="sug-item" data-val="${s}">${s}</div>`).join('');
-        box.classList.toggle('d-none', filtered.length === 0);
-    };
-    box.onclick = e => {
-        const it = e.target.closest('.sug-item'); if (!it) return;
-        const val = it.dataset.val.trim();
-        inp.value = val; box.classList.add('d-none');
-    };
-    document.addEventListener('click', e => {
-        if (!inp.contains(e.target) && !box.contains(e.target)) box.classList.add('d-none');
-    });
-}
 
 /* ══════════════════════════════════════════════════════════════════
    NAVEGACIÓN
@@ -777,7 +799,13 @@ function showTab(id, btn) {
         document.getElementById('prod-search-input').value = ''; // Clear search
         handleProductSearchInTab(''); // Show all products initially
         document.getElementById('prod-details-preview').style.display = 'none'; // Hide preview
-        selectedProductForSale = null; // Clear any pending selection
+        selectedProductInProdTab = null; // Clear any pending selection
+    } else if (id === 'operaciones') {
+        // When going to sales, clear product fields if no product was explicitly added from the products tab
+        if (!document.getElementById('in-producto').value) {
+            document.getElementById('in-costo').value = '';
+            document.getElementById('in-precio').value = '';
+        }
     }
 }
 
@@ -794,27 +822,43 @@ function switchSubTab(id) {
 document.addEventListener('DOMContentLoaded', () => {
     const ed = document.getElementById('entregas-date');
     if (ed) ed.value = getMXISODate();
-    showTab('operaciones', document.querySelector('.tab-btn.active'));
+    showTab('productos', document.querySelector('.tab-btn[onclick*="productos"]')); // Open Products tab by default
 
     document.getElementById('btn-save-record').onclick = async () => {
         const t   = document.getElementById('in-tienda').value.trim().toUpperCase();
         const c   = document.getElementById('in-cliente').value.trim().toUpperCase();
-        const pId = document.getElementById('in-producto-id').value; // Get ID of selected product
-        const pName = document.getElementById('in-producto-display').value.trim().toUpperCase(); // Get name from display field
+        const pName = document.getElementById('in-producto').value.trim().toUpperCase(); // Get name from input
         const q   = parseInt(document.getElementById('in-cantidad').value) || 1;
         const co  = parseFloat(document.getElementById('in-costo').value)  || 0;
         const prI = parseFloat(document.getElementById('in-precio').value) || 0;
         const salePrice = (c === 'CRISTO') ? co : prI;
         
-        if (!t || !c || !pId || !pName) { // Check for product ID or name
+        if (!t || !c || !pName) { // Check for product name
             return toast("Faltan datos (tienda, cliente o producto)", "danger");
         }
+
+        // Check if product exists, if not, add it to products collection
+        let existingProduct = window.state.products.find(s => (s.nombre || '').toUpperCase() === pName);
+        if (!existingProduct) {
+             const newProductData = { nombre: pName, costo: co, precio: prI };
+             const docRef = await col('products').add(newProductData);
+             existingProduct = { id: docRef.id, ...newProductData };
+             toastScanner("Producto añadido al catálogo.", "success");
+        } else {
+            // Update existing product if prices changed (only if not explicitly updated via scanner flow)
+            // This is a fallback to keep product data consistent if sales flow changes prices
+            if (existingProduct.costo !== co || existingProduct.precio !== prI) {
+                await col('products').doc(existingProduct.id).update({ costo: co, precio: prI });
+                toastScanner("Precios de producto actualizados en catálogo.", "info");
+            }
+        }
+
 
         await col('sales').add({
             tienda:t,
             cliente:c,
-            producto:pName, // Use the name from the display field
-            productoId: pId, // Store product ID with the sale record
+            producto:pName,
+            productoId: existingProduct ? existingProduct.id : null, // Link with product ID if found/created
             cantidad:q,
             costo:co,
             precio:salePrice,
@@ -825,14 +869,13 @@ document.addEventListener('DOMContentLoaded', () => {
             pagado:false
         });
 
-        // Add/update client and store, product is now managed by the product tab
+        // Add/update client and store
         if (!window.state.stores.some(s  => (s.nombre||'').toUpperCase()===t))  col('stores').add({ nombre:t });
         if (!window.state.clients.some(s => (s.nombre||'').toUpperCase()===c))  col('clients').add({ nombre:c });
         
         toast("¡Venta guardada!");
         document.getElementById('in-cliente').value  = '';
-        document.getElementById('in-producto-display').value = '';
-        document.getElementById('in-producto-id').value = '';
+        document.getElementById('in-producto').value = '';
         document.getElementById('in-cantidad').value = '1';
         document.getElementById('in-costo').value    = '';
         document.getElementById('in-precio').value   = '';
@@ -1327,7 +1370,6 @@ function cancelScanFlow() {
     document.getElementById('price-modal').style.display = 'none';
     document.getElementById('dup-confirm-modal').style.display = 'none';
     document.getElementById('update-confirm-modal').style.display = 'none';
-    // Removed manual-product-options-modal as it's no longer needed
 
     closeScanner(); // Detener la cámara y ocultar el modal IA
 }
@@ -1676,7 +1718,7 @@ async function uploadAndSaveNewProduct(nombre, venta, costo, caducidad, fechaEsc
     if (caducidad)  data.caducidad = caducidad;
 
     const docRef = await col('products').add(data);
-    toastScanner("✅ Producto guardado");
+    toastScanner("✅ Producto guardado", "success");
     return { id: docRef.id, ...data }; // Return the full product object
 }
 
@@ -1839,10 +1881,7 @@ async function performUpdateFromScanner() {
 ══════════════════════════════════════════════════════════════════ */
 window.onload = () => {
     startSync();
-    // Initialize product search tab if it's the default or opened
-    if (document.getElementById('tab-productos').style.display !== 'none') {
-        handleProductSearchInTab('');
-    }
+    showTab('productos', document.querySelector('.tab-btn[onclick*="productos"]')); // Ensure Products tab is active on load
 };
 </script>
   <script>
