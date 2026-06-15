@@ -846,42 +846,53 @@ function dataURLtoBlob(dataurl) {
 async function attemptWebShare(text, files, title, context, isScannerToast = false) {
     const defaultToast = isScannerToast ? toastScanner : toast;
 
-    if (!navigator.canShare) {
-        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    if (!navigator.share) {
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
         defaultToast(`${context}: Compartido solo texto (navegador no soporta API Web Share).`, "info");
         console.log(`${context}: Fallback a WhatsApp para compartir texto.`);
         return;
     }
 
     try {
-        const canShareWithFiles = files.length > 0 && navigator.canShare({ files: files, text: text });
-        const canShareTextOnly = navigator.canShare({ text: text });
+        const shareData = { title, text };
+        let sharedWithFiles = false;
 
-        console.log(`${context}: navigator.canShare (con archivos):`, canShareWithFiles);
-        console.log(`${context}: navigator.canShare (solo texto):`, canShareTextOnly);
-
-        if (canShareWithFiles) {
-            await navigator.share({ files: files, title: title, text: text });
-            console.log(`${context}: Compartido exitosamente (con imagen y texto).`);
-            defaultToast(`${context}: Producto compartido con imagen.`, "success");
-        } else if (canShareTextOnly) {
-            await navigator.share({ title: title, text: text });
-            console.log(`${context}: Compartido exitosamente (solo texto).`);
-            if (files.length > 0) {
-                 defaultToast(`${context}: Su dispositivo no soporta compartir imágenes junto con texto. Se compartió solo el texto.`, "warning");
-            } else {
-                defaultToast(`${context}: Producto compartido (solo texto).`, "info");
+        if (files && files.length > 0) {
+            try {
+                if (navigator.canShare && navigator.canShare({ files })) {
+                    shareData.files = files;
+                    sharedWithFiles = true;
+                } else {
+                    console.log(`${context}: Este navegador no admite compartir archivos; se intentará solo texto.`);
+                }
+            } catch (canShareError) {
+                console.warn(`${context}: navigator.canShare falló para archivos. Se ignora y se usa texto.`, canShareError);
             }
-        } else {
-            throw new Error(`El compartidor del sistema no pudo procesar la solicitud para ${context}.`);
         }
-    } catch(e) {
-        if (e.name !== 'AbortError') { // El usuario canceló la operación de compartir
-            console.error(`${context}: Error al iniciar el compartidor del sistema:`, e);
-            defaultToast(`${context}: Error al compartir. Detalles en la consola.`, "danger");
+
+        await navigator.share(shareData);
+
+        if (sharedWithFiles) {
+            defaultToast(`${context}: Producto compartido con imagen.`, "success");
+        } else if (files && files.length > 0) {
+            defaultToast(`${context}: Se compartió solo texto porque no se admiten archivos.`, "warning");
         } else {
+            defaultToast(`${context}: Producto compartido (solo texto).`, "info");
+        }
+        console.log(`${context}: Compartido exitosamente.`, shareData);
+    } catch(e) {
+        if (e.name === 'AbortError') {
             console.log(`${context}: Operación de compartir cancelada por el usuario.`);
             defaultToast(`${context}: Compartir cancelado.`, "info");
+            return;
+        }
+
+        console.error(`${context}: Error al iniciar el compartidor del sistema:`, e);
+        if (text) {
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+            defaultToast(`${context}: Fallback a WhatsApp para compartir texto.`, "info");
+        } else {
+            defaultToast(`${context}: Error al compartir. Detalles en la consola.`, "danger");
         }
     } finally {
         console.log(`--- Fin intento de compartir desde ${context} ---`);
