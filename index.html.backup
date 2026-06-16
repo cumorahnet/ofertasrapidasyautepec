@@ -88,7 +88,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg==';">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900;">VERSION 36.2</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900;">VERSION 36.3</div>
 </div>
 
 <div id="toast-msg" class="toast-msg"></div>
@@ -291,34 +291,59 @@ function dataURLtoBlob(dataurl) {
 
 async function loadImageBlob(src) {
     if (!src || src === defaultGif || src.includes('svg')) {
-        throw new Error('No hay imagen válida');
+        throw new Error('No hay imagen válida para compartir directamente');
     }
     if (src.startsWith('data:')) return dataURLtoBlob(src);
     const response = await fetch(src, { mode: 'cors', cache: 'no-cache' });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    if (!response.ok) throw new Error(`HTTP ${response.status} al cargar imagen`);
     return response.blob();
 }
 
-async function attemptWebShare(text, files, title, context) {
+/**
+ * Intenta compartir contenido usando la Web Share API o un fallback a WhatsApp.
+ * @param {string} text El texto principal a compartir.
+ * @param {File[]} files Un array de objetos File a compartir.
+ * @param {string} title El título para la ventana de compartir.
+ * @param {string} context Un contexto para los mensajes toast.
+ * @param {string|null} publicImageUrl Una URL pública de la imagen para el fallback de WhatsApp.
+ */
+async function attemptWebShare(text, files, title, context, publicImageUrl = null) {
+    let whatsappText = text;
+    // Añadir URL de imagen al texto para el fallback de WhatsApp si hay una imagen pública.
+    if (publicImageUrl && publicImageUrl.startsWith('http')) {
+        whatsappText += `\n\n📸 Ver imagen: ${publicImageUrl}`;
+    }
+
     if (!navigator.share) {
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+        // Fallback para navegadores sin Web Share API (solo texto o texto con enlace a imagen)
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappText)}`, '_blank');
         toastScanner(`${context}: Enlace abierto en WhatsApp`, '#3b82f6');
         return;
     }
+
     const shareData = { title, text };
+    let canShareFiles = false;
+
+    // Verificar si se pueden compartir archivos
     if (files && files.length > 0 && navigator.canShare && navigator.canShare({ files })) {
-        shareData.files = files;
+        canShareFiles = true;
+        shareData.files = files; // Añadir archivos al objeto shareData solo si está soportado
     }
+
     try {
         await navigator.share(shareData);
         toastScanner(`${context}: Compartido correctamente`, '#10b981');
     } catch (e) {
         if (e.name !== 'AbortError') {
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+            // Fallback si la compartición falla (ej. el usuario cancela, o problema con archivos)
+            // Se usa whatsappText que ya incluye el enlace a la imagen si disponible.
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappText)}`, '_blank');
             toastScanner(`${context}: Se abrió WhatsApp`, '#3b82f6');
         }
+        // Si es 'AbortError', el usuario canceló la acción, no es necesario un toast de error.
     }
 }
+
 
 async function shareProductDetailsFromTab() {
     if (!selectedProductInProdTab) { toastScanner("No hay producto seleccionado", '#ef4444'); return; }
@@ -328,13 +353,20 @@ async function shareProductDetailsFromTab() {
     const photoSrc = document.getElementById('prod-preview-photo').src;
     const msg = `🛒 *OFERTA*\n📦 ${name}\n💰 $${price.toFixed(2)}${cost > 0 ? ` (Costo: $${cost.toFixed(2)})` : ''}`;
     let files = [];
+    let imageUrlForFallback = null; // Variable para la URL de la imagen en el fallback
     try {
-        if (photoSrc && photoSrc !== defaultGif && !photoSrc.includes('svg')) {
+        if (photoSrc && photoSrc !== defaultGif && photoSrc.startsWith('http')) {
+            // Si photoSrc es una URL HTTP (Firebase Storage), la usamos para el fallback
+            imageUrlForFallback = photoSrc;
+            const blob = await loadImageBlob(photoSrc);
+            files.push(new File([blob], 'producto.jpg', { type: 'image/jpeg' }));
+        } else if (photoSrc && photoSrc !== defaultGif && photoSrc.startsWith('data:')) {
+            // Si es una URL de datos, solo la convertimos a blob para compartición directa
             const blob = await loadImageBlob(photoSrc);
             files.push(new File([blob], 'producto.jpg', { type: 'image/jpeg' }));
         }
-    } catch(e) { console.warn('Error al cargar imagen:', e); }
-    await attemptWebShare(msg, files, 'Oferta Yaute', 'Productos');
+    } catch(e) { console.warn('Error al cargar imagen para compartir:', e); }
+    await attemptWebShare(msg, files, 'Oferta Yaute', 'Productos', imageUrlForFallback);
 }
 
 async function confirmPrices() {
@@ -350,16 +382,16 @@ async function confirmPrices() {
             const blob = await new Promise(r => pendingCanvas.toBlob(r, 'image/jpeg', 0.85));
             const ref = storage.ref(`productos/${Date.now()}_${nombre.replace(/\s/g, '_')}.jpg`);
             await ref.put(blob);
-            photoURL = await ref.getDownloadURL();
+            photoURL = await ref.getDownloadURL(); // Obtenemos la URL pública
             files.push(new File([blob], 'oferta.jpg', { type: 'image/jpeg' }));
-        } catch(e) { console.warn(e); }
+        } catch(e) { console.warn('Error al subir imagen para compartir:', e); }
     }
     const data = { nombre, costo, precio: venta, foto: photoURL || '' };
     try {
         if (pendingExisteId) await col('products').doc(pendingExisteId).update(data);
         else await col('products').add(data);
         const msg = `🛒 *OFERTA*\n📦 ${nombre}\n💰 $${venta.toFixed(2)}${costo > 0 ? ` (Costo: $${costo.toFixed(2)})` : ''}`;
-        await attemptWebShare(msg, files, 'Oferta Yaute', 'Escáner');
+        await attemptWebShare(msg, files, 'Oferta Yaute', 'Escáner', photoURL); // Pasamos photoURL aquí
     } catch(e) { toastScanner("Error: " + e.message, '#ef4444'); }
     pendingCanvas = null;
     pendingExisteId = null;

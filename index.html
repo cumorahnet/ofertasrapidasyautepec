@@ -122,7 +122,7 @@
             <p class="fw-bold mb-1" style="font-size:0.7rem;">PRODUCTO SELECCIONADO</p>
             <div class="d-flex align-items-center gap-3 mb-3">
                 <!-- MODIFICACIÓN AQUÍ: src actualizado a base64 y se agregó onerror -->
-                <img id="prod-preview-photo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MCcgaGVpZ2h0PSc4MCcgdmlld0JveD0nMCAwIDI0IDI0JyBmaWxsPScjOTRhM2I4Jz48cGF0aCBkPSdNNCA0aDE2djE2SDRVNHonLz48L3N2Zz4=" onerror="this.src = defaultGif;" style="width:80px; height:80px; object-fit:cover; border-radius:12px;">
+                <img id="prod-preview-photo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MCcgaGVpZ2h0PSc4MCcgdmlld0JveD0nMCAwIDI0IDI0JyBmaWxsPScjOTRhM2I4Jz48cGF0aCBkPSdNNCA0aDE2djE2SDRVNHonLz4+DQo=" onerror="this.src = defaultGif;" style="width:80px; height:80px; object-fit:cover; border-radius:12px;">
                 <div style="flex:1">
                     <textarea id="prod-edit-name" class="form-control mb-2" rows="2" style="resize:none; text-transform:uppercase; font-weight:700;"></textarea>
                     <div class="row g-2">
@@ -256,7 +256,7 @@ const APP_ID = 'yaute-v1-shared';
 function col(name) { return db.collection('artifacts').doc(APP_ID).collection('public').doc('data').collection(name); }
 
 // MODIFICACIÓN AQUÍ: defaultGif ahora está en base64
-const defaultGif = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MCcgaGVpZ2h0PSc4MCcgdmlld0JveD0nMCAwIDI0IDI0JyBmaWxsPScjOTRhM2I4Jz48cGF0aCBkPSdNNCA0aDE2djE2SDRVNHonLz48L3N2Zz4=';
+const defaultGif = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MCcgaGVpZ2h0PSc4MCcgdmlld0JveD0nMCAwIDI0IDI0JyBmaWxsPScjOTRhM2I4Jz48cGF0aCBkPSdNNCA0aDE2djE2SDRVNHonLz4+DQo=';
 
 window.state = { sales: [], clients: [], stores: [], products: [] };
 let deleteRef = { col: '', id: '' };
