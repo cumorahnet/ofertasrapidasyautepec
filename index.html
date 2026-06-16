@@ -121,8 +121,8 @@
         <div id="prod-details-preview" class="card-custom" style="display:none;">
             <p class="fw-bold mb-1" style="font-size:0.7rem;">PRODUCTO SELECCIONADO</p>
             <div class="d-flex align-items-center gap-3 mb-3">
-                <!-- MODIFICACIÓN AQUÍ: src actualizado a base64 y se agregó onerror -->
-                <img id="prod-preview-photo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MCcgaGVpZ2h0PSc4MCcgdmlld0JveD0nMCAwIDI0IDI0JyBmaWxsPScjOTRhM2I4Jz48cGF0aCBkPSdNNCA0aDE2djE2SDRVNHonLz4+DQo=" onerror="this.src = defaultGif;" style="width:80px; height:80px; object-fit:cover; border-radius:12px;">
+                <!-- REVERTIDO: src actualizado a logo.png, onerror con SVG genérico -->
+                <img id="prod-preview-photo" src="logo.png" onerror="this.src = defaultGif;" style="width:80px; height:80px; object-fit:cover; border-radius:12px;">
                 <div style="flex:1">
                     <textarea id="prod-edit-name" class="form-control mb-2" rows="2" style="resize:none; text-transform:uppercase; font-weight:700;"></textarea>
                     <div class="row g-2">
@@ -255,8 +255,8 @@ const storage = firebase.storage();
 const APP_ID = 'yaute-v1-shared';
 function col(name) { return db.collection('artifacts').doc(APP_ID).collection('public').doc('data').collection(name); }
 
-// MODIFICACIÓN AQUÍ: defaultGif ahora está en base64
-const defaultGif = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MCcgaGVpZ2h0PSc4MCcgdmlld0JveD0nMCAwIDI0IDI0JyBmaWxsPScjOTRhM2I4Jz48cGF0aCBkPSdNNCA0aDE2djE2SDRVNHonLz4+DQo=';
+// REVERTIDO: defaultGif vuelve a ser una ruta de archivo, con un fallback SVG más genérico en el onerror.
+const defaultGif = 'default.gif'; // Asegúrate de tener este archivo en la raíz de tu proyecto.
 
 window.state = { sales: [], clients: [], stores: [], products: [] };
 let deleteRef = { col: '', id: '' };
@@ -278,69 +278,35 @@ const hideSplash = () => {
     if (splash) splash.remove();
 };
 
-// Funciones de compartir CORREGIDAS
-function dataURLtoBlob(dataurl) {
-    const arr = dataurl.split(',');
-    const mime = arr[0].match(/:(.*?);/)[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const uarr = new Uint8Array(n);
-    while (n--) uarr[n] = bstr.charCodeAt(n);
-    return new Blob([uarr], { type: mime });
-}
-
-async function loadImageBlob(src) {
-    if (!src || src === defaultGif || src.includes('svg')) {
-        throw new Error('No hay imagen válida para compartir directamente');
-    }
-    if (src.startsWith('data:')) return dataURLtoBlob(src);
-    const response = await fetch(src, { mode: 'cors', cache: 'no-cache' });
-    if (!response.ok) throw new Error(`HTTP ${response.status} al cargar imagen`);
-    return response.blob();
-}
+// REVERTIDO: Funciones de compartir vuelven a la versión anterior (solo texto)
+// Ya no se usan dataURLtoBlob ni loadImageBlob, se eliminan.
 
 /**
- * Intenta compartir contenido usando la Web Share API o un fallback a WhatsApp.
+ * Intenta compartir contenido usando la Web Share API o un fallback a WhatsApp (solo texto).
+ * Esta es la versión anterior que no maneja archivos de imagen.
  * @param {string} text El texto principal a compartir.
- * @param {File[]} files Un array de objetos File a compartir.
- * @param {string} title El título para la ventana de compartir.
  * @param {string} context Un contexto para los mensajes toast.
- * @param {string|null} publicImageUrl Una URL pública de la imagen para el fallback de WhatsApp.
  */
-async function attemptWebShare(text, files, title, context, publicImageUrl = null) {
-    let whatsappText = text;
-    // Añadir URL de imagen al texto para el fallback de WhatsApp si hay una imagen pública.
-    if (publicImageUrl && publicImageUrl.startsWith('http')) {
-        whatsappText += `\n\n📸 Ver imagen: ${publicImageUrl}`;
-    }
-
-    if (!navigator.share) {
-        // Fallback para navegadores sin Web Share API (solo texto o texto con enlace a imagen)
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappText)}`, '_blank');
-        toastScanner(`${context}: Enlace abierto en WhatsApp`, '#3b82f6');
-        return;
-    }
-
-    const shareData = { title, text };
-    let canShareFiles = false;
-
-    // Verificar si se pueden compartir archivos
-    if (files && files.length > 0 && navigator.canShare && navigator.canShare({ files })) {
-        canShareFiles = true;
-        shareData.files = files; // Añadir archivos al objeto shareData solo si está soportado
-    }
-
-    try {
-        await navigator.share(shareData);
-        toastScanner(`${context}: Compartido correctamente`, '#10b981');
-    } catch (e) {
-        if (e.name !== 'AbortError') {
-            // Fallback si la compartición falla (ej. el usuario cancela, o problema con archivos)
-            // Se usa whatsappText que ya incluye el enlace a la imagen si disponible.
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(whatsappText)}`, '_blank');
-            toastScanner(`${context}: Se abrió WhatsApp`, '#3b82f6');
+async function attemptWebShare(text, context) {
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'Oferta Yaute', // Título genérico
+                text: text,
+            });
+            toastScanner(`${context}: Compartido correctamente`, '#10b981');
+        } catch (e) {
+            // Si hay un error (ej. el usuario cancela), intenta abrir WhatsApp.
+            // Ignora AbortError que es cuando el usuario cancela explícitamente.
+            if (e.name !== 'AbortError') {
+                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+                toastScanner(`${context}: Se abrió WhatsApp`, '#3b82f6');
+            }
         }
-        // Si es 'AbortError', el usuario canceló la acción, no es necesario un toast de error.
+    } else {
+        // Fallback para navegadores sin Web Share API (solo texto)
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+        toastScanner(`${context}: Se abrió WhatsApp`, '#3b82f6');
     }
 }
 
@@ -350,23 +316,9 @@ async function shareProductDetailsFromTab() {
     const name = document.getElementById('prod-edit-name').value.trim().toUpperCase();
     const price = parseFloat(document.getElementById('prod-edit-precio').value) || 0;
     const cost = parseFloat(document.getElementById('prod-edit-costo').value) || 0;
-    const photoSrc = document.getElementById('prod-preview-photo').src;
     const msg = `🛒 *OFERTA*\n📦 ${name}\n💰 $${price.toFixed(2)}${cost > 0 ? ` (Costo: $${cost.toFixed(2)})` : ''}`;
-    let files = [];
-    let imageUrlForFallback = null; // Variable para la URL de la imagen en el fallback
-    try {
-        if (photoSrc && photoSrc !== defaultGif && photoSrc.startsWith('http')) {
-            // Si photoSrc es una URL HTTP (Firebase Storage), la usamos para el fallback
-            imageUrlForFallback = photoSrc;
-            const blob = await loadImageBlob(photoSrc);
-            files.push(new File([blob], 'producto.jpg', { type: 'image/jpeg' }));
-        } else if (photoSrc && photoSrc !== defaultGif && photoSrc.startsWith('data:')) {
-            // Si es una URL de datos, solo la convertimos a blob para compartición directa
-            const blob = await loadImageBlob(photoSrc);
-            files.push(new File([blob], 'producto.jpg', { type: 'image/jpeg' }));
-        }
-    } catch(e) { console.warn('Error al cargar imagen para compartir:', e); }
-    await attemptWebShare(msg, files, 'Oferta Yaute', 'Productos', imageUrlForFallback);
+    // REVERTIDO: Se llama a attemptWebShare sin argumentos de imagen.
+    await attemptWebShare(msg, 'Productos');
 }
 
 async function confirmPrices() {
@@ -375,7 +327,6 @@ async function confirmPrices() {
     const costo = parseFloat(document.getElementById('pm-costo').value) || 0;
     if (!nombre) { toastScanner("Nombre vacío", '#ef4444'); return; }
     document.getElementById('price-modal').style.display = 'none';
-    let files = [];
     let photoURL = '';
     if (pendingCanvas) {
         try {
@@ -383,15 +334,18 @@ async function confirmPrices() {
             const ref = storage.ref(`productos/${Date.now()}_${nombre.replace(/\s/g, '_')}.jpg`);
             await ref.put(blob);
             photoURL = await ref.getDownloadURL(); // Obtenemos la URL pública
-            files.push(new File([blob], 'oferta.jpg', { type: 'image/jpeg' }));
-        } catch(e) { console.warn('Error al subir imagen para compartir:', e); }
+        } catch(e) { 
+            console.warn('Error al subir imagen para guardar en Firestore:', e);
+            toastScanner("Error al subir imagen del escáner.", '#ef4444'); // Añadido toast para el error de subida
+        }
     }
     const data = { nombre, costo, precio: venta, foto: photoURL || '' };
     try {
         if (pendingExisteId) await col('products').doc(pendingExisteId).update(data);
         else await col('products').add(data);
         const msg = `🛒 *OFERTA*\n📦 ${nombre}\n💰 $${venta.toFixed(2)}${costo > 0 ? ` (Costo: $${costo.toFixed(2)})` : ''}`;
-        await attemptWebShare(msg, files, 'Oferta Yaute', 'Escáner', photoURL); // Pasamos photoURL aquí
+        // REVERTIDO: Se llama a attemptWebShare sin argumentos de imagen.
+        await attemptWebShare(msg, 'Escáner');
     } catch(e) { toastScanner("Error: " + e.message, '#ef4444'); }
     pendingCanvas = null;
     pendingExisteId = null;
@@ -423,13 +377,13 @@ function renderControlList() { const c = document.getElementById('cat-items-list
 function renderControlListItems() { renderControlList(); }
 function renderEntregas() { const list = document.getElementById('lista-entregas'); if(list) list.innerHTML = (window.state.sales || []).slice(0,5).map(s => `<div class="card-custom py-2">${s.cliente} - $${s.total}</div>`).join(''); }
 
-// Se añadió el <img> al listado de productos
+// Se añadió el <img> al listado de productos, con fallback más robusto
 function handleProductSearchInTab(val) {
     const term = val.toUpperCase();
     const results = (window.state.products || []).filter(p => (p.nombre || '').toUpperCase().includes(term));
     document.getElementById('prod-search-results').innerHTML = results.map(p => `
         <div class="card-custom py-2 mb-1 d-flex align-items-center gap-3">
-            <img src="${p.foto || defaultGif}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;">
+            <img src="${p.foto || defaultGif}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjOTRhM2I4Ij48cGF0aCBkPSJtMiAyMmMwIDEuMTA0Ljg5NiAyIDIgMmgyMGMxLjEwNCAwIDItLjg5NiAyLTJ2LTE5YzAtMS4xMDQtLjg5Ni0yLTItMmgtMjBjLTEuMTA0IDAtMiAuODk2LTIgMnYxOXptMi0xN2gyMGw0IDQuNWwtNC42NTkgNC40OTMtMS4zNDEgMS41MDd2Nmg2Ljk0bC0yLjgzMy0yLjg2LTQuMTA3LTQuMjIyLTQuMDAzIDQuNzQ0bC00LjY4NS01Ljg1Ni02IDkuOTU2di0xMC41em0xOC0yYzAgLjU1Mi0uNDQ4IDEtMSAxcy0xLS40NDgtMS0xIC40NDgtMSAxLTF6bTAgNWc1MiAwIDIgMmgyMGMxLjEwNCAwIDItLjg5NiAyLTJ2LTE5YzAtMS4xMDQtLjg5Ni0yLTItMmgtMjBjLTEuMTA0IDAtMiAuODk2LTIgMnYxOXptMi0xN2gyMGw0IDQuNWwtNC42NTkgNC40OTMtMS4zNDEgMS41MDd2Nmg2Ljk0bC0yLjgzMy0yLjg2LTQuMTA3LTQuMjIyLTQuMDAzIDQuNzQ0bC00LjY4NS01Ljg1Ni02IDkuOTU2di0xMC41em0xOC0yYzAgLjU1Mi0uNDQ4IDEtMSAxcy0xLS40NDgtMS0xIC40NDhhLTEtMSAwIDAgMSAxIDB6bTAgNWc1MmcwIDAgMmgyMGMxLjEwNCAwIDItLjg5NiAyLTJ2LTE5YzAtMS4xMDQtLjg5Ni0yLTItMmgtMjBjLTEuMTA0IDAtMiAuODk2LTIgMnYxOXptMi0xN2gyMGw0IDQuNWwtNC42NTkgNC40OTMtMS4zNDEgMS41MDd2Nmg2Ljk0bC0yLjgzMy0yLjg2LTQuMTA3LTQuMjIyLTQuMDAzIDQuNzQ0bC00LjY4NS01Ljg1Ni02IDkuOTU2di0xMC41em0xOC0yYzAgLjU1Mi0uNDQ4IDEtMSAxcy0xLS40NDgtMS0xIC40NDgtMSAxLTF6bTAgNWc2MnA9IjIwIiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiM5NGFhZGIiPjxwYXRoIGQ9Ik0zIDV2MTRoMThWNkg1VjdoMTZ2MTBIM2wtMi0yaDBaTTE5IDguNWwtNyA3LTQtNGwtMyAzVjVoMTh6Ii8+PC9zdmc+';">
             <span class="flex-grow-1">${p.nombre}</span>
             <button class="btn btn-sm btn-primary" onclick="selectProductInTab('${p.id}')">Seleccionar</button>
         </div>
