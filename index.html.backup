@@ -388,9 +388,40 @@ function switchSubTab(id) { document.getElementById('control-content').innerHTML
 function renderControlList() { const c = document.getElementById('cat-items-list-container'); if(c) c.innerHTML = (window.state.products || []).map(p => `<div class="card-custom py-2 mb-1">${p.nombre}</div>`).join('') || '<div class="text-center">Sin datos</div>'; }
 function renderControlListItems() { renderControlList(); }
 function renderEntregas() { const list = document.getElementById('lista-entregas'); if(list) list.innerHTML = (window.state.sales || []).slice(0,5).map(s => `<div class="card-custom py-2">${s.cliente} - $${s.total}</div>`).join(''); }
-function handleProductSearchInTab(val) { const term = val.toUpperCase(); const results = (window.state.products || []).filter(p => (p.nombre || '').toUpperCase().includes(term)); document.getElementById('prod-search-results').innerHTML = results.map(p => `<div class="card-custom py-2 mb-1 d-flex justify-content-between"><span>${p.nombre}</span><button class="btn btn-sm btn-primary" onclick="selectProductInTab('${p.id}')">Seleccionar</button></div>`).join('') || '<div class="text-center">Sin resultados</div>'; }
-function selectProductInTab(id) { const p = window.state.products.find(x => x.id === id); if(p) { selectedProductInProdTab = p; document.getElementById('prod-edit-name').value = p.nombre || ''; document.getElementById('prod-edit-costo').value = p.costo || 0; document.getElementById('prod-edit-precio').value = p.precio || 0; document.getElementById('prod-preview-photo').src = p.foto || defaultGif; document.getElementById('prod-details-preview').style.display = 'block'; document.getElementById('prod-search-input').style.display = 'none'; } }
-function clearProductSelection() { selectedProductInProdTab = null; document.getElementById('prod-details-preview').style.display = 'none'; document.getElementById('prod-search-input').style.display = 'block'; handleProductSearchInTab(''); }
+
+// MODIFICACIÓN CRÍTICA AQUÍ: Se añade el <img> al listado de productos
+function handleProductSearchInTab(val) {
+    const term = val.toUpperCase();
+    const results = (window.state.products || []).filter(p => (p.nombre || '').toUpperCase().includes(term));
+    document.getElementById('prod-search-results').innerHTML = results.map(p => `
+        <div class="card-custom py-2 mb-1 d-flex align-items-center gap-3">
+            <img src="${p.foto || defaultGif}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;">
+            <span class="flex-grow-1">${p.nombre}</span>
+            <button class="btn btn-sm btn-primary" onclick="selectProductInTab('${p.id}')">Seleccionar</button>
+        </div>
+    `).join('') || '<div class="text-center">Sin resultados</div>';
+}
+
+function selectProductInTab(id) {
+    const p = window.state.products.find(x => x.id === id);
+    if(p) {
+        selectedProductInProdTab = p;
+        document.getElementById('prod-edit-name').value = p.nombre || '';
+        document.getElementById('prod-edit-costo').value = p.costo || 0;
+        document.getElementById('prod-edit-precio').value = p.precio || 0;
+        document.getElementById('prod-preview-photo').src = p.foto || defaultGif;
+        document.getElementById('prod-details-preview').style.display = 'block';
+        document.getElementById('prod-search-input').style.display = 'none';
+        document.getElementById('prod-search-results').style.display = 'none'; // Ocultar resultados de búsqueda
+    }
+}
+function clearProductSelection() {
+    selectedProductInProdTab = null;
+    document.getElementById('prod-details-preview').style.display = 'none';
+    document.getElementById('prod-search-input').style.display = 'block';
+    document.getElementById('prod-search-results').style.display = 'block'; // Mostrar resultados de búsqueda
+    handleProductSearchInTab('');
+}
 async function saveProductChangesInTab() { if(selectedProductInProdTab) { await col('products').doc(selectedProductInProdTab.id).update({ nombre: document.getElementById('prod-edit-name').value, costo: parseFloat(document.getElementById('prod-edit-costo').value) || 0, precio: parseFloat(document.getElementById('prod-edit-precio').value) || 0 }); toastScanner("Guardado"); } }
 function openScannerModal() { document.getElementById('ia-modal').style.display = 'flex'; navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(s => { scannerStream = s; document.getElementById('cam-preview-ia').srcObject = s; }).catch(e => toastScanner("Error cámara", '#ef4444')); }
 function closeScanner() { if(scannerStream) scannerStream.getTracks().forEach(t => t.stop()); scannerStream = null; document.getElementById('ia-modal').style.display = 'none'; }
