@@ -88,7 +88,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg==';">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900;">VERSION 36.1</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900;">VERSION 36.2</div>
 </div>
 
 <div id="toast-msg" class="toast-msg"></div>
@@ -121,7 +121,8 @@
         <div id="prod-details-preview" class="card-custom" style="display:none;">
             <p class="fw-bold mb-1" style="font-size:0.7rem;">PRODUCTO SELECCIONADO</p>
             <div class="d-flex align-items-center gap-3 mb-3">
-                <img id="prod-preview-photo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M4 4h16v16H4V4z'/%3E%3C/svg%3E" style="width:80px; height:80px; object-fit:cover; border-radius:12px;">
+                <!-- MODIFICACIÓN AQUÍ: src actualizado a base64 y se agregó onerror -->
+                <img id="prod-preview-photo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MCcgaGVpZ2h0PSc4MCcgdmlld0JveD0nMCAwIDI0IDI0JyBmaWxsPScjOTRhM2I4Jz48cGF0aCBkPSdNNCA0aDE2djE2SDRVNHonLz48L3N2Zz4=" onerror="this.src = defaultGif;" style="width:80px; height:80px; object-fit:cover; border-radius:12px;">
                 <div style="flex:1">
                     <textarea id="prod-edit-name" class="form-control mb-2" rows="2" style="resize:none; text-transform:uppercase; font-weight:700;"></textarea>
                     <div class="row g-2">
@@ -254,7 +255,8 @@ const storage = firebase.storage();
 const APP_ID = 'yaute-v1-shared';
 function col(name) { return db.collection('artifacts').doc(APP_ID).collection('public').doc('data').collection(name); }
 
-const defaultGif = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="%2394a3b8"%3E%3Cpath d="M4 4h16v16H4V4z"/%3E%3C/svg%3E';
+// MODIFICACIÓN AQUÍ: defaultGif ahora está en base64
+const defaultGif = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc4MCcgaGVpZ2h0PSc4MCcgdmlld0JveD0nMCAwIDI0IDI0JyBmaWxsPScjOTRhM2I4Jz48cGF0aCBkPSdNNCA0aDE2djE2SDRVNHonLz48L3N2Zz4=';
 
 window.state = { sales: [], clients: [], stores: [], products: [] };
 let deleteRef = { col: '', id: '' };
@@ -389,7 +391,7 @@ function renderControlList() { const c = document.getElementById('cat-items-list
 function renderControlListItems() { renderControlList(); }
 function renderEntregas() { const list = document.getElementById('lista-entregas'); if(list) list.innerHTML = (window.state.sales || []).slice(0,5).map(s => `<div class="card-custom py-2">${s.cliente} - $${s.total}</div>`).join(''); }
 
-// MODIFICACIÓN CRÍTICA AQUÍ: Se añade el <img> al listado de productos
+// Se añadió el <img> al listado de productos
 function handleProductSearchInTab(val) {
     const term = val.toUpperCase();
     const results = (window.state.products || []).filter(p => (p.nombre || '').toUpperCase().includes(term));
@@ -409,6 +411,7 @@ function selectProductInTab(id) {
         document.getElementById('prod-edit-name').value = p.nombre || '';
         document.getElementById('prod-edit-costo').value = p.costo || 0;
         document.getElementById('prod-edit-precio').value = p.precio || 0;
+        // La asignación de src ya es robusta con el || defaultGif
         document.getElementById('prod-preview-photo').src = p.foto || defaultGif;
         document.getElementById('prod-details-preview').style.display = 'block';
         document.getElementById('prod-search-input').style.display = 'none';
