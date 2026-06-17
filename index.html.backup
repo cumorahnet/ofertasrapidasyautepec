@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v36.1 — Sistema Completo</title>
+    <title>Yaute v36.3 — Sistema Completo</title>
     <link rel="icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -64,6 +64,7 @@
 
         .sug-box { position:absolute; top:100%; left:0; right:0; background:white; border-radius:14px; max-height:220px; overflow-y:auto; z-index:1500; border:1px solid #e2e8f0; box-shadow:0 15px 30px rgba(0,0,0,0.15); }
         .sug-item { padding:14px 18px; border-bottom:1px solid #f1f5f9; cursor:pointer; font-size:0.95rem; font-weight:700; color:var(--primary); }
+        .sug-item:hover { background-color: #f8fafc; } /* Added hover effect */
 
         #ticket-render { position:absolute; top:-5000px; width:450px; background:white; padding:40px; font-family:monospace; color:black; }
         .toast-msg { position:fixed; top:22px; left:50%; transform:translateX(-50%); z-index:30000; padding:12px 24px; border-radius:50px; font-weight:800; display:none; color:white; max-width:88%; text-align:center; }
@@ -86,9 +87,9 @@
 <body>
 
 <div id="splash-screen">
-    <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg==';">
+    <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+PHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIyMiIgZmlsbD0iIzBmMTcyYSIvPjx0ZXh0IHg9IjYwIiB5PSI3MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIEJsYWNrLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNDAiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiMzYjgyZjYiPk9SWTwvdGV4dD48L3N2Zz4=';">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900;">VERSION 36.3</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900;">VERSION 36.4</div>
 </div>
 
 <div id="toast-msg" class="toast-msg"></div>
@@ -101,7 +102,7 @@
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px;">
-            <span class="version-badge">v36.1</span>
+            <span class="version-badge">v36.3</span> <!-- Versión actualizada -->
         </div>
     </div>
 </header>
@@ -121,7 +122,7 @@
         <div id="prod-details-preview" class="card-custom" style="display:none;">
             <p class="fw-bold mb-1" style="font-size:0.7rem;">PRODUCTO SELECCIONADO</p>
             <div class="d-flex align-items-center gap-3 mb-3">
-                <!-- REVERTIDO: src actualizado a logo.png, onerror con SVG genérico -->
+                <!-- Fallback a defaultGif (SVG) -->
                 <img id="prod-preview-photo" src="logo.png" onerror="this.src = defaultGif;" style="width:80px; height:80px; object-fit:cover; border-radius:12px;">
                 <div style="flex:1">
                     <textarea id="prod-edit-name" class="form-control mb-2" rows="2" style="resize:none; text-transform:uppercase; font-weight:700;"></textarea>
@@ -147,7 +148,7 @@
                 <div class="col-6 position-relative"><input type="text" id="in-cliente" class="form-control text-uppercase" placeholder="CLIENTE"><div id="sug-cliente" class="sug-box d-none"></div></div>
             </div>
             <div class="row g-2 mb-2">
-                <div class="col-3"><input type="number" id="in-cantidad" class="form-control text-center" value="1"></div>
+                <div class="col-3"><input type="number" id="in-cantidad" class="form-control text-center" value="1" min="1"></div>
                 <div class="col-9 position-relative"><input type="text" id="in-producto" class="form-control text-uppercase" placeholder="PRODUCTO"><div id="sug-producto" class="sug-box d-none"></div></div>
             </div>
             <div class="row g-2 mb-3">
@@ -160,7 +161,10 @@
 
     <!-- TAB REPARTO -->
     <div id="tab-entregas" class="tab-content" style="display:none;">
-        <div class="card-custom py-2 mb-3 text-center"><input type="date" id="entregas-date" class="form-control text-center fw-bold"></div>
+        <div class="card-custom py-2 mb-3 text-center">
+            <label for="entregas-date" class="form-label visually-hidden">Fecha de Entregas</label>
+            <input type="date" id="entregas-date" class="form-control text-center fw-bold">
+        </div>
         <div id="lista-entregas"></div>
     </div>
 
@@ -255,8 +259,8 @@ const storage = firebase.storage();
 const APP_ID = 'yaute-v1-shared';
 function col(name) { return db.collection('artifacts').doc(APP_ID).collection('public').doc('data').collection(name); }
 
-// REVERTIDO: defaultGif vuelve a ser una ruta de archivo, con un fallback SVG más genérico en el onerror.
-const defaultGif = 'default.gif'; // Asegúrate de tener este archivo en la raíz de tu proyecto.
+// defaultGif ahora es un Data URL de SVG para robustez y no depender de un archivo físico.
+const defaultGif = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjOTRhM2I4Ij48cGF0aCBkPSJNMjEgMTljMCAxLjEtLjkgMi0yIDJINWMtMS4xIDAtMi0uOS0yLTJWNWMwLTEuMS45LTItMi0yMWgxNmMxLjEgMCAyIC45IDIgMnYxNHptLTExLThsLTYgNmgxNmw2LTZINC45M0wxMCA3eiIvPjwvc3ZnPg==';
 
 window.state = { sales: [], clients: [], stores: [], products: [] };
 let deleteRef = { col: '', id: '' };
@@ -275,11 +279,11 @@ const toastScanner = (msg, color = '#10b981') => {
 
 const hideSplash = () => {
     const splash = document.getElementById('splash-screen');
-    if (splash) splash.remove();
+    // Se elimina el splash después de la animación CSS.
+    // La animación CSS ya maneja el opacity y pointer-events.
+    // Esto es solo para asegurar que se quita del DOM.
+    if (splash) setTimeout(() => splash.remove(), 600); // Coincide con la duración de la animación.
 };
-
-// REVERTIDO: Funciones de compartir vuelven a la versión anterior (solo texto)
-// Ya no se usan dataURLtoBlob ni loadImageBlob, se eliminan.
 
 /**
  * Intenta compartir contenido usando la Web Share API o un fallback a WhatsApp (solo texto).
@@ -317,7 +321,7 @@ async function shareProductDetailsFromTab() {
     const price = parseFloat(document.getElementById('prod-edit-precio').value) || 0;
     const cost = parseFloat(document.getElementById('prod-edit-costo').value) || 0;
     const msg = `🛒 *OFERTA*\n📦 ${name}\n💰 $${price.toFixed(2)}${cost > 0 ? ` (Costo: $${cost.toFixed(2)})` : ''}`;
-    // REVERTIDO: Se llama a attemptWebShare sin argumentos de imagen.
+    // Se llama a attemptWebShare sin argumentos de imagen.
     await attemptWebShare(msg, 'Productos');
 }
 
@@ -334,6 +338,7 @@ async function confirmPrices() {
             const ref = storage.ref(`productos/${Date.now()}_${nombre.replace(/\s/g, '_')}.jpg`);
             await ref.put(blob);
             photoURL = await ref.getDownloadURL(); // Obtenemos la URL pública
+            toastScanner("Imagen subida a Firebase Storage.", '#10b981');
         } catch(e) { 
             console.warn('Error al subir imagen para guardar en Firestore:', e);
             toastScanner("Error al subir imagen del escáner.", '#ef4444'); // Añadido toast para el error de subida
@@ -343,25 +348,109 @@ async function confirmPrices() {
     try {
         if (pendingExisteId) await col('products').doc(pendingExisteId).update(data);
         else await col('products').add(data);
+        toastScanner("Producto guardado/actualizado en Firebase.", '#10b981');
+
         const msg = `🛒 *OFERTA*\n📦 ${nombre}\n💰 $${venta.toFixed(2)}${costo > 0 ? ` (Costo: $${costo.toFixed(2)})` : ''}`;
-        // REVERTIDO: Se llama a attemptWebShare sin argumentos de imagen.
         await attemptWebShare(msg, 'Escáner');
-    } catch(e) { toastScanner("Error: " + e.message, '#ef4444'); }
+    } catch(e) { 
+        console.error("Error al guardar producto en Firestore:", e);
+        toastScanner("Error: " + e.message, '#ef4444'); 
+    }
     pendingCanvas = null;
     pendingExisteId = null;
     closeScanner();
 }
 
-// Resto de funciones (simplificadas para que el código quede completo)
 function startSync() {
     if (!localStorage.getItem('yaute_key_v3310')) document.getElementById('key-config-modal').style.display = 'flex';
     ['sales', 'clients', 'stores', 'products'].forEach(n => {
-        col(n).onSnapshot(s => { window.state[n] = s.docs.map(d => ({ id: d.id, ...d.data() })); renderUI(); });
+        col(n).onSnapshot(s => { 
+            window.state[n] = s.docs.map(d => ({ id: d.id, ...d.data() })); 
+            renderUI(); 
+        }, error => {
+            console.error(`Error al sincronizar ${n}:`, error);
+            document.getElementById('status-dot').style.background = 'red'; // Indicar error de conexión
+            toastScanner(`Error de conexión con Firebase: ${n}`, '#ef4444');
+        });
     });
-    setTimeout(hideSplash, 2000);
+    // La animación CSS ya oculta la splash screen después de 4 segundos.
+    // Esta función `hideSplash` solo asegura que el elemento se elimine del DOM.
+    hideSplash();
+    document.getElementById('status-dot').style.background = 'green'; // Asumir conexión exitosa inicialmente
 }
 
-function renderUI() { renderControlList(); renderEntregas(); if (!selectedProductInProdTab) handleProductSearchInTab(''); }
+// Función genérica para configurar el autocompletado
+function setupAutocomplete(inputId, suggestionBoxId, dataArray, keyToShow, keyToFilter, callback = null) {
+    const input = document.getElementById(inputId);
+    const sugBox = document.getElementById(suggestionBoxId);
+
+    const renderSuggestions = () => {
+        const searchTerm = input.value.toUpperCase();
+        if (searchTerm.length < 2) { // Muestra sugerencias solo si hay al menos 2 caracteres
+            sugBox.classList.add('d-none');
+            return;
+        }
+
+        const filteredItems = dataArray.filter(item =>
+            (item[keyToFilter] || '').toUpperCase().includes(searchTerm)
+        ).slice(0, 5); // Limitar a 5 sugerencias
+
+        if (filteredItems.length > 0) {
+            sugBox.innerHTML = filteredItems.map(item => `
+                <div class="sug-item" data-id="${item.id}" data-value="${item[keyToShow]}">
+                    ${item[keyToShow]}
+                </div>
+            `).join('');
+            sugBox.classList.remove('d-none');
+        } else {
+            sugBox.classList.add('d-none');
+        }
+    };
+
+    input.addEventListener('input', renderSuggestions);
+
+    sugBox.addEventListener('click', (e) => {
+        const sugItem = e.target.closest('.sug-item');
+        if (sugItem) {
+            input.value = sugItem.dataset.value;
+            sugBox.classList.add('d-none');
+            // Si se proporciona un callback, se invoca con el elemento seleccionado.
+            if (callback) {
+                const selectedItem = dataArray.find(item => item[keyToFilter] === input.value);
+                if (selectedItem) {
+                    callback(selectedItem);
+                }
+            }
+        }
+    });
+
+    // Ocultar sugerencias cuando el input pierde el foco, pero con un pequeño retraso
+    // para permitir el clic en el cuadro de sugerencias
+    input.addEventListener('blur', () => {
+        setTimeout(() => sugBox.classList.add('d-none'), 150);
+    });
+
+    // Mostrar sugerencias nuevamente si el foco regresa y hay texto
+    input.addEventListener('focus', renderSuggestions);
+}
+
+// Función para inicializar todos los campos de autocompletado después de que se cargan los datos
+function initAutocompletes() {
+    setupAutocomplete('in-tienda', 'sug-tienda', window.state.stores, 'nombre', 'nombre');
+    setupAutocomplete('in-cliente', 'sug-cliente', window.state.clients, 'nombre', 'nombre');
+    setupAutocomplete('in-producto', 'sug-producto', window.state.products, 'nombre', 'nombre', (selectedProduct) => {
+        // Callback para la selección de producto para prellenar costo y precio
+        document.getElementById('in-costo').value = selectedProduct.costo || '';
+        document.getElementById('in-precio').value = selectedProduct.precio || '';
+    });
+}
+
+function renderUI() { 
+    renderControlList(); 
+    renderEntregas(); 
+    if (!selectedProductInProdTab) handleProductSearchInTab(''); 
+    initAutocompletes(); // Asegura que las sugerencias se actualicen con los datos más recientes
+}
 
 function showTab(id, btn) {
     document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
@@ -369,25 +458,83 @@ function showTab(id, btn) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
     if (id === 'productos' && !selectedProductInProdTab) handleProductSearchInTab('');
+    if (id === 'entregas') renderEntregas(); // Asegura que la lista de entregas se actualice al cambiar de pestaña
 }
 
-function switchSubTab(id) { document.getElementById('control-content').innerHTML = id === 'finanzas' ? '<div class="text-center py-5">Finanzas - Próximamente</div>' : '<div id="cat-items-list-container"></div>'; renderControlListItems(); }
+function switchSubTab(id) { 
+    document.getElementById('control-content').innerHTML = id === 'finanzas' ? '<div class="text-center py-5">Finanzas - Próximamente</div>' : '<div id="cat-items-list-container"></div>'; 
+    renderControlListItems(); 
+}
 
-function renderControlList() { const c = document.getElementById('cat-items-list-container'); if(c) c.innerHTML = (window.state.products || []).map(p => `<div class="card-custom py-2 mb-1">${p.nombre}</div>`).join('') || '<div class="text-center">Sin datos</div>'; }
+function renderControlList() { 
+    const c = document.getElementById('cat-items-list-container'); 
+    if(c) c.innerHTML = (window.state.products || []).map(p => `
+        <div class="card-custom py-2 mb-1 d-flex align-items-center gap-3">
+            <img src="${p.foto || defaultGif}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;">
+            <span class="flex-grow-1">${p.nombre}</span>
+            <span class="text-muted">$${(p.precio || 0).toFixed(2)}</span>
+            <button class="btn btn-sm btn-outline-danger ms-2" onclick="openDeleteModal('products', '${p.id}')">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `).join('') || '<div class="card-custom text-center text-muted py-3">No hay productos en el catálogo.</div>'; 
+}
 function renderControlListItems() { renderControlList(); }
-function renderEntregas() { const list = document.getElementById('lista-entregas'); if(list) list.innerHTML = (window.state.sales || []).slice(0,5).map(s => `<div class="card-custom py-2">${s.cliente} - $${s.total}</div>`).join(''); }
 
-// Se añadió el <img> al listado de productos, con fallback más robusto
+// Modificado renderEntregas para filtrar por fecha
+function renderEntregas() {
+    const list = document.getElementById('lista-entregas');
+    const selectedDateStr = document.getElementById('entregas-date').value;
+
+    if (!list) return;
+
+    if (!selectedDateStr) {
+        list.innerHTML = '<div class="card-custom text-center text-muted py-3">Selecciona una fecha para ver entregas.</div>';
+        return;
+    }
+
+    const selectedDateObj = new Date(selectedDateStr + 'T00:00:00'); // Añadir T00:00:00 para evitar problemas de zona horaria
+    const formattedSelectedDate = selectedDateObj.toLocaleDateString('es-ES'); // Formato 'D/M/YYYY' o 'DD/MM/YYYY' según el sistema
+
+    const filteredSales = (window.state.sales || []).filter(s => {
+        if (!s.timestamp) return false; // Asegurar que el timestamp existe
+        const saleDateObj = new Date(s.timestamp);
+        return saleDateObj.toLocaleDateString('es-ES') === formattedSelectedDate;
+    }).sort((a,b) => b.timestamp - a.timestamp); // Ordenar por las más recientes primero
+
+    if (filteredSales.length > 0) {
+        list.innerHTML = filteredSales.map(s => `
+            <div class="card-custom mb-1 p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <p class="fw-bold mb-0 text-primary">${s.cliente} (${s.tienda})</p>
+                        <p class="mb-0 text-muted" style="font-size:0.85rem;">${s.producto} (x${s.cantidad})</p>
+                    </div>
+                    <div class="text-end d-flex align-items-center">
+                        <span class="fw-bold text-success">$${(s.total || 0).toFixed(2)}</span>
+                        <button class="btn btn-sm btn-outline-danger ms-2" onclick="openDeleteModal('sales', '${s.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    } else {
+        list.innerHTML = '<div class="card-custom text-center text-muted py-3">No hay entregas para esta fecha.</div>';
+    }
+}
+
+// Se añadió el <img> al listado de productos, usando defaultGif si no hay foto
 function handleProductSearchInTab(val) {
     const term = val.toUpperCase();
     const results = (window.state.products || []).filter(p => (p.nombre || '').toUpperCase().includes(term));
     document.getElementById('prod-search-results').innerHTML = results.map(p => `
         <div class="card-custom py-2 mb-1 d-flex align-items-center gap-3">
-            <img src="${p.foto || defaultGif}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjOTRhM2I4Ij48cGF0aCBkPSJtMiAyMmMwIDEuMTA0Ljg5NiAyIDIgMmgyMGMxLjEwNCAwIDItLjg5NiAyLTJ2LTE5YzAtMS4xMDQtLjg5Ni0yLTItMmgtMjBjLTEuMTA0IDAtMiAuODk2LTIgMnYxOXptMi0xN2gyMGw0IDQuNWwtNC42NTkgNC40OTMtMS4zNDEgMS41MDd2Nmg2Ljk0bC0yLjgzMy0yLjg2LTQuMTA3LTQuMjIyLTQuMDAzIDQuNzQ0bC00LjY4NS01Ljg1Ni02IDkuOTU2di0xMC41em0xOC0yYzAgLjU1Mi0uNDQ4IDEtMSAxcy0xLS40NDgtMS0xIC40NDgtMSAxLTF6bTAgNWc1MiAwIDIgMmgyMGMxLjEwNCAwIDItLjg5NiAyLTJ2LTE5YzAtMS4xMDQtLjg5Ni0yLTItMmgtMjBjLTEuMTA0IDAtMiAuODk2LTIgMnYxOXptMi0xN2gyMGw0IDQuNWwtNC42NTkgNC40OTMtMS4zNDEgMS41MDd2Nmg2Ljk0bC0yLjgzMy0yLjg2LTQuMTA3LTQuMjIyLTQuMDAzIDQuNzQ0bC00LjY4NS01Ljg1Ni02IDkuOTU2di0xMC41em0xOC0yYzAgLjU1Mi0uNDQ4IDEtMSAxcy0xLS40NDgtMS0xIC40NDhhLTEtMSAwIDAgMSAxIDB6bTAgNWc1MmcwIDAgMmgyMGMxLjEwNCAwIDItLjg5NiAyLTJ2LTE5YzAtMS4xMDQtLjg5Ni0yLTItMmgtMjBjLTEuMTA0IDAtMiAuODk2LTIgMnYxOXptMi0xN2gyMGw0IDQuNWwtNC42NTkgNC40OTMtMS4zNDEgMS41MDd2Nmg2Ljk0bC0yLjgzMy0yLjg2LTQuMTA3LTQuMjIyLTQuMDAzIDQuNzQ0bC00LjY4NS01Ljg1Ni02IDkuOTU2di0xMC41em0xOC0yYzAgLjU1Mi0uNDQ4IDEtMSAxcy0xLS40NDgtMS0xIC40NDgtMSAxLTF6bTAgNWc2MnA9IjIwIiBoZWlnaHQ9IjIwIiB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9IiM5NGFhZGIiPjxwYXRoIGQ9Ik0zIDV2MTRoMThWNkg1VjdoMTZ2MTBIM2wtMi0yaDBaTTE5IDguNWwtNyA3LTQtNGwtMyAzVjVoMTh6Ii8+PC9zdmc+';">
+            <img src="${p.foto || defaultGif}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;">
             <span class="flex-grow-1">${p.nombre}</span>
             <button class="btn btn-sm btn-primary" onclick="selectProductInTab('${p.id}')">Seleccionar</button>
         </div>
-    `).join('') || '<div class="text-center">Sin resultados</div>';
+    `).join('') || '<div class="card-custom text-center text-muted py-3">Sin resultados</div>';
 }
 
 function selectProductInTab(id) {
@@ -411,19 +558,157 @@ function clearProductSelection() {
     document.getElementById('prod-search-results').style.display = 'block'; // Mostrar resultados de búsqueda
     handleProductSearchInTab('');
 }
-async function saveProductChangesInTab() { if(selectedProductInProdTab) { await col('products').doc(selectedProductInProdTab.id).update({ nombre: document.getElementById('prod-edit-name').value, costo: parseFloat(document.getElementById('prod-edit-costo').value) || 0, precio: parseFloat(document.getElementById('prod-edit-precio').value) || 0 }); toastScanner("Guardado"); } }
-function openScannerModal() { document.getElementById('ia-modal').style.display = 'flex'; navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(s => { scannerStream = s; document.getElementById('cam-preview-ia').srcObject = s; }).catch(e => toastScanner("Error cámara", '#ef4444')); }
+async function saveProductChangesInTab() { 
+    if(selectedProductInProdTab) { 
+        const newName = document.getElementById('prod-edit-name').value.trim();
+        const newCosto = parseFloat(document.getElementById('prod-edit-costo').value) || 0;
+        const newPrecio = parseFloat(document.getElementById('prod-edit-precio').value) || 0;
+
+        if (!newName) {
+            toastScanner("El nombre del producto no puede estar vacío.", '#ef4444');
+            return;
+        }
+
+        try {
+            await col('products').doc(selectedProductInProdTab.id).update({ 
+                nombre: newName, 
+                costo: newCosto, 
+                precio: newPrecio 
+            }); 
+            toastScanner("Cambios de producto guardados.", '#10b981'); 
+        } catch (e) {
+            console.error("Error al guardar cambios del producto:", e);
+            toastScanner("Error al guardar: " + e.message, '#ef4444');
+        }
+    }
+}
+
+function openScannerModal() { 
+    document.getElementById('ia-modal').style.display = 'flex'; 
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+        .then(s => { 
+            scannerStream = s; 
+            document.getElementById('cam-preview-ia').srcObject = s; 
+        }).catch(e => {
+            console.error("Error al acceder a la cámara:", e);
+            toastScanner("Error al iniciar cámara. Asegúrate de dar permisos.", '#ef4444');
+        }); 
+}
 function closeScanner() { if(scannerStream) scannerStream.getTracks().forEach(t => t.stop()); scannerStream = null; document.getElementById('ia-modal').style.display = 'none'; }
 function cancelScanFlow() { closeScanner(); document.getElementById('price-modal').style.display = 'none'; pendingCanvas = null; }
 function cancelPrices() { cancelScanFlow(); }
-function captureIA() { const video = document.getElementById('cam-preview-ia'); const canvas = document.createElement('canvas'); canvas.width = video.videoWidth; canvas.height = video.videoHeight; canvas.getContext('2d').drawImage(video, 0, 0); pendingCanvas = canvas; pendingNombre = "PRODUCTO ESCANEADO"; document.getElementById('pm-nombre').value = pendingNombre; document.getElementById('price-modal').style.display = 'flex'; }
-function saveGeminiKey() { const key = document.getElementById('user-gemini-key').value.trim(); if(key) { localStorage.setItem('yaute_key_v3310', key); document.getElementById('key-config-modal').style.display = 'none'; toastScanner("API Key guardada"); } }
+function captureIA() { 
+    const video = document.getElementById('cam-preview-ia'); 
+    const canvas = document.createElement('canvas'); 
+    canvas.width = video.videoWidth; 
+    canvas.height = video.videoHeight; 
+    canvas.getContext('2d').drawImage(video, 0, 0); 
+    pendingCanvas = canvas; 
+    
+    // Aquí podrías enviar la imagen a Gemini para obtener una descripción
+    // Por ahora, solo se usa un nombre predeterminado.
+    pendingNombre = "PRODUCTO ESCANEADO"; 
+    document.getElementById('pm-nombre').value = pendingNombre; 
+
+    // Prellenar fecha de escaneo con la fecha actual
+    document.getElementById('pm-fecha-escaneo').value = new Date().toISOString().slice(0,10);
+    
+    document.getElementById('price-modal').style.display = 'flex'; 
+}
+function saveGeminiKey() { 
+    const key = document.getElementById('user-gemini-key').value.trim(); 
+    if(key) { 
+        localStorage.setItem('yaute_key_v3310', key); 
+        document.getElementById('key-config-modal').style.display = 'none'; 
+        toastScanner("API Key guardada", '#10b981'); 
+    } else {
+        toastScanner("La API Key no puede estar vacía.", '#ef4444');
+    }
+}
 function changeGeminiKey() { document.getElementById('key-config-modal').style.display = 'flex'; }
 function openDeleteModal(colName, id) { deleteRef = { col: colName, id }; document.getElementById('delete-modal').style.display = 'flex'; }
 function closeDeleteModal() { document.getElementById('delete-modal').style.display = 'none'; }
-document.getElementById('btn-confirm-delete').onclick = async () => { await col(deleteRef.col).doc(deleteRef.id).delete(); closeDeleteModal(); toastScanner("Eliminado"); };
-document.getElementById('btn-save-record').onclick = async () => { await col('sales').add({ tienda: document.getElementById('in-tienda').value, cliente: document.getElementById('in-cliente').value, producto: document.getElementById('in-producto').value, cantidad: 1, total: 100, fechaStr: new Date().toLocaleDateString(), timestamp: Date.now() }); toastScanner("Venta guardada"); };
-document.getElementById('entregas-date').value = new Date().toISOString().slice(0,10);
+
+document.getElementById('btn-confirm-delete').onclick = async () => { 
+    try {
+        await col(deleteRef.col).doc(deleteRef.id).delete(); 
+        closeDeleteModal(); 
+        toastScanner("Registro eliminado.", '#10b981'); 
+    } catch (e) {
+        console.error("Error al eliminar registro:", e);
+        toastScanner("Error al eliminar: " + e.message, '#ef4444');
+    }
+};
+
+// Modificación del botón de guardar registro para usar valores reales y validación
+document.getElementById('btn-save-record').onclick = async () => {
+    const tienda = document.getElementById('in-tienda').value.trim().toUpperCase();
+    const cliente = document.getElementById('in-cliente').value.trim().toUpperCase();
+    const productoNombre = document.getElementById('in-producto').value.trim().toUpperCase();
+    const cantidad = parseInt(document.getElementById('in-cantidad').value) || 0;
+    const costo = parseFloat(document.getElementById('in-costo').value) || 0;
+    const precio = parseFloat(document.getElementById('in-precio').value) || 0;
+
+    if (!tienda || !cliente || !productoNombre) {
+        toastScanner("Tienda, Cliente y Producto son campos obligatorios.", '#ef4444');
+        return;
+    }
+    if (cantidad <= 0) {
+        toastScanner("La cantidad debe ser un número positivo.", '#ef4444');
+        return;
+    }
+    if (precio <= 0) {
+        toastScanner("El precio de venta debe ser mayor a 0.", '#ef4444');
+        return;
+    }
+
+    const totalVenta = cantidad * precio;
+    const totalCosto = cantidad * costo;
+
+    try {
+        await col('sales').add({
+            tienda,
+            cliente,
+            producto: productoNombre,
+            cantidad,
+            costoUnitario: costo,
+            precioUnitario: precio,
+            total: totalVenta,
+            totalCosto: totalCosto,
+            fechaStr: new Date().toLocaleDateString('es-ES'), // Usar locale para consistencia
+            timestamp: Date.now()
+        });
+        toastScanner("Venta guardada exitosamente", '#10b981');
+
+        // Limpiar campos después de guardar
+        document.getElementById('in-tienda').value = '';
+        document.getElementById('in-cliente').value = '';
+        document.getElementById('in-producto').value = '';
+        document.getElementById('in-cantidad').value = '1';
+        document.getElementById('in-costo').value = '';
+        document.getElementById('in-precio').value = '';
+
+        // Opcional: añadir tienda/cliente si no existen
+        if (!window.state.stores.some(s => s.nombre === tienda)) {
+            await col('stores').add({ nombre: tienda });
+        }
+        if (!window.state.clients.some(c => c.nombre === cliente)) {
+            await col('clients').add({ nombre: cliente });
+        }
+
+    } catch (e) {
+        console.error("Error al guardar registro de venta:", e);
+        toastScanner("Error al guardar venta: " + e.message, '#ef4444');
+    }
+};
+
+// Inicializar la fecha en el input de entregas y el listener de cambio
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('entregas-date').value = new Date().toISOString().slice(0,10);
+    document.getElementById('entregas-date').addEventListener('change', renderEntregas);
+});
+
+
 window.onload = startSync;
 </script>
 </body>

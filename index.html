@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v36.3 — Sistema Completo</title>
+    <title>Yaute v36.4 — Sistema Completo</title>
     <link rel="icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -89,7 +89,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+PHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIyMiIgZmlsbD0iIzBmMTcyYSIvPjx0ZXh0IHg9IjYwIiB5PSI3MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIEJsYWNrLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNDAiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiMzYjgyZjYiPk9SWTwvdGV4dD48L3N2Zz4=';">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900;">VERSION 36.4</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900;">VERSION 36.5</div>
 </div>
 
 <div id="toast-msg" class="toast-msg"></div>
@@ -102,7 +102,7 @@
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px;">
-            <span class="version-badge">v36.3</span> <!-- Versión actualizada -->
+            <span class="version-badge">v36.4</span> <!-- Versión actualizada -->
         </div>
     </div>
 </header>
@@ -386,7 +386,7 @@ function setupAutocomplete(inputId, suggestionBoxId, dataArray, keyToShow, keyTo
 
     const renderSuggestions = () => {
         const searchTerm = input.value.toUpperCase();
-        if (searchTerm.length < 2) { // Muestra sugerencias solo si hay al menos 2 caracteres
+        if (searchTerm.length < 2) { 
             sugBox.classList.add('d-none');
             return;
         }
@@ -459,11 +459,39 @@ function showTab(id, btn) {
     if (btn) btn.classList.add('active');
     if (id === 'productos' && !selectedProductInProdTab) handleProductSearchInTab('');
     if (id === 'entregas') renderEntregas(); // Asegura que la lista de entregas se actualice al cambiar de pestaña
+    if (id === 'operaciones') { // Limpiar campos al cambiar a la pestaña de ventas
+        document.getElementById('in-tienda').value = '';
+        document.getElementById('in-cliente').value = '';
+        document.getElementById('in-producto').value = '';
+        document.getElementById('in-cantidad').value = '1';
+        document.getElementById('in-costo').value = '';
+        document.getElementById('in-precio').value = '';
+    }
+    if (id === 'control') {
+        // Asegurarse de que el sub-tab activo se muestre correctamente al entrar a "Gestión"
+        const activeSubBtn = document.querySelector('#tab-control .sub-btn.active');
+        if (activeSubBtn) {
+            const subTabId = activeSubBtn.id.replace('sub-btn-', '');
+            switchSubTab(subTabId);
+        } else {
+            // Si no hay sub-tab activo, activar "Finanzas" por defecto
+            switchSubTab('finanzas');
+        }
+    }
 }
 
 function switchSubTab(id) { 
-    document.getElementById('control-content').innerHTML = id === 'finanzas' ? '<div class="text-center py-5">Finanzas - Próximamente</div>' : '<div id="cat-items-list-container"></div>'; 
-    renderControlListItems(); 
+    document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`sub-btn-${id}`).classList.add('active');
+
+    document.getElementById('control-content').innerHTML = ''; // Clear content first
+
+    if (id === 'finanzas') {
+        document.getElementById('control-content').innerHTML = '<div class="text-center py-5">Finanzas - Próximamente</div>';
+    } else if (id === 'catalogo') {
+        document.getElementById('control-content').innerHTML = '<div id="cat-items-list-container"></div>';
+        renderControlList(); // Render catalogue items
+    }
 }
 
 function renderControlList() { 
@@ -479,9 +507,11 @@ function renderControlList() {
         </div>
     `).join('') || '<div class="card-custom text-center text-muted py-3">No hay productos en el catálogo.</div>'; 
 }
-function renderControlListItems() { renderControlList(); }
 
-// Modificado renderEntregas para filtrar por fecha
+function renderControlListItems() { renderControlList(); } // Alias for consistency
+
+
+// Modificado renderEntregas para agrupar por cliente/tienda y permitir compartir
 function renderEntregas() {
     const list = document.getElementById('lista-entregas');
     const selectedDateStr = document.getElementById('entregas-date').value;
@@ -493,35 +523,139 @@ function renderEntregas() {
         return;
     }
 
-    const selectedDateObj = new Date(selectedDateStr + 'T00:00:00'); // Añadir T00:00:00 para evitar problemas de zona horaria
-    const formattedSelectedDate = selectedDateObj.toLocaleDateString('es-ES'); // Formato 'D/M/YYYY' o 'DD/MM/YYYY' según el sistema
+    // Convert selectedDateStr to a comparable format for filtering
+    // Usamos 'T00:00:00' para asegurar que la comparación de fechas ignore la hora y sea consistente en diferentes zonas horarias.
+    const selectedDateForFilter = new Date(selectedDateStr + 'T00:00:00').toDateString(); 
 
     const filteredSales = (window.state.sales || []).filter(s => {
-        if (!s.timestamp) return false; // Asegurar que el timestamp existe
+        if (!s.timestamp) return false;
         const saleDateObj = new Date(s.timestamp);
-        return saleDateObj.toLocaleDateString('es-ES') === formattedSelectedDate;
-    }).sort((a,b) => b.timestamp - a.timestamp); // Ordenar por las más recientes primero
+        return saleDateObj.toDateString() === selectedDateForFilter;
+    }).sort((a,b) => b.timestamp - a.timestamp); // Sort by most recent first
 
-    if (filteredSales.length > 0) {
-        list.innerHTML = filteredSales.map(s => `
-            <div class="card-custom mb-1 p-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <p class="fw-bold mb-0 text-primary">${s.cliente} (${s.tienda})</p>
-                        <p class="mb-0 text-muted" style="font-size:0.85rem;">${s.producto} (x${s.cantidad})</p>
-                    </div>
-                    <div class="text-end d-flex align-items-center">
-                        <span class="fw-bold text-success">$${(s.total || 0).toFixed(2)}</span>
-                        <button class="btn btn-sm btn-outline-danger ms-2" onclick="openDeleteModal('sales', '${s.id}')">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
+    // Group sales by client and store
+    const groupedSales = {}; // Key: `cliente_tienda`, Value: {cliente, tienda, total, items: []}
+
+    filteredSales.forEach(sale => {
+        // Asegúrate de que cliente y tienda existen, si no, usa un string vacío.
+        const client = sale.cliente || 'Sin Cliente';
+        const store = sale.tienda || 'Sin Tienda';
+        const key = `${client}_${store}`; 
+        
+        if (!groupedSales[key]) {
+            groupedSales[key] = {
+                cliente: client,
+                tienda: store,
+                total: 0,
+                items: []
+            };
+        }
+        groupedSales[key].total += sale.total;
+        groupedSales[key].items.push(sale); // Add the full sale object
+    });
+
+    const entries = Object.values(groupedSales);
+
+    if (entries.length > 0) {
+        list.innerHTML = entries.map(group => `
+            <div class="card-custom mb-2 p-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <p class="fw-bold mb-0 text-primary">${group.cliente} ${group.tienda && group.tienda !== 'Sin Tienda' ? `(${group.tienda})` : ''}</p>
+                    <span class="fw-bold text-success">$${(group.total || 0).toFixed(2)}</span>
+                </div>
+                <div class="mb-2">
+                    <p class="mb-1 text-muted" style="font-size:0.8rem;">Detalles del pedido:</p>
+                    <ul class="list-unstyled mb-0" style="font-size:0.85rem;">
+                        ${group.items.map(item => `
+                            <li>${item.cantidad} x ${item.producto} - $${(item.precioUnitario || 0).toFixed(2)} c/u</li>
+                        `).join('')}
+                    </ul>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary btn-sm flex-fill rounded-pill" onclick="shareDeliverySummary('${group.cliente.replace(/'/g, "\\'")}', '${group.tienda.replace(/'/g, "\\'")}', '${selectedDateStr}')">
+                        <i class="fas fa-share-alt"></i> Compartir
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm flex-fill rounded-pill" onclick="openDeleteModalForGroupedSales('${group.cliente.replace(/'/g, "\\'")}', '${group.tienda.replace(/'/g, "\\'")}', '${selectedDateStr}')">
+                        <i class="fas fa-trash"></i> Borrar Pedido
+                    </button>
                 </div>
             </div>
         `).join('');
     } else {
         list.innerHTML = '<div class="card-custom text-center text-muted py-3">No hay entregas para esta fecha.</div>';
     }
+}
+
+// Function to generate and share the delivery summary (ticket-like)
+async function shareDeliverySummary(clientName, storeName, dateStr) {
+    const selectedDateForFilter = new Date(dateStr + 'T00:00:00').toDateString();
+    const filteredSales = (window.state.sales || []).filter(s => {
+        if (!s.timestamp) return false;
+        const saleDateObj = new Date(s.timestamp);
+        return saleDateObj.toDateString() === selectedDateForFilter &&
+               s.cliente === clientName &&
+               s.tienda === storeName;
+    });
+
+    if (filteredSales.length === 0) {
+        toastScanner("No hay ventas para este cliente/tienda en la fecha seleccionada.", '#ef4444');
+        return;
+    }
+
+    let totalAmount = 0;
+    let itemsText = "";
+    filteredSales.forEach(sale => {
+        itemsText += `- ${sale.cantidad} x ${sale.producto} ($${(sale.precioUnitario || 0).toFixed(2)} c/u)\n`;
+        totalAmount += sale.total;
+    });
+
+    const header = `--- PEDIDO YAUTE ---\n📅 Fecha: ${new Date(dateStr).toLocaleDateString('es-ES')}\n👤 Cliente: ${clientName}\n${storeName && storeName !== 'Sin Tienda' ? `🏬 Tienda: ${storeName}\n` : ''}\n📦 Artículos:\n`;
+    const details = itemsText;
+    const footer = `\n💲 Total: $${totalAmount.toFixed(2)}\n--------------------\n¡Gracias por tu compra!`;
+
+    const fullMessage = header + details + footer;
+
+    await attemptWebShare(fullMessage, `Reparto (${clientName})`);
+}
+
+// Nueva función para borrar un grupo de ventas
+function openDeleteModalForGroupedSales(clientName, storeName, dateStr) {
+    const confirmBtn = document.getElementById('btn-confirm-delete');
+    
+    // Almacenar el handler original para restaurarlo después
+    const originalConfirmHandler = confirmBtn.onclick;
+
+    // Configurar el handler temporal para esta acción
+    confirmBtn.onclick = async () => {
+        const selectedDateForFilter = new Date(dateStr + 'T00:00:00').toDateString();
+        const salesToDelete = (window.state.sales || []).filter(s => {
+            if (!s.timestamp) return false;
+            const saleDateObj = new Date(s.timestamp);
+            return saleDateObj.toDateString() === selectedDateForFilter &&
+                   s.cliente === clientName &&
+                   s.tienda === storeName;
+        });
+
+        if (salesToDelete.length > 0) {
+            try {
+                const batch = db.batch();
+                salesToDelete.forEach(sale => {
+                    batch.delete(col('sales').doc(sale.id));
+                });
+                await batch.commit();
+                toastScanner(`Se eliminaron ${salesToDelete.length} registros para ${clientName}.`, '#10b981');
+            } catch (e) {
+                console.error("Error al eliminar ventas agrupadas:", e);
+                toastScanner("Error al eliminar el pedido: " + e.message, '#ef4444');
+            }
+        } else {
+            toastScanner("No se encontraron registros para eliminar.", '#ef4444');
+        }
+        closeDeleteModal();
+        // Restaurar el handler original
+        confirmBtn.onclick = originalConfirmHandler;
+    };
+    document.getElementById('delete-modal').style.display = 'flex';
 }
 
 // Se añadió el <img> al listado de productos, usando defaultGif si no hay foto
@@ -626,19 +760,41 @@ function saveGeminiKey() {
     }
 }
 function changeGeminiKey() { document.getElementById('key-config-modal').style.display = 'flex'; }
-function openDeleteModal(colName, id) { deleteRef = { col: colName, id }; document.getElementById('delete-modal').style.display = 'flex'; }
-function closeDeleteModal() { document.getElementById('delete-modal').style.display = 'none'; }
 
-document.getElementById('btn-confirm-delete').onclick = async () => { 
-    try {
-        await col(deleteRef.col).doc(deleteRef.id).delete(); 
-        closeDeleteModal(); 
-        toastScanner("Registro eliminado.", '#10b981'); 
-    } catch (e) {
-        console.error("Error al eliminar registro:", e);
-        toastScanner("Error al eliminar: " + e.message, '#ef4444');
-    }
-};
+// Adjusted openDeleteModal to be more generic, for product deletion.
+function openDeleteModal(colName, id) { 
+    deleteRef = { col: colName, id }; 
+    document.getElementById('delete-modal').style.display = 'flex'; 
+    
+    // Default action for btn-confirm-delete
+    const confirmBtn = document.getElementById('btn-confirm-delete');
+    // Guardamos el handler por defecto en una variable para restaurarlo más tarde
+    // Este `originalConfirmHandler` no será el que se establezca en `openDeleteModalForGroupedSales`
+    // sino el que está en el scope global o el último asignado genéricamente.
+    // Esto es un patrón común cuando se reutiliza un modal de confirmación.
+    const originalConfirmHandler = confirmBtn.onclick; 
+
+    confirmBtn.onclick = async () => { 
+        try {
+            await col(deleteRef.col).doc(deleteRef.id).delete(); 
+            closeDeleteModal(); 
+            toastScanner("Registro eliminado.", '#10b981'); 
+        } catch (e) {
+            console.error("Error al eliminar registro:", e);
+            toastScanner("Error al eliminar: " + e.message, '#ef4444');
+        } finally {
+            // Aseguramos que se restaura el handler original si lo hubiera,
+            // aunque en este caso, cada `openDeleteModal` ya establece el suyo.
+            // Para la consistencia, lo dejamos.
+            confirmBtn.onclick = originalConfirmHandler; 
+        }
+    };
+}
+
+function closeDeleteModal() { 
+    document.getElementById('delete-modal').style.display = 'none'; 
+}
+
 
 // Modificación del botón de guardar registro para usar valores reales y validación
 document.getElementById('btn-save-record').onclick = async () => {
@@ -706,6 +862,8 @@ document.getElementById('btn-save-record').onclick = async () => {
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('entregas-date').value = new Date().toISOString().slice(0,10);
     document.getElementById('entregas-date').addEventListener('change', renderEntregas);
+    // Initial render for the default selected tab
+    showTab('productos', document.querySelector('.bottom-nav .tab-btn.active'));
 });
 
 
