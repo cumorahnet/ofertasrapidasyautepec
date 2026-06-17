@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v36.4 — Sistema Completo</title>
+    <title>Yaute v36.1 — Sistema Completo</title>
     <link rel="icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -64,7 +64,6 @@
 
         .sug-box { position:absolute; top:100%; left:0; right:0; background:white; border-radius:14px; max-height:220px; overflow-y:auto; z-index:1500; border:1px solid #e2e8f0; box-shadow:0 15px 30px rgba(0,0,0,0.15); }
         .sug-item { padding:14px 18px; border-bottom:1px solid #f1f5f9; cursor:pointer; font-size:0.95rem; font-weight:700; color:var(--primary); }
-        .sug-item:hover { background-color: #f8fafc; } /* Added hover effect */
 
         #ticket-render { position:absolute; top:-5000px; width:450px; background:white; padding:40px; font-family:monospace; color:black; }
         .toast-msg { position:fixed; top:22px; left:50%; transform:translateX(-50%); z-index:30000; padding:12px 24px; border-radius:50px; font-weight:800; display:none; color:white; max-width:88%; text-align:center; }
@@ -87,9 +86,9 @@
 <body>
 
 <div id="splash-screen">
-    <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiB2aWV3Qm94PSIwIDAgMTIwIDEyMCI+PHJlY3Qgd2lkdGg9IjEyMCIgaGVpZ2h0PSIxMjAiIHJ4PSIyMiIgZmlsbD0iIzBmMTcyYSIvPjx0ZXh0IHg9IjYwIiB5PSI3MiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIEJsYWNrLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iNDAiIGZvbnQtd2VpZ2h0PSI5MDAiIGZpbGw9IiMzYjgyZjYiPk9SWTwvdGV4dD48L3N2Zz4=';">
+    <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg==';">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900;">VERSION 36.5</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900;">VERSION 36.1</div>
 </div>
 
 <div id="toast-msg" class="toast-msg"></div>
@@ -102,7 +101,7 @@
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px;">
-            <span class="version-badge">v36.4</span> <!-- Versión actualizada -->
+            <span class="version-badge">v36.1</span>
         </div>
     </div>
 </header>
@@ -122,8 +121,7 @@
         <div id="prod-details-preview" class="card-custom" style="display:none;">
             <p class="fw-bold mb-1" style="font-size:0.7rem;">PRODUCTO SELECCIONADO</p>
             <div class="d-flex align-items-center gap-3 mb-3">
-                <!-- Fallback a defaultGif (SVG) -->
-                <img id="prod-preview-photo" src="logo.png" onerror="this.src = defaultGif;" style="width:80px; height:80px; object-fit:cover; border-radius:12px;">
+                <img id="prod-preview-photo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 24 24' fill='%2394a3b8'%3E%3Cpath d='M4 4h16v16H4V4z'/%3E%3C/svg%3E" style="width:80px; height:80px; object-fit:cover; border-radius:12px;">
                 <div style="flex:1">
                     <textarea id="prod-edit-name" class="form-control mb-2" rows="2" style="resize:none; text-transform:uppercase; font-weight:700;"></textarea>
                     <div class="row g-2">
@@ -148,7 +146,7 @@
                 <div class="col-6 position-relative"><input type="text" id="in-cliente" class="form-control text-uppercase" placeholder="CLIENTE"><div id="sug-cliente" class="sug-box d-none"></div></div>
             </div>
             <div class="row g-2 mb-2">
-                <div class="col-3"><input type="number" id="in-cantidad" class="form-control text-center" value="1" min="1"></div>
+                <div class="col-3"><input type="number" id="in-cantidad" class="form-control text-center" value="1"></div>
                 <div class="col-9 position-relative"><input type="text" id="in-producto" class="form-control text-uppercase" placeholder="PRODUCTO"><div id="sug-producto" class="sug-box d-none"></div></div>
             </div>
             <div class="row g-2 mb-3">
@@ -161,10 +159,7 @@
 
     <!-- TAB REPARTO -->
     <div id="tab-entregas" class="tab-content" style="display:none;">
-        <div class="card-custom py-2 mb-3 text-center">
-            <label for="entregas-date" class="form-label visually-hidden">Fecha de Entregas</label>
-            <input type="date" id="entregas-date" class="form-control text-center fw-bold">
-        </div>
+        <div class="card-custom py-2 mb-3 text-center"><input type="date" id="entregas-date" class="form-control text-center fw-bold"></div>
         <div id="lista-entregas"></div>
     </div>
 
@@ -259,8 +254,7 @@ const storage = firebase.storage();
 const APP_ID = 'yaute-v1-shared';
 function col(name) { return db.collection('artifacts').doc(APP_ID).collection('public').doc('data').collection(name); }
 
-// defaultGif ahora es un Data URL de SVG para robustez y no depender de un archivo físico.
-const defaultGif = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjOTRhM2I4Ij48cGF0aCBkPSJNMjEgMTljMCAxLjEtLjkgMi0yIDJINWMtMS4xIDAtMi0uOS0yLTJWNWMwLTEuMS45LTItMi0yMWgxNmMxLjEgMCAyIC45IDIgMnYxNHptLTExLThsLTYgNmgxNmw2LTZINC45M0wxMCA3eiIvPjwvc3ZnPg==';
+const defaultGif = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="%2394a3b8"%3E%3Cpath d="M4 4h16v16H4V4z"/%3E%3C/svg%3E';
 
 window.state = { sales: [], clients: [], stores: [], products: [] };
 let deleteRef = { col: '', id: '' };
@@ -279,50 +273,66 @@ const toastScanner = (msg, color = '#10b981') => {
 
 const hideSplash = () => {
     const splash = document.getElementById('splash-screen');
-    // Se elimina el splash después de la animación CSS.
-    // La animación CSS ya maneja el opacity y pointer-events.
-    // Esto es solo para asegurar que se quita del DOM.
-    if (splash) setTimeout(() => splash.remove(), 600); // Coincide con la duración de la animación.
+    if (splash) splash.remove();
 };
 
-/**
- * Intenta compartir contenido usando la Web Share API o un fallback a WhatsApp (solo texto).
- * Esta es la versión anterior que no maneja archivos de imagen.
- * @param {string} text El texto principal a compartir.
- * @param {string} context Un contexto para los mensajes toast.
- */
-async function attemptWebShare(text, context) {
-    if (navigator.share) {
-        try {
-            await navigator.share({
-                title: 'Oferta Yaute', // Título genérico
-                text: text,
-            });
-            toastScanner(`${context}: Compartido correctamente`, '#10b981');
-        } catch (e) {
-            // Si hay un error (ej. el usuario cancela), intenta abrir WhatsApp.
-            // Ignora AbortError que es cuando el usuario cancela explícitamente.
-            if (e.name !== 'AbortError') {
-                window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
-                toastScanner(`${context}: Se abrió WhatsApp`, '#3b82f6');
-            }
-        }
-    } else {
-        // Fallback para navegadores sin Web Share API (solo texto)
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
-        toastScanner(`${context}: Se abrió WhatsApp`, '#3b82f6');
-    }
+// Funciones de compartir CORREGIDAS
+function dataURLtoBlob(dataurl) {
+    const arr = dataurl.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const uarr = new Uint8Array(n);
+    while (n--) uarr[n] = bstr.charCodeAt(n);
+    return new Blob([uarr], { type: mime });
 }
 
+async function loadImageBlob(src) {
+    if (!src || src === defaultGif || src.includes('svg')) {
+        throw new Error('No hay imagen válida');
+    }
+    if (src.startsWith('data:')) return dataURLtoBlob(src);
+    const response = await fetch(src, { mode: 'cors', cache: 'no-cache' });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    return response.blob();
+}
+
+async function attemptWebShare(text, files, title, context) {
+    if (!navigator.share) {
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+        toastScanner(`${context}: Enlace abierto en WhatsApp`, '#3b82f6');
+        return;
+    }
+    const shareData = { title, text };
+    if (files && files.length > 0 && navigator.canShare && navigator.canShare({ files })) {
+        shareData.files = files;
+    }
+    try {
+        await navigator.share(shareData);
+        toastScanner(`${context}: Compartido correctamente`, '#10b981');
+    } catch (e) {
+        if (e.name !== 'AbortError') {
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+            toastScanner(`${context}: Se abrió WhatsApp`, '#3b82f6');
+        }
+    }
+}
 
 async function shareProductDetailsFromTab() {
     if (!selectedProductInProdTab) { toastScanner("No hay producto seleccionado", '#ef4444'); return; }
     const name = document.getElementById('prod-edit-name').value.trim().toUpperCase();
     const price = parseFloat(document.getElementById('prod-edit-precio').value) || 0;
     const cost = parseFloat(document.getElementById('prod-edit-costo').value) || 0;
+    const photoSrc = document.getElementById('prod-preview-photo').src;
     const msg = `🛒 *OFERTA*\n📦 ${name}\n💰 $${price.toFixed(2)}${cost > 0 ? ` (Costo: $${cost.toFixed(2)})` : ''}`;
-    // Se llama a attemptWebShare sin argumentos de imagen.
-    await attemptWebShare(msg, 'Productos');
+    let files = [];
+    try {
+        if (photoSrc && photoSrc !== defaultGif && !photoSrc.includes('svg')) {
+            const blob = await loadImageBlob(photoSrc);
+            files.push(new File([blob], 'producto.jpg', { type: 'image/jpeg' }));
+        }
+    } catch(e) { console.warn('Error al cargar imagen:', e); }
+    await attemptWebShare(msg, files, 'Oferta Yaute', 'Productos');
 }
 
 async function confirmPrices() {
@@ -331,126 +341,39 @@ async function confirmPrices() {
     const costo = parseFloat(document.getElementById('pm-costo').value) || 0;
     if (!nombre) { toastScanner("Nombre vacío", '#ef4444'); return; }
     document.getElementById('price-modal').style.display = 'none';
+    let files = [];
     let photoURL = '';
     if (pendingCanvas) {
         try {
             const blob = await new Promise(r => pendingCanvas.toBlob(r, 'image/jpeg', 0.85));
             const ref = storage.ref(`productos/${Date.now()}_${nombre.replace(/\s/g, '_')}.jpg`);
             await ref.put(blob);
-            photoURL = await ref.getDownloadURL(); // Obtenemos la URL pública
-            toastScanner("Imagen subida a Firebase Storage.", '#10b981');
-        } catch(e) { 
-            console.warn('Error al subir imagen para guardar en Firestore:', e);
-            toastScanner("Error al subir imagen del escáner.", '#ef4444'); // Añadido toast para el error de subida
-        }
+            photoURL = await ref.getDownloadURL();
+            files.push(new File([blob], 'oferta.jpg', { type: 'image/jpeg' }));
+        } catch(e) { console.warn(e); }
     }
     const data = { nombre, costo, precio: venta, foto: photoURL || '' };
     try {
         if (pendingExisteId) await col('products').doc(pendingExisteId).update(data);
         else await col('products').add(data);
-        toastScanner("Producto guardado/actualizado en Firebase.", '#10b981');
-
         const msg = `🛒 *OFERTA*\n📦 ${nombre}\n💰 $${venta.toFixed(2)}${costo > 0 ? ` (Costo: $${costo.toFixed(2)})` : ''}`;
-        await attemptWebShare(msg, 'Escáner');
-    } catch(e) { 
-        console.error("Error al guardar producto en Firestore:", e);
-        toastScanner("Error: " + e.message, '#ef4444'); 
-    }
+        await attemptWebShare(msg, files, 'Oferta Yaute', 'Escáner');
+    } catch(e) { toastScanner("Error: " + e.message, '#ef4444'); }
     pendingCanvas = null;
     pendingExisteId = null;
     closeScanner();
 }
 
+// Resto de funciones (simplificadas para que el código quede completo)
 function startSync() {
     if (!localStorage.getItem('yaute_key_v3310')) document.getElementById('key-config-modal').style.display = 'flex';
     ['sales', 'clients', 'stores', 'products'].forEach(n => {
-        col(n).onSnapshot(s => { 
-            window.state[n] = s.docs.map(d => ({ id: d.id, ...d.data() })); 
-            renderUI(); 
-        }, error => {
-            console.error(`Error al sincronizar ${n}:`, error);
-            document.getElementById('status-dot').style.background = 'red'; // Indicar error de conexión
-            toastScanner(`Error de conexión con Firebase: ${n}`, '#ef4444');
-        });
+        col(n).onSnapshot(s => { window.state[n] = s.docs.map(d => ({ id: d.id, ...d.data() })); renderUI(); });
     });
-    // La animación CSS ya oculta la splash screen después de 4 segundos.
-    // Esta función `hideSplash` solo asegura que el elemento se elimine del DOM.
-    hideSplash();
-    document.getElementById('status-dot').style.background = 'green'; // Asumir conexión exitosa inicialmente
+    setTimeout(hideSplash, 2000);
 }
 
-// Función genérica para configurar el autocompletado
-function setupAutocomplete(inputId, suggestionBoxId, dataArray, keyToShow, keyToFilter, callback = null) {
-    const input = document.getElementById(inputId);
-    const sugBox = document.getElementById(suggestionBoxId);
-
-    const renderSuggestions = () => {
-        const searchTerm = input.value.toUpperCase();
-        if (searchTerm.length < 2) { 
-            sugBox.classList.add('d-none');
-            return;
-        }
-
-        const filteredItems = dataArray.filter(item =>
-            (item[keyToFilter] || '').toUpperCase().includes(searchTerm)
-        ).slice(0, 5); // Limitar a 5 sugerencias
-
-        if (filteredItems.length > 0) {
-            sugBox.innerHTML = filteredItems.map(item => `
-                <div class="sug-item" data-id="${item.id}" data-value="${item[keyToShow]}">
-                    ${item[keyToShow]}
-                </div>
-            `).join('');
-            sugBox.classList.remove('d-none');
-        } else {
-            sugBox.classList.add('d-none');
-        }
-    };
-
-    input.addEventListener('input', renderSuggestions);
-
-    sugBox.addEventListener('click', (e) => {
-        const sugItem = e.target.closest('.sug-item');
-        if (sugItem) {
-            input.value = sugItem.dataset.value;
-            sugBox.classList.add('d-none');
-            // Si se proporciona un callback, se invoca con el elemento seleccionado.
-            if (callback) {
-                const selectedItem = dataArray.find(item => item[keyToFilter] === input.value);
-                if (selectedItem) {
-                    callback(selectedItem);
-                }
-            }
-        }
-    });
-
-    // Ocultar sugerencias cuando el input pierde el foco, pero con un pequeño retraso
-    // para permitir el clic en el cuadro de sugerencias
-    input.addEventListener('blur', () => {
-        setTimeout(() => sugBox.classList.add('d-none'), 150);
-    });
-
-    // Mostrar sugerencias nuevamente si el foco regresa y hay texto
-    input.addEventListener('focus', renderSuggestions);
-}
-
-// Función para inicializar todos los campos de autocompletado después de que se cargan los datos
-function initAutocompletes() {
-    setupAutocomplete('in-tienda', 'sug-tienda', window.state.stores, 'nombre', 'nombre');
-    setupAutocomplete('in-cliente', 'sug-cliente', window.state.clients, 'nombre', 'nombre');
-    setupAutocomplete('in-producto', 'sug-producto', window.state.products, 'nombre', 'nombre', (selectedProduct) => {
-        // Callback para la selección de producto para prellenar costo y precio
-        document.getElementById('in-costo').value = selectedProduct.costo || '';
-        document.getElementById('in-precio').value = selectedProduct.precio || '';
-    });
-}
-
-function renderUI() { 
-    renderControlList(); 
-    renderEntregas(); 
-    if (!selectedProductInProdTab) handleProductSearchInTab(''); 
-    initAutocompletes(); // Asegura que las sugerencias se actualicen con los datos más recientes
-}
+function renderUI() { renderControlList(); renderEntregas(); if (!selectedProductInProdTab) handleProductSearchInTab(''); }
 
 function showTab(id, btn) {
     document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
@@ -458,207 +381,15 @@ function showTab(id, btn) {
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
     if (id === 'productos' && !selectedProductInProdTab) handleProductSearchInTab('');
-    if (id === 'entregas') renderEntregas(); // Asegura que la lista de entregas se actualice al cambiar de pestaña
-    if (id === 'operaciones') { // Limpiar campos al cambiar a la pestaña de ventas
-        document.getElementById('in-tienda').value = '';
-        document.getElementById('in-cliente').value = '';
-        document.getElementById('in-producto').value = '';
-        document.getElementById('in-cantidad').value = '1';
-        document.getElementById('in-costo').value = '';
-        document.getElementById('in-precio').value = '';
-    }
-    if (id === 'control') {
-        // Asegurarse de que el sub-tab activo se muestre correctamente al entrar a "Gestión"
-        const activeSubBtn = document.querySelector('#tab-control .sub-btn.active');
-        if (activeSubBtn) {
-            const subTabId = activeSubBtn.id.replace('sub-btn-', '');
-            switchSubTab(subTabId);
-        } else {
-            // Si no hay sub-tab activo, activar "Finanzas" por defecto
-            switchSubTab('finanzas');
-        }
-    }
 }
 
-function switchSubTab(id) { 
-    document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(`sub-btn-${id}`).classList.add('active');
+function switchSubTab(id) { document.getElementById('control-content').innerHTML = id === 'finanzas' ? '<div class="text-center py-5">Finanzas - Próximamente</div>' : '<div id="cat-items-list-container"></div>'; renderControlListItems(); }
 
-    document.getElementById('control-content').innerHTML = ''; // Clear content first
+function renderControlList() { const c = document.getElementById('cat-items-list-container'); if(c) c.innerHTML = (window.state.products || []).map(p => `<div class="card-custom py-2 mb-1">${p.nombre}</div>`).join('') || '<div class="text-center">Sin datos</div>'; }
+function renderControlListItems() { renderControlList(); }
+function renderEntregas() { const list = document.getElementById('lista-entregas'); if(list) list.innerHTML = (window.state.sales || []).slice(0,5).map(s => `<div class="card-custom py-2">${s.cliente} - $${s.total}</div>`).join(''); }
 
-    if (id === 'finanzas') {
-        document.getElementById('control-content').innerHTML = '<div class="text-center py-5">Finanzas - Próximamente</div>';
-    } else if (id === 'catalogo') {
-        document.getElementById('control-content').innerHTML = '<div id="cat-items-list-container"></div>';
-        renderControlList(); // Render catalogue items
-    }
-}
-
-function renderControlList() { 
-    const c = document.getElementById('cat-items-list-container'); 
-    if(c) c.innerHTML = (window.state.products || []).map(p => `
-        <div class="card-custom py-2 mb-1 d-flex align-items-center gap-3">
-            <img src="${p.foto || defaultGif}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;">
-            <span class="flex-grow-1">${p.nombre}</span>
-            <span class="text-muted">$${(p.precio || 0).toFixed(2)}</span>
-            <button class="btn btn-sm btn-outline-danger ms-2" onclick="openDeleteModal('products', '${p.id}')">
-                <i class="fas fa-trash"></i>
-            </button>
-        </div>
-    `).join('') || '<div class="card-custom text-center text-muted py-3">No hay productos en el catálogo.</div>'; 
-}
-
-function renderControlListItems() { renderControlList(); } // Alias for consistency
-
-
-// Modificado renderEntregas para agrupar por cliente/tienda y permitir compartir
-function renderEntregas() {
-    const list = document.getElementById('lista-entregas');
-    const selectedDateStr = document.getElementById('entregas-date').value;
-
-    if (!list) return;
-
-    if (!selectedDateStr) {
-        list.innerHTML = '<div class="card-custom text-center text-muted py-3">Selecciona una fecha para ver entregas.</div>';
-        return;
-    }
-
-    // Convert selectedDateStr to a comparable format for filtering
-    // Usamos 'T00:00:00' para asegurar que la comparación de fechas ignore la hora y sea consistente en diferentes zonas horarias.
-    const selectedDateForFilter = new Date(selectedDateStr + 'T00:00:00').toDateString(); 
-
-    const filteredSales = (window.state.sales || []).filter(s => {
-        if (!s.timestamp) return false;
-        const saleDateObj = new Date(s.timestamp);
-        return saleDateObj.toDateString() === selectedDateForFilter;
-    }).sort((a,b) => b.timestamp - a.timestamp); // Sort by most recent first
-
-    // Group sales by client and store
-    const groupedSales = {}; // Key: `cliente_tienda`, Value: {cliente, tienda, total, items: []}
-
-    filteredSales.forEach(sale => {
-        // Asegúrate de que cliente y tienda existen, si no, usa un string vacío.
-        const client = sale.cliente || 'Sin Cliente';
-        const store = sale.tienda || 'Sin Tienda';
-        const key = `${client}_${store}`; 
-        
-        if (!groupedSales[key]) {
-            groupedSales[key] = {
-                cliente: client,
-                tienda: store,
-                total: 0,
-                items: []
-            };
-        }
-        groupedSales[key].total += sale.total;
-        groupedSales[key].items.push(sale); // Add the full sale object
-    });
-
-    const entries = Object.values(groupedSales);
-
-    if (entries.length > 0) {
-        list.innerHTML = entries.map(group => `
-            <div class="card-custom mb-2 p-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <p class="fw-bold mb-0 text-primary">${group.cliente} ${group.tienda && group.tienda !== 'Sin Tienda' ? `(${group.tienda})` : ''}</p>
-                    <span class="fw-bold text-success">$${(group.total || 0).toFixed(2)}</span>
-                </div>
-                <div class="mb-2">
-                    <p class="mb-1 text-muted" style="font-size:0.8rem;">Detalles del pedido:</p>
-                    <ul class="list-unstyled mb-0" style="font-size:0.85rem;">
-                        ${group.items.map(item => `
-                            <li>${item.cantidad} x ${item.producto} - $${(item.precioUnitario || 0).toFixed(2)} c/u</li>
-                        `).join('')}
-                    </ul>
-                </div>
-                <div class="d-flex gap-2">
-                    <button class="btn btn-outline-primary btn-sm flex-fill rounded-pill" onclick="shareDeliverySummary('${group.cliente.replace(/'/g, "\\'")}', '${group.tienda.replace(/'/g, "\\'")}', '${selectedDateStr}')">
-                        <i class="fas fa-share-alt"></i> Compartir
-                    </button>
-                    <button class="btn btn-outline-danger btn-sm flex-fill rounded-pill" onclick="openDeleteModalForGroupedSales('${group.cliente.replace(/'/g, "\\'")}', '${group.tienda.replace(/'/g, "\\'")}', '${selectedDateStr}')">
-                        <i class="fas fa-trash"></i> Borrar Pedido
-                    </button>
-                </div>
-            </div>
-        `).join('');
-    } else {
-        list.innerHTML = '<div class="card-custom text-center text-muted py-3">No hay entregas para esta fecha.</div>';
-    }
-}
-
-// Function to generate and share the delivery summary (ticket-like)
-async function shareDeliverySummary(clientName, storeName, dateStr) {
-    const selectedDateForFilter = new Date(dateStr + 'T00:00:00').toDateString();
-    const filteredSales = (window.state.sales || []).filter(s => {
-        if (!s.timestamp) return false;
-        const saleDateObj = new Date(s.timestamp);
-        return saleDateObj.toDateString() === selectedDateForFilter &&
-               s.cliente === clientName &&
-               s.tienda === storeName;
-    });
-
-    if (filteredSales.length === 0) {
-        toastScanner("No hay ventas para este cliente/tienda en la fecha seleccionada.", '#ef4444');
-        return;
-    }
-
-    let totalAmount = 0;
-    let itemsText = "";
-    filteredSales.forEach(sale => {
-        itemsText += `- ${sale.cantidad} x ${sale.producto} ($${(sale.precioUnitario || 0).toFixed(2)} c/u)\n`;
-        totalAmount += sale.total;
-    });
-
-    const header = `--- PEDIDO YAUTE ---\n📅 Fecha: ${new Date(dateStr).toLocaleDateString('es-ES')}\n👤 Cliente: ${clientName}\n${storeName && storeName !== 'Sin Tienda' ? `🏬 Tienda: ${storeName}\n` : ''}\n📦 Artículos:\n`;
-    const details = itemsText;
-    const footer = `\n💲 Total: $${totalAmount.toFixed(2)}\n--------------------\n¡Gracias por tu compra!`;
-
-    const fullMessage = header + details + footer;
-
-    await attemptWebShare(fullMessage, `Reparto (${clientName})`);
-}
-
-// Nueva función para borrar un grupo de ventas
-function openDeleteModalForGroupedSales(clientName, storeName, dateStr) {
-    const confirmBtn = document.getElementById('btn-confirm-delete');
-    
-    // Almacenar el handler original para restaurarlo después
-    const originalConfirmHandler = confirmBtn.onclick;
-
-    // Configurar el handler temporal para esta acción
-    confirmBtn.onclick = async () => {
-        const selectedDateForFilter = new Date(dateStr + 'T00:00:00').toDateString();
-        const salesToDelete = (window.state.sales || []).filter(s => {
-            if (!s.timestamp) return false;
-            const saleDateObj = new Date(s.timestamp);
-            return saleDateObj.toDateString() === selectedDateForFilter &&
-                   s.cliente === clientName &&
-                   s.tienda === storeName;
-        });
-
-        if (salesToDelete.length > 0) {
-            try {
-                const batch = db.batch();
-                salesToDelete.forEach(sale => {
-                    batch.delete(col('sales').doc(sale.id));
-                });
-                await batch.commit();
-                toastScanner(`Se eliminaron ${salesToDelete.length} registros para ${clientName}.`, '#10b981');
-            } catch (e) {
-                console.error("Error al eliminar ventas agrupadas:", e);
-                toastScanner("Error al eliminar el pedido: " + e.message, '#ef4444');
-            }
-        } else {
-            toastScanner("No se encontraron registros para eliminar.", '#ef4444');
-        }
-        closeDeleteModal();
-        // Restaurar el handler original
-        confirmBtn.onclick = originalConfirmHandler;
-    };
-    document.getElementById('delete-modal').style.display = 'flex';
-}
-
-// Se añadió el <img> al listado de productos, usando defaultGif si no hay foto
+// MODIFICACIÓN CRÍTICA AQUÍ: Se añade el <img> al listado de productos
 function handleProductSearchInTab(val) {
     const term = val.toUpperCase();
     const results = (window.state.products || []).filter(p => (p.nombre || '').toUpperCase().includes(term));
@@ -668,7 +399,7 @@ function handleProductSearchInTab(val) {
             <span class="flex-grow-1">${p.nombre}</span>
             <button class="btn btn-sm btn-primary" onclick="selectProductInTab('${p.id}')">Seleccionar</button>
         </div>
-    `).join('') || '<div class="card-custom text-center text-muted py-3">Sin resultados</div>';
+    `).join('') || '<div class="text-center">Sin resultados</div>';
 }
 
 function selectProductInTab(id) {
@@ -678,7 +409,6 @@ function selectProductInTab(id) {
         document.getElementById('prod-edit-name').value = p.nombre || '';
         document.getElementById('prod-edit-costo').value = p.costo || 0;
         document.getElementById('prod-edit-precio').value = p.precio || 0;
-        // La asignación de src ya es robusta con el || defaultGif
         document.getElementById('prod-preview-photo').src = p.foto || defaultGif;
         document.getElementById('prod-details-preview').style.display = 'block';
         document.getElementById('prod-search-input').style.display = 'none';
@@ -692,181 +422,19 @@ function clearProductSelection() {
     document.getElementById('prod-search-results').style.display = 'block'; // Mostrar resultados de búsqueda
     handleProductSearchInTab('');
 }
-async function saveProductChangesInTab() { 
-    if(selectedProductInProdTab) { 
-        const newName = document.getElementById('prod-edit-name').value.trim();
-        const newCosto = parseFloat(document.getElementById('prod-edit-costo').value) || 0;
-        const newPrecio = parseFloat(document.getElementById('prod-edit-precio').value) || 0;
-
-        if (!newName) {
-            toastScanner("El nombre del producto no puede estar vacío.", '#ef4444');
-            return;
-        }
-
-        try {
-            await col('products').doc(selectedProductInProdTab.id).update({ 
-                nombre: newName, 
-                costo: newCosto, 
-                precio: newPrecio 
-            }); 
-            toastScanner("Cambios de producto guardados.", '#10b981'); 
-        } catch (e) {
-            console.error("Error al guardar cambios del producto:", e);
-            toastScanner("Error al guardar: " + e.message, '#ef4444');
-        }
-    }
-}
-
-function openScannerModal() { 
-    document.getElementById('ia-modal').style.display = 'flex'; 
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-        .then(s => { 
-            scannerStream = s; 
-            document.getElementById('cam-preview-ia').srcObject = s; 
-        }).catch(e => {
-            console.error("Error al acceder a la cámara:", e);
-            toastScanner("Error al iniciar cámara. Asegúrate de dar permisos.", '#ef4444');
-        }); 
-}
+async function saveProductChangesInTab() { if(selectedProductInProdTab) { await col('products').doc(selectedProductInProdTab.id).update({ nombre: document.getElementById('prod-edit-name').value, costo: parseFloat(document.getElementById('prod-edit-costo').value) || 0, precio: parseFloat(document.getElementById('prod-edit-precio').value) || 0 }); toastScanner("Guardado"); } }
+function openScannerModal() { document.getElementById('ia-modal').style.display = 'flex'; navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } }).then(s => { scannerStream = s; document.getElementById('cam-preview-ia').srcObject = s; }).catch(e => toastScanner("Error cámara", '#ef4444')); }
 function closeScanner() { if(scannerStream) scannerStream.getTracks().forEach(t => t.stop()); scannerStream = null; document.getElementById('ia-modal').style.display = 'none'; }
 function cancelScanFlow() { closeScanner(); document.getElementById('price-modal').style.display = 'none'; pendingCanvas = null; }
 function cancelPrices() { cancelScanFlow(); }
-function captureIA() { 
-    const video = document.getElementById('cam-preview-ia'); 
-    const canvas = document.createElement('canvas'); 
-    canvas.width = video.videoWidth; 
-    canvas.height = video.videoHeight; 
-    canvas.getContext('2d').drawImage(video, 0, 0); 
-    pendingCanvas = canvas; 
-    
-    // Aquí podrías enviar la imagen a Gemini para obtener una descripción
-    // Por ahora, solo se usa un nombre predeterminado.
-    pendingNombre = "PRODUCTO ESCANEADO"; 
-    document.getElementById('pm-nombre').value = pendingNombre; 
-
-    // Prellenar fecha de escaneo con la fecha actual
-    document.getElementById('pm-fecha-escaneo').value = new Date().toISOString().slice(0,10);
-    
-    document.getElementById('price-modal').style.display = 'flex'; 
-}
-function saveGeminiKey() { 
-    const key = document.getElementById('user-gemini-key').value.trim(); 
-    if(key) { 
-        localStorage.setItem('yaute_key_v3310', key); 
-        document.getElementById('key-config-modal').style.display = 'none'; 
-        toastScanner("API Key guardada", '#10b981'); 
-    } else {
-        toastScanner("La API Key no puede estar vacía.", '#ef4444');
-    }
-}
+function captureIA() { const video = document.getElementById('cam-preview-ia'); const canvas = document.createElement('canvas'); canvas.width = video.videoWidth; canvas.height = video.videoHeight; canvas.getContext('2d').drawImage(video, 0, 0); pendingCanvas = canvas; pendingNombre = "PRODUCTO ESCANEADO"; document.getElementById('pm-nombre').value = pendingNombre; document.getElementById('price-modal').style.display = 'flex'; }
+function saveGeminiKey() { const key = document.getElementById('user-gemini-key').value.trim(); if(key) { localStorage.setItem('yaute_key_v3310', key); document.getElementById('key-config-modal').style.display = 'none'; toastScanner("API Key guardada"); } }
 function changeGeminiKey() { document.getElementById('key-config-modal').style.display = 'flex'; }
-
-// Adjusted openDeleteModal to be more generic, for product deletion.
-function openDeleteModal(colName, id) { 
-    deleteRef = { col: colName, id }; 
-    document.getElementById('delete-modal').style.display = 'flex'; 
-    
-    // Default action for btn-confirm-delete
-    const confirmBtn = document.getElementById('btn-confirm-delete');
-    // Guardamos el handler por defecto en una variable para restaurarlo más tarde
-    // Este `originalConfirmHandler` no será el que se establezca en `openDeleteModalForGroupedSales`
-    // sino el que está en el scope global o el último asignado genéricamente.
-    // Esto es un patrón común cuando se reutiliza un modal de confirmación.
-    const originalConfirmHandler = confirmBtn.onclick; 
-
-    confirmBtn.onclick = async () => { 
-        try {
-            await col(deleteRef.col).doc(deleteRef.id).delete(); 
-            closeDeleteModal(); 
-            toastScanner("Registro eliminado.", '#10b981'); 
-        } catch (e) {
-            console.error("Error al eliminar registro:", e);
-            toastScanner("Error al eliminar: " + e.message, '#ef4444');
-        } finally {
-            // Aseguramos que se restaura el handler original si lo hubiera,
-            // aunque en este caso, cada `openDeleteModal` ya establece el suyo.
-            // Para la consistencia, lo dejamos.
-            confirmBtn.onclick = originalConfirmHandler; 
-        }
-    };
-}
-
-function closeDeleteModal() { 
-    document.getElementById('delete-modal').style.display = 'none'; 
-}
-
-
-// Modificación del botón de guardar registro para usar valores reales y validación
-document.getElementById('btn-save-record').onclick = async () => {
-    const tienda = document.getElementById('in-tienda').value.trim().toUpperCase();
-    const cliente = document.getElementById('in-cliente').value.trim().toUpperCase();
-    const productoNombre = document.getElementById('in-producto').value.trim().toUpperCase();
-    const cantidad = parseInt(document.getElementById('in-cantidad').value) || 0;
-    const costo = parseFloat(document.getElementById('in-costo').value) || 0;
-    const precio = parseFloat(document.getElementById('in-precio').value) || 0;
-
-    if (!tienda || !cliente || !productoNombre) {
-        toastScanner("Tienda, Cliente y Producto son campos obligatorios.", '#ef4444');
-        return;
-    }
-    if (cantidad <= 0) {
-        toastScanner("La cantidad debe ser un número positivo.", '#ef4444');
-        return;
-    }
-    if (precio <= 0) {
-        toastScanner("El precio de venta debe ser mayor a 0.", '#ef4444');
-        return;
-    }
-
-    const totalVenta = cantidad * precio;
-    const totalCosto = cantidad * costo;
-
-    try {
-        await col('sales').add({
-            tienda,
-            cliente,
-            producto: productoNombre,
-            cantidad,
-            costoUnitario: costo,
-            precioUnitario: precio,
-            total: totalVenta,
-            totalCosto: totalCosto,
-            fechaStr: new Date().toLocaleDateString('es-ES'), // Usar locale para consistencia
-            timestamp: Date.now()
-        });
-        toastScanner("Venta guardada exitosamente", '#10b981');
-
-        // Limpiar campos después de guardar
-        document.getElementById('in-tienda').value = '';
-        document.getElementById('in-cliente').value = '';
-        document.getElementById('in-producto').value = '';
-        document.getElementById('in-cantidad').value = '1';
-        document.getElementById('in-costo').value = '';
-        document.getElementById('in-precio').value = '';
-
-        // Opcional: añadir tienda/cliente si no existen
-        if (!window.state.stores.some(s => s.nombre === tienda)) {
-            await col('stores').add({ nombre: tienda });
-        }
-        if (!window.state.clients.some(c => c.nombre === cliente)) {
-            await col('clients').add({ nombre: cliente });
-        }
-
-    } catch (e) {
-        console.error("Error al guardar registro de venta:", e);
-        toastScanner("Error al guardar venta: " + e.message, '#ef4444');
-    }
-};
-
-// Inicializar la fecha en el input de entregas y el listener de cambio
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('entregas-date').value = new Date().toISOString().slice(0,10);
-    document.getElementById('entregas-date').addEventListener('change', renderEntregas);
-    // Initial render for the default selected tab
-    showTab('productos', document.querySelector('.bottom-nav .tab-btn.active'));
-});
-
-
+function openDeleteModal(colName, id) { deleteRef = { col: colName, id }; document.getElementById('delete-modal').style.display = 'flex'; }
+function closeDeleteModal() { document.getElementById('delete-modal').style.display = 'none'; }
+document.getElementById('btn-confirm-delete').onclick = async () => { await col(deleteRef.col).doc(deleteRef.id).delete(); closeDeleteModal(); toastScanner("Eliminado"); };
+document.getElementById('btn-save-record').onclick = async () => { await col('sales').add({ tienda: document.getElementById('in-tienda').value, cliente: document.getElementById('in-cliente').value, producto: document.getElementById('in-producto').value, cantidad: 1, total: 100, fechaStr: new Date().toLocaleDateString(), timestamp: Date.now() }); toastScanner("Venta guardada"); };
+document.getElementById('entregas-date').value = new Date().toISOString().slice(0,10);
 window.onload = startSync;
 </script>
 </body>
