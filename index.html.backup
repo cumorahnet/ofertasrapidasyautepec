@@ -117,7 +117,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 36.10</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 36.11</div>
 </div>
 
 <div id="toast-alert"></div>
@@ -603,6 +603,15 @@ function startSync() {
     setupAuto('in-cliente',  'sug-cliente',  'clients');
     setupAuto('in-producto', 'sug-producto', 'products');
     setupAuto('ep-tienda-escaneo', 'sug-edit-tienda', 'stores'); // Para la edición de productos
+
+    // Manejador para cerrar las sugerencias de búsqueda de productos al hacer clic fuera
+    const productSearchInput = document.getElementById('product-search-input');
+    const sugProductEditBox  = document.getElementById('sug-product-edit');
+    document.addEventListener('click', e => {
+        if (productSearchInput && sugProductEditBox && !productSearchInput.contains(e.target) && !sugProductEditBox.contains(e.target)) {
+            sugProductEditBox.classList.add('d-none');
+        }
+    });
 }
 
 function setupAuto(inpId, boxId, key) {
@@ -630,10 +639,9 @@ function setupAuto(inpId, boxId, key) {
                     document.getElementById('in-costo').value  = p.costo  || 0;
                     document.getElementById('in-precio').value = p.precio || 0;
                 }
-                // Si es el input de productos para edición, abre el formulario de edición
-                if (inpId === 'product-search-input') {
-                    selectProductForEdit(p.id);
-                }
+                // La lógica para product-search-input se maneja ahora directamente en filterProductsForEdit
+                // Este bloque de `if (inpId === 'product-search-input') { selectProductForEdit(p.id); }`
+                // ya no es necesario aquí y se elimina para evitar duplicidad o confusión.
             }
         }
         // Para tiendas/clientes, solo establece el valor
@@ -931,3 +939,811 @@ function renderFinanceResults() {
         const s = new Date(finDateFrom+'T00:00:00'), e = new Date(finDateTo+'T23:59:59');
         filtered = window.state.sales.filter(x => { const [d,m,y] = (x.fechaStr||'').split('/'); const dx = new Date(y,m-1,d); return dx>=s && dx<=e; });
     } else if (finAllDates) {
+        // TODAS las fechas — sin filtro de fecha
+        filtered = window.state.sales.slice();
+    } else {
+        const [y,m,d] = finDate.split('-');
+        const target = normalizeDateStr(`${parseInt(d)}/${parseInt(m)}/${y}`);
+        filtered = window.state.sales.filter(x => normalizeDateStr(x.fechaStr) === target);
+    }
+    filtered = filtered.filter(x =>
+        (!finStore   || (x.tienda||'').trim().toUpperCase()===finStore) &&
+        (!finClient  || (x.cliente||'').trim().toUpperCase()===finClient) &&
+        (!finProduct || (x.producto||'').toUpperCase().includes(finProduct.toUpperCase()))
+    );
+
+    const totalQty      = filtered.reduce((a,b) => a+(b.cantidad||0), 0);
+    const totalVenta    = filtered.reduce((a,b) => a+(b.total||0), 0);
+    const totalCosto    = filtered.reduce((a,b) => a+((b.costo||0)*(b.cantidad||0)), 0);
+    const totalUtilidad = totalVenta - totalCosto;
+
+    if (!filtered.length) { res.innerHTML = `<div class="text-center py-5 text-muted small fw-bold">SIN DATOS</div>`; return; }
+
+    if (activeFinanceView === 'compras') {
+        const grouped = filtered.reduce((acc, s) => {
+            const k = `${s.producto}_${s.costo}`;
+            if (!acc[k]) acc[k] = { producto:s.producto, costo:s.costo, cantidad:0, total:0, raw:s };
+            acc[k].cantidad += (s.cantidad||0);
+            acc[k].total    += (s.costo||0)*(s.cantidad||0);
+            return acc;
+        }, {});
+        res.innerHTML = `<div class="stat-card bg-gradient-primary shadow"><h3>$${totalCosto.toFixed(2)}</h3><small>PAGO TOTAL EN CAJA</small><div class="mt-2"><span class="badge bg-white text-primary rounded-pill fw-bold">${totalQty} PIEZAS</span></div></div>`
+            + Object.values(grouped).map(g => `<div class="card-custom finance-item d-flex justify-content-between align-items-center shadow-none border py-2 px-3 small"><div><b class="text-uppercase">${g.producto}</b><br><span class="text-muted">Costo: $${g.costo.toFixed(2)}</span></div><div class="text-end d-flex align-items-center gap-2"><div><b>$${g.total.toFixed(2)}</b><br><small>${g.cantidad} pzs</small></div><div class="d-flex flex-column gap-1"><i class="fas fa-pen-to-square text-primary" onclick='openEditModal(${JSON.stringify(g.raw).replace(/'/g,"\\'")})'></i><i class="fas fa-trash-can text-danger" onclick="openDeleteModal('sales','${g.raw.id}')"></i></div></div></div>`).join('');
+    } else if (activeFinanceView === 'ganancias') {
+        res.innerHTML = `<div class="stat-card bg-gradient-success shadow"><h3>$${totalUtilidad.toFixed(2)}</h3><small>UTILIDAD NETA</small></div>`
+            + [...new Set(filtered.map(s => s.tienda))].map(t => {
+                const items = filtered.filter(f => (f.tienda||'').trim().toUpperCase() === t.trim().toUpperCase());
+                const v = items.reduce((a,b)=>a+(b.total||0),0), c = items.reduce((a,b)=>a+((b.costo||0)*(b.cantidad||0)),0);
+                return `<div class="card-custom py-2 mb-1 shadow-none border d-flex justify-content-between align-items-center px-3 small"><b><i class="fas fa-store me-2 text-primary"></i>${t}</b><span class="fw-bold text-success">+$${(v-c).toFixed(2)}</span></div>`;
+            }).join('');
+    } else if (activeFinanceView === 'diezmo') {
+        res.innerHTML = `<div class="stat-card bg-gradient-warning shadow"><i class="fas fa-landmark-dome fa-2x mb-2"></i><h3>$${(totalUtilidad*0.1).toFixed(2)}</h3><small class="fw-bold">10% PARA EL SEÑOR</small><div class="mt-2 small" style="opacity:0.8">Sobre utilidad de $${totalUtilidad.toFixed(2)}</div></div>`;
+    }
+}
+
+function updateFinFilter(key, val) {
+    if (key==='single')   finDate     = val;
+    if (key==='from')     finDateFrom = val;
+    if (key==='to')       finDateTo   = val;
+    if (key==='store')    finStore    = val.trim().toUpperCase();
+    if (key==='client')   finClient   = val.trim().toUpperCase();
+    if (key==='product')  finProduct  = val.trim();
+    if (key==='allDates') { finAllDates = val; renderFinanceMenu(); return; }
+    renderFinanceResults();
+}
+
+// Búsqueda predictiva de producto en finanzas
+function filterFinProduct(val) {
+    finProduct = val.trim();
+    var sug = document.getElementById('fin-product-sug');
+    if (!sug) return;
+    var q = val.toUpperCase();
+    if (!q) { sug.style.display = 'none'; renderFinanceResults(); return; }
+
+    // Obtener productos únicos de las ventas filtradas
+    var productos = [...new Set(window.state.sales.map(s => (s.producto||'').toUpperCase()))]
+        .filter(p => p.includes(q)).sort().slice(0, 8);
+
+    if (!productos.length) { sug.style.display = 'none'; renderFinanceResults(); return; }
+
+    sug.innerHTML = productos.map(p =>
+        '<div class="sug-item fin-prod-sug-item" data-val="' + p.replace(/"/g,'&quot;') + '">' + p + '</div>'
+    ).join('');
+    sug.style.display = 'block';
+    renderFinanceResults();
+}
+
+// Event delegation para sugerencias de producto en finanzas
+document.addEventListener('click', function(e) {
+    var item = e.target.closest('.fin-prod-sug-item');
+    if (item) {
+        var val = item.dataset.val || item.textContent.trim();
+        finProduct = val;
+        var inp = document.getElementById('fin-product-inp');
+        var sug = document.getElementById('fin-product-sug');
+        if (inp) inp.value = val;
+        if (sug) sug.style.display = 'none';
+        renderFinanceResults();
+        return;
+    }
+    // Cerrar sugerencias al tocar fuera
+    var sug = document.getElementById('fin-product-sug');
+    var inp = document.getElementById('fin-product-inp');
+    if (sug && inp && !inp.contains(e.target) && !sug.contains(e.target)) {
+        sug.style.display = 'none';
+    }
+});
+function setFinView(v) { activeFinanceView = v; renderFinanceMenu(); }
+
+/* ══════════════════════════════════════════════════════════════════
+   REPARTO
+══════════════════════════════════════════════════════════════════ */
+function renderEntregas() {
+    const list = document.getElementById('lista-entregas');
+    const val  = document.getElementById('entregas-date')?.value;
+    if (!list || !val) return;
+    const target   = normalizeDateStr(val.split('-').reverse().join('/'));
+    const filtered = window.state.sales.filter(s => normalizeDateStr(s.fechaStr) === target);
+    const grouped  = filtered.reduce((acc, v) => {
+        if (!acc[v.cliente]) acc[v.cliente] = { t:0, items:[] };
+        acc[v.cliente].t += (v.total||0);
+        acc[v.cliente].items.push(v);
+        return acc;
+    }, {});
+    list.innerHTML = Object.keys(grouped).map(cli => {
+        const isE = grouped[cli].items.every(i => i.entregado === true);
+        const isP = grouped[cli].items.every(i => i.pagado    === true);
+        return `<div class="card-custom mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+                <b>${cli}</b>
+                <button class="btn btn-sm btn-success rounded-pill px-3 fw-bold" onclick="shareTicket('${cli}')">WhatsApp</button>
+            </div>
+            <div class="text-end fw-black text-primary mt-1 small">$${grouped[cli].t.toFixed(2)}</div>
+            <div class="check-group">
+                <label class="check-item"><input type="checkbox" ${isE?'checked':''} onchange="updateStatus('${cli}','${target}','entregado',this.checked)"> Entregado</label>
+                <label class="check-item"><input type="checkbox" ${isP?'checked':''} onchange="updateStatus('${cli}','${target}','pagado',this.checked)"> Pagado</label>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+async function updateStatus(cli, date, field, val) {
+    const matching = window.state.sales.filter(s => (s.cliente||'').trim().toUpperCase()===cli.trim().toUpperCase() && normalizeDateStr(s.fechaStr)===date);
+    for (const s of matching) await col('sales').doc(s.id).update({ [field]: val });
+    toast("Actualizado");
+}
+
+async function shareTicket(n) {
+    const dateInput = document.getElementById('entregas-date');
+    const f     = dateInput.value.split('-').reverse().join('/');
+    const items = window.state.sales.filter(s => (s.cliente||'').toUpperCase()===n.toUpperCase() && normalizeDateStr(s.fechaStr)===normalizeDateStr(f));
+    const pName = formatProperName(n);
+    document.getElementById('t-cliente').innerText = pName;
+    document.getElementById('t-fecha').innerText   = f;
+    let tot = 0;
+    document.getElementById('t-items').innerHTML = items.map(i => {
+        tot += (i.total||0);
+        return `<tr><td style="padding:10px 0; padding-right:20px;">${i.cantidad}x</td><td style="padding:10px 0; padding-right:20px; text-transform:uppercase">${i.producto}</td><td style="text-align:right; padding:10px 0;">$${(i.total||0).toFixed(2)}</td></tr>`;
+    }).join('');
+    document.getElementById('t-total').innerText = '$' + tot.toFixed(2);
+    const canvas = await html2canvas(document.getElementById('ticket-render'), { scale:2, backgroundColor:'#ffffff' });
+    canvas.toBlob(async b => {
+        const file = new File([b], 'Ticket.png', { type:'image/png' });
+        const msg  = `hola *${pName}* te envío tu cuenta, gracias por tu preferencia`;
+        if (navigator.share) try { await navigator.share({ files:[file], title:'Nota Yaute', text:msg }); } catch(e) {}
+        else window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    }, 'image/png');
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   SCANNER — API KEY GEMINI
+══════════════════════════════════════════════════════════════════ */
+function saveGeminiKey() {
+    const val = document.getElementById('user-gemini-key').value.trim();
+    if (val && val.length > 10) { localStorage.setItem('yaute_key_v3310', val); document.getElementById('key-config-modal').style.display = 'none'; toastScanner("✅ Key activada"); }
+    else toastScanner("Key inválida", '#ef4444');
+}
+function changeGeminiKey() {
+    document.getElementById('user-gemini-key').value = localStorage.getItem('yaute_key_v3310') || '';
+    document.getElementById('key-config-modal').style.display = 'flex';
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   SCANNER — CÁMARA
+══════════════════════════════════════════════════════════════════ */
+// Función general para filtrar sugerencias de tienda (usada por scanner y ahora por edición de producto)
+function filterScanTienda(val) {
+    const activeInput = document.activeElement;
+    let boxId = '';
+    if (activeInput.id === 'pm-tienda-escaneo') {
+        boxId = 'sug-scan-tienda';
+    } else if (activeInput.id === 'ep-tienda-escaneo') {
+        boxId = 'sug-edit-tienda';
+    } else {
+        return; // No es un input de tienda relevante
+    }
+
+    var box = document.getElementById(boxId);
+    var q   = (val || '').toUpperCase();
+    if (!q) { box.classList.add('d-none'); return; }
+    var matches = (window.state.stores || [])
+        .map(function(s){ return (s.nombre||'').toUpperCase(); })
+        .filter(function(s){ return s.includes(q); })
+        .slice(0, 6);
+    if (!matches.length) { box.classList.add('d-none'); return; }
+    box.innerHTML = matches.map(function(s){
+        return '<div class="sug-item sug-scan-item" data-val="' + s.replace(/"/g,'&quot;') + '">' + s + '</div>';
+    }).join('');
+    box.classList.remove('d-none');
+}
+
+// Event delegation para sugerencias de tienda en scanner/edición
+document.addEventListener('click', function(e) {
+    var item = e.target.closest('.sug-scan-item');
+    if (item) {
+        const inputId = item.closest('.sug-box').previousElementSibling.id; // Asume que el input está justo antes del sug-box
+        document.getElementById(inputId).value = item.dataset.val || item.textContent.trim();
+        document.getElementById(item.closest('.sug-box').id).classList.add('d-none');
+        if (inputId === 'pm-tienda-escaneo' || inputId === 'ep-tienda-escaneo') {
+            localStorage.setItem('yaute_scan_tienda', document.getElementById(inputId).value.toUpperCase());
+        }
+        return;
+    }
+    // Cerrar sugerencias al tocar fuera para ambos
+    var sugScanBox = document.getElementById('sug-scan-tienda');
+    var inpScan    = document.getElementById('pm-tienda-escaneo');
+    if (sugScanBox && inpScan && !inpScan.contains(e.target) && !sugScanBox.contains(e.target)) {
+        sugScanBox.classList.add('d-none');
+    }
+    var sugEditBox = document.getElementById('sug-edit-tienda');
+    var inpEdit    = document.getElementById('ep-tienda-escaneo');
+    if (sugEditBox && inpEdit && !inpEdit.contains(e.target) && !sugEditBox.contains(e.target)) {
+        sugEditBox.classList.add('d-none');
+    }
+});
+
+
+async function openScannerModal() {
+    // Precargar fecha de hoy y tienda persistida antes de abrir cámara
+    var hoy = new Date().toISOString().slice(0,10);
+    var tiendaPersistida = localStorage.getItem('yaute_scan_tienda') || '';
+    var fechaEl  = document.getElementById('pm-fecha-escaneo');
+    var tiendaEl = document.getElementById('pm-tienda-escaneo');
+    if (fechaEl)  fechaEl.value  = hoy;
+    if (tiendaEl) tiendaEl.value = tiendaPersistida;
+
+    document.getElementById('ia-modal').style.display = 'flex';
+    try {
+        scannerStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
+        });
+        document.getElementById('cam-preview-ia').srcObject = scannerStream;
+    } catch(e) {
+        toastScanner("Error de cámara: " + e.message, '#ef4444');
+        closeScanner();
+    }
+}
+function closeScanner() {
+    if (scannerStream) scannerStream.getTracks().forEach(t => t.stop());
+    scannerStream = null;
+    document.getElementById('ia-modal').style.display = 'none';
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PRECIO SUGERIDO LÓGICA (PARA AMBOS CONTEXTOS)
+══════════════════════════════════════════════════════════════════ */
+var MARGEN_DEFAULT = 20;
+
+function formatCaducidad(input) {
+    var meses = {
+        'ene':'Ene','feb':'Feb','mar':'Mar','abr':'Abr','may':'May','jun':'Jun',
+        'jul':'Jul','ago':'Ago','sep':'Sep','oct':'Oct','nov':'Nov','dic':'Dic',
+        'jan':'Ene','aug':'Ago'
+    };
+    var raw   = input.value.replace(/[^a-zA-Z0-9 ]/g,'');
+    var parts = raw.trim().split(/\s+/);
+    var mes   = parts[0] ? parts[0].toLowerCase().slice(0,3) : '';
+    var anio  = parts[1] || '';
+    var mesF  = meses[mes] || (parts[0] ? parts[0].charAt(0).toUpperCase() + parts[0].slice(1).toLowerCase() : '');
+    if (mesF && anio) { input.value = mesF + ' ' + anio; }
+    else if (mesF)    { input.value = mesF + (raw.includes(' ') ? ' ' : ''); }
+}
+
+function redondearA10(valor) {
+    var entero = Math.ceil(valor);
+    var resto  = entero % 10;
+    if (resto === 0) return entero;
+    return resto < 5 ? entero - resto : entero + (10 - resto);
+}
+
+/* Precarga precios en el panel del scanner (después de una captura IA) */
+function precargarPrecios(precio, costo) {
+    var ventaInput  = document.getElementById('pm-venta');
+    var costoInput  = document.getElementById('pm-costo');
+    costoInput.value = costo || '';
+    if (precio && parseFloat(precio) > 0) {
+        ventaInput.value = parseFloat(precio).toFixed(2);
+        ventaInput.dataset.suggested = '';
+    } else if (costo && parseFloat(costo) > 0) {
+        autoSuggestVenta(String(costo)); // Llama a la versión del scanner
+    } else {
+        ventaInput.value = '';
+    }
+}
+
+/* Auto-sugiere precio de venta para el modal del scanner */
+function autoSuggestVenta(costoStr) {
+    var costo      = parseFloat(costoStr);
+    var margenEl   = document.getElementById('pm-margen');
+    var margen     = margenEl ? (parseFloat(margenEl.value) || MARGEN_DEFAULT) : MARGEN_DEFAULT;
+    var ventaInput = document.getElementById('pm-venta');
+    if (!isNaN(costo) && costo > 0) {
+        var sugerido = redondearA10(costo + margen);
+        ventaInput.value = sugerido.toFixed(2);
+        ventaInput.dataset.suggested = sugerido.toFixed(2);
+    }
+}
+
+/* Auto-sugiere precio de venta para la página de edición de productos */
+function autoSuggestVentaOnEdit(costoStr) {
+    var costo      = parseFloat(costoStr);
+    var margenEl   = document.getElementById('ep-margen');
+    var margen     = margenEl ? (parseFloat(margenEl.value) || MARGEN_DEFAULT) : MARGEN_DEFAULT;
+    var ventaInput = document.getElementById('ep-venta');
+    if (!isNaN(costo) && costo > 0) {
+        var sugerido = redondearA10(costo + margen);
+        ventaInput.value = sugerido.toFixed(2);
+        ventaInput.dataset.suggested = sugerido.toFixed(2);
+    }
+}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   SCANNER — CORRECCIÓN DE ORIENTACIÓN
+══════════════════════════════════════════════════════════════════ */
+function captureOrientado(video) {
+    var vw = video.videoWidth;
+    var vh = video.videoHeight;
+    var rw = video.clientWidth  || video.offsetWidth;
+    var rh = video.clientHeight || video.offsetHeight;
+    var sensorLandscape  = (vw > vh);
+    var vistaPortrait    = (rh > rw);
+    var browserRoto      = sensorLandscape && vistaPortrait;
+    var c   = document.createElement('canvas');
+    var ctx = c.getContext('2d');
+
+    if (browserRoto) {
+        c.width  = vh;
+        c.height = vw;
+        ctx.save();
+        ctx.translate(c.width, 0);
+        ctx.rotate(Math.PI / 2);
+        ctx.drawImage(video, 0, 0, vw, vh);
+        ctx.restore();
+    } else {
+        c.width  = vw;
+        c.height = vh;
+        ctx.drawImage(video, 0, 0, vw, vh);
+    }
+
+    if (c.width > c.height) {
+        var c2   = document.createElement('canvas');
+        var ctx2 = c2.getContext('2d');
+        c2.width  = c.height;
+        c2.height = c.width;
+        ctx2.save();
+        ctx2.translate(c2.width, 0);
+        ctx2.rotate(Math.PI / 2);
+        ctx2.drawImage(c, 0, 0);
+        ctx2.restore();
+        return c2;
+    }
+    return c;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   SCANNER — CAPTURA + IA + DETECCIÓN DUPLICADOS
+══════════════════════════════════════════════════════════════════ */
+async function captureIA() {
+    const key   = localStorage.getItem('yaute_key_v3310');
+    if (!key) { changeGeminiKey(); return; }
+    const video = document.getElementById('cam-preview-ia');
+    if (!video.srcObject || video.videoWidth === 0) { toastScanner("Cámara no lista", '#f59e0b'); return; }
+
+    // Limpiar caducidad en cada nuevo escaneo
+    document.getElementById('pm-caducidad').value = '';
+
+    pendingCanvas = captureOrientado(video);
+    const b64 = pendingCanvas.toDataURL('image/jpeg', 0.88).split(',')[1];
+
+    const snapIcon = document.getElementById('snap-icon');
+    snapIcon.className = 'fas fa-spinner fa-spin fa-2x text-primary';
+    document.getElementById('snap-btn').style.pointerEvents = 'none';
+
+    // Reintento automático si Gemini responde 429 (quota por minuto)
+    const callGemini = async (intentos = 3) => {
+        const res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${key}`,
+            { method:'POST', headers:{'Content-Type':'application/json'},
+              body: JSON.stringify({ contents:[{ parts:[
+                  { inline_data:{ mime_type:'image/jpeg', data:b64 } },
+                  { text:"Eres un lector experto de etiquetas de productos de consumo en México. Analiza la imagen y extrae: 1) Marca comercial, 2) Nombre del producto, 3) Presentación (gramaje, volumen, número de piezas, sabor o variante si aparece). Responde SOLO con el resultado en UNA LÍNEA en MAYÚSCULAS con el formato: MARCA NOMBRE PRESENTACIÓN. Sin explicaciones, sin puntos, sin saltos de línea." }
+              ]}], generationConfig:{ temperature:0.1, maxOutputTokens:120 } })
+            }
+        );
+        const data = await res.json();
+        if (res.status === 429 && intentos > 1) {
+            const segs = intentos === 3 ? 20 : 40;
+            toastScanner(`⏳ Muchas consultas — reintentando en ${segs}s...`, '#f59e0b');
+            await new Promise(r => setTimeout(r, segs * 1000));
+            return callGemini(intentos - 1);
+        }
+        if (!res.ok) throw new Error(data.error?.message || `HTTP ${res.status}`);
+        return data;
+    };
+
+    try {
+        const data = await callGemini();
+        pendingNombre = data.candidates[0].content.parts[0].text.trim().toUpperCase();
+
+        // ── Detección de duplicados en 3 niveles ──────────────────────
+        // Nivel 1: coincidencia exacta
+        // Nivel 2: uno contiene al otro (>= 6 chars)
+        // Nivel 3: >= 2 palabras clave de 4+ chars en común
+        const palabrasEsc = pendingNombre.split(' ').filter(w => w.length >= 4);
+        const candidatos = window.state.products.filter(p => {
+            const g = (p.nombre||'').toUpperCase().trim();
+            if (g === pendingNombre) return true;
+            if (g.length >= 6 && (pendingNombre.includes(g) || g.includes(pendingNombre))) return true;
+            const pg = g.split(' ').filter(w => w.length >= 4);
+            return palabrasEsc.filter(w => pg.includes(w)).length >= 2;
+        });
+
+        document.getElementById('pm-nombre').value = pendingNombre;
+
+        if (candidatos.length === 1 && (candidatos[0].nombre||'').toUpperCase().trim() === pendingNombre) {
+            // Coincidencia exacta → panel directo con badge
+            pendingExisteId = candidatos[0].id;
+            precargarPrecios(candidatos[0].precio, candidatos[0].costo);
+            const badge = document.getElementById('dup-badge');
+            var prev = candidatos[0];
+            var infoExtra = '';
+            if (prev.fechaEscaneo) infoExtra += '<br>📅 Escaneado: ' + prev.fechaEscaneo;
+            if (prev.tiendaEscaneo) infoExtra += ' · ' + prev.tiendaEscaneo;
+            if (prev.caducidad)    infoExtra += '<br>⏳ Cad: ' + prev.caducidad;
+            document.getElementById('dup-text').innerHTML =
+                '<strong>¡Ya registrado!</strong><br>"' + prev.nombre + '"<br>' +
+                'Venta: <b>$' + (prev.precio||0) + '</b> | Costo: $' + (prev.costo||0) +
+                infoExtra +
+                '<br><em style="font-size:0.65rem;">Precios precargados, puedes modificar.</em>';
+            badge.classList.add('show');
+            document.getElementById('price-modal').style.display = 'flex';
+        } else if (candidatos.length >= 1) {
+            // Similares → preguntar al usuario
+            pendingExisteId = null; // No hay un ID exacto todavía
+            document.getElementById('pm-venta').value = '';
+            document.getElementById('pm-costo').value = '';
+            document.getElementById('dup-badge').classList.remove('show');
+            showDupConfirm(candidatos);
+        } else {
+            // Producto nuevo
+            pendingExisteId = null;
+            document.getElementById('pm-venta').value = '';
+            document.getElementById('pm-costo').value = '';
+            document.getElementById('dup-badge').classList.remove('show');
+            document.getElementById('price-modal').style.display = 'flex';
+        }
+
+    } catch(e) {
+        toastScanner("Error IA: " + e.message, '#ef4444');
+    } finally {
+        snapIcon.className = 'fas fa-camera fa-2x text-primary';
+        document.getElementById('snap-btn').style.pointerEvents = 'auto';
+    }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   SCANNER — GESTIÓN DE DUPLICADOS
+══════════════════════════════════════════════════════════════════ */
+function showDupConfirm(candidatos) {
+    document.getElementById('dcm-escaneado').textContent = '"' + pendingNombre + '"';
+    document.getElementById('dcm-candidatos').innerHTML = candidatos.map(function(p) {
+        // Usar data-attributes para evitar problemas de comillas en onclick
+        var safeId    = (p.id    || '').replace(/'/g, '');
+        var safePrecio = parseFloat(p.precio) || 0;
+        var safeCosto  = parseFloat(p.costo)  || 0;
+        var safeNombre = (p.nombre || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        return '<div class="dup-candidate" data-id="' + safeId + '" data-precio="' + safePrecio + '" data-costo="' + safeCosto + '"' +
+               ' style="background:#f8fafc; border:2px solid #e2e8f0; border-radius:12px; padding:12px 14px; margin-bottom:8px; cursor:pointer;">' +
+               '<div style="font-weight:800; font-size:0.85rem; color:#0f172a; text-transform:uppercase;">' + safeNombre + '</div>' +
+               '<div style="font-size:0.72rem; color:#64748b; margin-top:2px;">' +
+               'Venta: <span style="color:#10b981; font-weight:700;">$' + safePrecio + '</span> &nbsp;|&nbsp; ' +
+               'Costo: <span style="color:#ef4444; font-weight:700;">$' + safeCosto + '</span></div>' +
+               ((p.fechaEscaneo || p.tiendaEscaneo) ? '<div style="font-size:0.62rem; color:#94a3b8; margin-top:2px;">📅 ' + (p.fechaEscaneo||'') + (p.tiendaEscaneo ? ' · '+p.tiendaEscaneo : '') + '</div>' : '') +
+               (p.caducidad ? '<div style="font-size:0.62rem; color:#f59e0b; margin-top:1px;">⏳ Cad: ' + p.caducidad + '</div>' : '') +
+               '<div style="font-size:0.65rem; color:#3b82f6; margin-top:4px; font-weight:700;">✓ SÍ, ES ESTE PRODUCTO</div>' +
+               '</div>';
+    }).join('');
+    // Usar event delegation en lugar de onclick inline para evitar bugs de comillas
+    document.getElementById('dcm-candidatos').onclick = function(e) {
+        var card = e.target.closest('.dup-candidate');
+        if (card) selectDuplicate(card.dataset.id, parseFloat(card.dataset.precio), parseFloat(card.dataset.costo));
+    };
+    document.getElementById('dup-confirm-modal').style.display = 'flex';
+}
+
+function selectDuplicate(id, precio, costo) {
+    pendingExisteId = id;
+    precargarPrecios(precio, costo);
+    var p = window.state.products.find(function(x){ return x.id === id; });
+    if (p) {
+        var badge = document.getElementById('dup-badge');
+        document.getElementById('dup-text').innerHTML =
+            '<strong>Seleccionado:</strong> "' + p.nombre + '"<br>Precios precargados, puedes modificar.';
+        badge.classList.add('show');
+    }
+    document.getElementById('dup-confirm-modal').style.display = 'none';
+    document.getElementById('price-modal').style.display = 'flex';
+}
+
+function skipDuplicate() {
+    pendingExisteId = null;
+    document.getElementById('dup-badge').classList.remove('show');
+    document.getElementById('pm-venta').value = '';
+    document.getElementById('pm-costo').value = '';
+    document.getElementById('dup-confirm-modal').style.display = 'none';
+    document.getElementById('price-modal').style.display = 'flex';
+}
+
+function closeDupConfirm() {
+    document.getElementById('dup-confirm-modal').style.display = 'none';
+    pendingNombre = ''; pendingCanvas = null; pendingExisteId = null;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   SCANNER — CONFIRMAR PRECIOS (compartir + Storage + Firestore)
+   Esta función es la que se llama después de que el usuario interactúa
+   con el modal de precios del ESCÁNER.
+══════════════════════════════════════════════════════════════════ */
+async function confirmPrices() {
+    const nombre        = document.getElementById('pm-nombre').value.replace(/\n/g,' ').trim().toUpperCase();
+    const venta         = parseFloat(document.getElementById('pm-venta').value)  || 0;
+    const costo         = parseFloat(document.getElementById('pm-costo').value)  || 0;
+    const caducidad     = (document.getElementById('pm-caducidad').value   || '').trim();
+    const fechaEscaneo  = (document.getElementById('pm-fecha-escaneo').value || '').trim();
+    const tiendaEscaneo = (document.getElementById('pm-tienda-escaneo').value|| '').trim().toUpperCase();
+    const margen        = parseFloat(document.getElementById('pm-margen').value) || MARGEN_DEFAULT; // Obtener el margen actual
+
+    if (!nombre) { toastScanner("Nombre vacío", '#ef4444'); return; }
+
+    // Persistir tienda para el próximo escaneo
+    if (tiendaEscaneo) localStorage.setItem('yaute_scan_tienda', tiendaEscaneo);
+
+    document.getElementById('price-modal').style.display = 'none';
+
+    // 1. Web Share API — incluir caducidad si existe
+    // Solo compartir la imagen si se realizó un escaneo nuevo
+    let fileToShare = null;
+    if (pendingCanvas && navigator.canShare) {
+        try {
+            const blob = await new Promise(r => pendingCanvas.toBlob(r, 'image/jpeg', 0.88));
+            fileToShare = new File([blob], 'oferta.jpg', { type:'image/jpeg' });
+            let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + nombre + '\n💰 $' + venta;
+            if (caducidad)  msgWA += '\n⏳ Cad: ' + caducidad;
+            if (navigator.canShare({ files:[fileToShare] })) {
+                await navigator.share({ files:[fileToShare], text: msgWA });
+            } else {
+                window.open(`https://wa.me/?text=${encodeURIComponent(msgWA)}`, '_blank');
+            }
+        } catch(e) { if (e.name !== 'AbortError') console.warn('Share:', e.message); }
+    } else {
+        // Si no hay canvas (ej. edición directa sin rescanear), aún se puede compartir el texto
+        if (navigator.share) {
+             let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + nombre + '\n💰 $' + venta;
+            if (caducidad)  msgWA += '\n⏳ Cad: ' + caducidad;
+            try { await navigator.share({ text: msgWA }); } catch(e) { if (e.name !== 'AbortError') console.warn('Share (text only):', e.message); }
+        } else {
+            let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + nombre + '\n💰 $' + venta;
+            if (caducidad)  msgWA += '\n⏳ Cad: ' + caducidad;
+            window.open(`https://wa.me/?text=${encodeURIComponent(msgWA)}`, '_blank');
+        }
+    }
+
+
+    // 2. Subir foto a Storage si hay un nuevo canvas
+    let fotoUrl = '';
+    if (pendingCanvas) {
+        try {
+            const blob = await new Promise(r => pendingCanvas.toBlob(r, 'image/jpeg', 0.82));
+            const ref  = storage.ref('productos/' + Date.now() + '_' + nombre.replace(/\s+/g,'_') + '.jpg');
+            await ref.put(blob); fotoUrl = await ref.getDownloadURL();
+        } catch(e) { console.warn('Storage:', e.message); }
+    }
+
+    // 3. Guardar / actualizar en Firestore
+    const data = { nombre, costo, precio: venta, fechaEscaneo, tiendaEscaneo, margen }; // Añadir margen aquí
+    if (fotoUrl)    data.foto      = fotoUrl;
+    if (caducidad)  data.caducidad = caducidad;
+
+    if (pendingExisteId) { await col('products').doc(pendingExisteId).update(data); toastScanner("✅ Producto actualizado"); }
+    else                 { await col('products').add(data);                          toastScanner("✅ Producto guardado");    }
+
+    document.getElementById('pm-caducidad').value = '';
+    pendingNombre = ''; pendingCanvas = null; pendingExisteId = null;
+    closeScanner();
+}
+
+function cancelPrices() {
+    document.getElementById('price-modal').style.display = 'none';
+    document.getElementById('dup-badge').classList.remove('show');
+    document.getElementById('pm-caducidad').value = '';   // limpiar caducidad
+    pendingNombre = ''; pendingCanvas = null; pendingExisteId = null;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PRODUCTOS TAB — FUNCIONALIDADES ADICIONALES
+══════════════════════════════════════════════════════════════════ */
+
+// Función para filtrar productos en la pestaña 'Productos' (para edición)
+function filterProductsForEdit(val) {
+    const inp = document.getElementById('product-search-input');
+    const box = document.getElementById('sug-product-edit');
+    const noProductMsg = document.getElementById('no-product-found-msg');
+    hideProductEditDetails(); // Ocultar el formulario de edición al empezar a buscar
+    if (!inp || !box) return;
+
+    const query = val.trim().toUpperCase();
+    if (!query) {
+        box.classList.add('d-none');
+        noProductMsg.style.display = 'block';
+        return;
+    }
+
+    const filtered = (window.state.products || [])
+        .filter(p => (p.nombre || '').toUpperCase().includes(query))
+        .slice(0, 8); // Mostrar un máximo de 8 sugerencias
+
+    if (filtered.length === 0) {
+        box.classList.add('d-none');
+        noProductMsg.style.display = 'block';
+    } else {
+        box.innerHTML = filtered.map(p =>
+            `<div class="sug-item" data-id="${p.id}" data-val="${p.nombre}">${p.nombre}</div>`
+        ).join('');
+        box.classList.remove('d-none');
+        noProductMsg.style.display = 'none';
+
+        // Manejador de clic para las sugerencias de búsqueda de productos
+        // Se adjunta cada vez que se actualizan las sugerencias
+        box.onclick = e => {
+            const it = e.target.closest('.sug-item');
+            if (!it) return;
+            const productId = it.dataset.id;
+            selectProductForEdit(productId);
+            box.classList.add('d-none'); // Ocultar sugerencias después de la selección
+        };
+    }
+}
+
+// Función para seleccionar un producto de la sugerencia y mostrarlo para edición
+function selectProductForEdit(productId) {
+    const product = window.state.products.find(p => p.id === productId);
+    if (!product) {
+        toastScanner("Producto no encontrado", "danger");
+        return;
+    }
+
+    editingProductId = productId;
+    document.getElementById('product-search-section').style.display = 'none'; // Ocultar buscador
+    document.getElementById('product-edit-details').style.display = 'block'; // Mostrar formulario de edición
+
+    // Rellenar campos de edición
+    document.getElementById('ep-nombre').value          = product.nombre || '';
+    document.getElementById('ep-costo').value           = product.costo  || 0;
+    document.getElementById('ep-venta').value           = product.precio || 0;
+    document.getElementById('ep-margen').value          = product.margen || MARGEN_DEFAULT; // Asume un campo 'margen' o usa default
+    document.getElementById('ep-caducidad').value       = product.caducidad || '';
+    document.getElementById('ep-fecha-escaneo').value   = product.fechaEscaneo || getMXISODate(); // Usar fecha actual si no existe
+    document.getElementById('ep-tienda-escaneo').value  = product.tiendaEscaneo || '';
+
+    // Mostrar foto si existe
+    const photoPreview = document.getElementById('ep-foto-preview');
+    if (product.foto) {
+        photoPreview.src = product.foto;
+        photoPreview.style.display = 'block';
+        document.getElementById('product-photo-label').style.display = 'block';
+    } else {
+        photoPreview.src = '';
+        photoPreview.style.display = 'none';
+        document.getElementById('product-photo-label').style.display = 'none';
+    }
+
+    // Asegurarse de que el campo de tienda tenga las sugerencias activas si hay texto
+    // La función filterScanTienda se encarga de esto al recibir input
+    // Deberíamos re-inicializar el listener oninput para el campo de tienda de edición
+    document.getElementById('ep-tienda-escaneo').oninput = (e) => filterScanTienda(e.target.value);
+}
+
+// Ocultar el formulario de edición y volver a la búsqueda
+function hideProductEditDetails() {
+    editingProductId = null;
+    document.getElementById('product-edit-details').style.display = 'none';
+    document.getElementById('product-search-section').style.display = 'block';
+    document.getElementById('product-search-input').value = ''; // Limpiar búsqueda
+    document.getElementById('sug-product-edit').classList.add('d-none'); // Ocultar sugerencias
+    resetProductEditDetails(); // Limpiar campos del formulario de edición
+}
+
+// Limpia los campos del formulario de edición
+function resetProductEditDetails() {
+    document.getElementById('ep-nombre').value          = '';
+    document.getElementById('ep-costo').value           = '';
+    document.getElementById('ep-venta').value           = '';
+    document.getElementById('ep-margen').value          = MARGEN_DEFAULT;
+    document.getElementById('ep-caducidad').value       = '';
+    document.getElementById('ep-fecha-escaneo').value   = getMXISODate();
+    document.getElementById('ep-tienda-escaneo').value  = '';
+    document.getElementById('ep-foto-preview').src      = '';
+    document.getElementById('ep-foto-preview').style.display = 'none';
+    document.getElementById('product-photo-label').style.display = 'none';
+}
+
+
+// Función para guardar y compartir los datos de un producto editado
+async function confirmProductEdit() {
+    if (!editingProductId) {
+        toastScanner("No hay producto seleccionado para editar.", "danger");
+        return;
+    }
+
+    const nombre        = document.getElementById('ep-nombre').value.replace(/\n/g,' ').trim().toUpperCase();
+    const venta         = parseFloat(document.getElementById('ep-venta').value)  || 0;
+    const costo         = parseFloat(document.getElementById('ep-costo').value)  || 0;
+    const caducidad     = (document.getElementById('ep-caducidad').value   || '').trim();
+    const fechaEscaneo  = (document.getElementById('ep-fecha-escaneo').value || '').trim();
+    const tiendaEscaneo = (document.getElementById('ep-tienda-escaneo').value|| '').trim().toUpperCase();
+    const margen        = parseFloat(document.getElementById('ep-margen').value) || MARGEN_DEFAULT; // Obtener el margen actual
+
+    if (!nombre) { toastScanner("Nombre vacío", '#ef4444'); return; }
+
+    // Persistir tienda para el próximo escaneo o edición
+    if (tiendaEscaneo) localStorage.setItem('yaute_scan_tienda', tiendaEscaneo);
+
+    // Los datos a actualizar
+    const dataToUpdate = { nombre, costo, precio: venta, fechaEscaneo, tiendaEscaneo, margen }; // Añadir margen aquí
+    if (caducidad) dataToUpdate.caducidad = caducidad;
+    // La foto no se actualiza desde aquí, solo al escanear un nuevo producto.
+    // Si la foto ya existe en el producto, se mantiene.
+
+    try {
+        await col('products').doc(editingProductId).update(dataToUpdate);
+        toastScanner("✅ Producto actualizado y compartido");
+
+        // Compartir texto (la imagen no se puede compartir desde aquí sin un re-escaneo)
+        if (navigator.share) {
+             let msgWA = '🛒 *OFERTA ACTUALIZADA*\n📦 ' + nombre + '\n💰 $' + venta;
+            if (caducidad)  msgWA += '\n⏳ Cad: ' + caducidad;
+            try { await navigator.share({ text: msgWA }); } catch(e) { if (e.name !== 'AbortError') console.warn('Share (text only) on edit:', e.message); }
+        } else {
+            let msgWA = '🛒 *OFERTA ACTUALIZADA*\n📦 ' + nombre + '\n💰 $' + venta;
+            if (caducidad)  msgWA += '\n⏳ Cad: ' + caducidad;
+            window.open(`https://wa.me/?text=${encodeURIComponent(msgWA)}`, '_blank');
+        }
+
+        hideProductEditDetails(); // Ocultar el formulario de edición y volver al buscador
+    } catch (e) {
+        console.error("Error al actualizar el producto:", e);
+        toastScanner("Error al actualizar: " + e.message, '#ef4444');
+    }
+}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   ARRANQUE
+══════════════════════════════════════════════════════════════════ */
+window.onload = startSync;
+</script>
+  <script>
+    // Registrar Service Worker para PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js', {
+            scope: './'
+          })
+          .then(function(reg) {
+            console.log('SW registrado para nueva raíz:', reg.scope);
+          })
+          .catch(function(err) {
+            console.warn('SW no disponible en la nueva raíz:', err);
+          });
+      });
+    }
+
+    // Banner de instalación en Android Chrome
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      deferredPrompt = e;
+      // Mostrar botón de instalar si no está ya instalada
+      var btn = document.getElementById('btn-install-pwa');
+      if (btn) btn.style.display = 'flex';
+    });
+
+    window.addEventListener('appinstalled', function() {
+      var btn = document.getElementById('btn-install-pwa');
+      if (btn) btn.style.display = 'none';
+      deferredPrompt = null;
+    });
+
+    function installPWA() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(function(result) {
+          deferredPrompt = null;
+        });
+      }
+    }
+  </script>
+</body>
+</html>
