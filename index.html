@@ -117,7 +117,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 36.7</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 36.8</div>
 </div>
 
 <div id="toast-alert"></div>
@@ -318,8 +318,28 @@
 
 <!-- ══ MAIN ══════════════════════════════════════════════════════ -->
 <main>
-    <!-- TAB VENTAS -->
-    <div id="tab-operaciones" class="tab-content">
+    <!-- NUEVA TAB DE PRODUCTOS (AHORA LA PRIMERA) -->
+    <div id="tab-productos" class="tab-content">
+        <div class="card-custom text-center d-flex flex-column align-items-center justify-content-center" style="height:250px; margin-top:20px;">
+            <i class="fas fa-barcode fa-5x text-primary mb-4"></i>
+            <h5 class="fw-bold mb-3">Registrar / Actualizar Producto</h5>
+            <button class="btn btn-primary w-75 py-3 rounded-pill fw-bold shadow" onclick="openScannerModal()">
+                <i class="fas fa-camera me-2"></i> ESCANEAR PRODUCTO
+            </button>
+            <p class="text-muted mt-3 mb-0" style="font-size:0.75rem;">
+                Utiliza la IA para identificar y guardar<br>la información de nuevos productos.
+            </p>
+        </div>
+        <div class="card-custom text-center mt-4">
+            <h6 class="fw-bold mb-3" style="color:var(--primary);">Configuración del Escáner</h6>
+            <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="changeGeminiKey()">
+                <i class="fas fa-gear me-2"></i> Ajustar API Key Gemini
+            </button>
+        </div>
+    </div>
+
+    <!-- TAB VENTAS (AHORA LA SEGUNDA) -->
+    <div id="tab-operaciones" class="tab-content" style="display:none;">
         <div class="card-custom">
             <div class="row g-2 mb-2">
                 <div class="col-6" style="position:relative"><label class="text-uppercase">Tienda</label><input type="text" id="in-tienda" class="form-control text-uppercase fw-bold text-primary"><div id="sug-tienda" class="sug-box d-none"></div></div>
@@ -337,26 +357,6 @@
                 <div class="col-6"><label class="text-uppercase">Precio Venta</label><input type="number" id="in-precio" class="form-control fw-bold border-success" step="0.01"></div>
             </div>
             <button id="btn-save-record" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow">GUARDAR REGISTRO</button>
-        </div>
-    </div>
-
-    <!-- NUEVA TAB DE PRODUCTOS -->
-    <div id="tab-productos" class="tab-content" style="display:none;">
-        <div class="card-custom text-center d-flex flex-column align-items-center justify-content-center" style="height:250px; margin-top:20px;">
-            <i class="fas fa-barcode fa-5x text-primary mb-4"></i>
-            <h5 class="fw-bold mb-3">Registrar / Actualizar Producto</h5>
-            <button class="btn btn-primary w-75 py-3 rounded-pill fw-bold shadow" onclick="openScannerModal()">
-                <i class="fas fa-camera me-2"></i> ESCANEAR PRODUCTO
-            </button>
-            <p class="text-muted mt-3 mb-0" style="font-size:0.75rem;">
-                Utiliza la IA para identificar y guardar<br>la información de nuevos productos.
-            </p>
-        </div>
-        <div class="card-custom text-center mt-4">
-            <h6 class="fw-bold mb-3" style="color:var(--primary);">Configuración del Escáner</h6>
-            <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="changeGeminiKey()">
-                <i class="fas fa-gear me-2"></i> Ajustar API Key Gemini
-            </button>
         </div>
     </div>
 
@@ -412,8 +412,8 @@
 
 <!-- ══ BOTTOM NAV ════════════════════════════════════════════════ -->
 <nav class="bottom-nav">
-    <button class="tab-btn active" onclick="showTab('operaciones', this)"><i class="fas fa-cash-register"></i>Ventas</button>
-    <button class="tab-btn" onclick="showTab('productos', this)"><i class="fas fa-box"></i>Productos</button>
+    <button class="tab-btn active" onclick="showTab('productos', this)"><i class="fas fa-box"></i>Productos</button>
+    <button class="tab-btn" onclick="showTab('operaciones', this)"><i class="fas fa-cash-register"></i>Ventas</button>
     <button class="tab-btn" onclick="showTab('entregas', this)"><i class="fas fa-truck"></i>Reparto</button>
     <button class="tab-btn" onclick="showTab('control', this)"><i class="fas fa-shield-halved"></i>Gestión</button>
 </nav>
@@ -615,8 +615,8 @@ function switchSubTab(id) {
 document.addEventListener('DOMContentLoaded', () => {
     const ed = document.getElementById('entregas-date');
     if (ed) ed.value = getMXISODate();
-    // Inicialmente muestra la pestaña de operaciones
-    showTab('operaciones', document.querySelector('.tab-btn[onclick="showTab(\'operaciones\', this)"]'));
+    // Inicia mostrando la pestaña de "Productos"
+    showTab('productos', document.querySelector('.tab-btn[onclick="showTab(\'productos\', this)"]'));
 
 
     document.getElementById('btn-save-record').onclick = async () => {
@@ -1462,11 +1462,6 @@ window.onload = startSync;
     // Registrar Service Worker para PWA
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
-        // --- MODIFICACIÓN IMPORTANTE PARA USAR OTRA RAÍZ ---
-        // Se ha cambiado la ruta del Service Worker y su scope para que sean relativos.
-        // Esto permite que el proyecto funcione correctamente desde cualquier subdirectorio
-        // o la raíz principal, siempre y cuando 'sw.js' y 'manifest.json' estén en la misma
-        // carpeta que este archivo HTML.
         navigator.serviceWorker.register('./sw.js', {
             scope: './'
           })
