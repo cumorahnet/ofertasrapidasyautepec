@@ -117,7 +117,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 36.8</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 36.9</div>
 </div>
 
 <div id="toast-alert"></div>
@@ -212,7 +212,7 @@
     </div>
 </div>
 
-<!-- ══ MODAL PRECIOS SCANNER ═════════════════════════════════════ -->
+<!-- ══ MODAL PRECIOS SCANNER (Usado después de escanear) ═════════════════════════════════════ -->
 <div id="price-modal">
     <div id="price-panel">
         <p class="fw-bold mb-1" style="font-size:0.7rem; color:#94a3b8; letter-spacing:1px;">PRODUCTO IDENTIFICADO</p>
@@ -320,16 +320,68 @@
 <main>
     <!-- NUEVA TAB DE PRODUCTOS (AHORA LA PRIMERA) -->
     <div id="tab-productos" class="tab-content">
-        <div class="card-custom text-center d-flex flex-column align-items-center justify-content-center" style="height:250px; margin-top:20px;">
-            <i class="fas fa-barcode fa-5x text-primary mb-4"></i>
-            <h5 class="fw-bold mb-3">Registrar / Actualizar Producto</h5>
-            <button class="btn btn-primary w-75 py-3 rounded-pill fw-bold shadow" onclick="openScannerModal()">
-                <i class="fas fa-camera me-2"></i> ESCANEAR PRODUCTO
-            </button>
-            <p class="text-muted mt-3 mb-0" style="font-size:0.75rem;">
-                Utiliza la IA para identificar y guardar<br>la información de nuevos productos.
+        <div class="card-custom mb-3" id="product-search-section">
+            <label class="text-uppercase">Buscar Producto</label>
+            <input type="text" id="product-search-input" class="form-control text-uppercase" placeholder="Escribe para buscar..." oninput="filterProductsForEdit(this.value)">
+            <div id="sug-product-edit" class="sug-box d-none"></div>
+            <p class="text-center text-muted mt-3 mb-0" style="font-size:0.75rem;" id="no-product-found-msg">
+                ¿No encuentras el producto?
             </p>
+            <button class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow mt-2" onclick="openScannerModal()">
+                <i class="fas fa-camera me-2"></i> ESCANEAR NUEVO PRODUCTO
+            </button>
         </div>
+
+        <!-- Sección de edición de producto (similar a price-panel, pero para edición directa) -->
+        <div id="product-edit-details" class="card-custom" style="display:none;">
+            <h5 class="fw-bold mb-4" style="color:var(--primary)">Editar Detalles del Producto</h5>
+            <div class="mb-3 text-center" id="product-photo-preview-container">
+                 <img id="ep-foto-preview" src="" style="width:100px; height:100px; object-fit:cover; border-radius:10px; border:1px solid #e2e8f0; display:none;">
+                 <small class="text-muted d-block mt-1" id="product-photo-label" style="display:none;">Foto actual (solo se actualiza escaneando)</small>
+            </div>
+            <div class="mb-3"><label class="text-uppercase">Descripción</label><textarea id="ep-nombre" class="form-control mb-3" rows="3" placeholder="Nombre del producto" style="resize:none; text-transform:uppercase; font-weight:700; font-size:0.9rem; line-height:1.4; word-break:break-word; white-space:pre-wrap;"></textarea></div>
+            <div class="row g-2 mb-2">
+                <div class="col-6">
+                    <label class="small fw-bold text-muted">FECHA ESCANEO</label>
+                    <input type="date" id="ep-fecha-escaneo" class="form-control fw-bold" style="font-size:0.82rem;">
+                </div>
+                <div class="col-6" style="position:relative;">
+                    <label class="small fw-bold text-muted">TIENDA</label>
+                    <input type="text" id="ep-tienda-escaneo" class="form-control text-uppercase fw-bold" placeholder="TIENDA..." style="font-size:0.82rem;">
+                    <div id="sug-edit-tienda" class="sug-box d-none"></div>
+                </div>
+            </div>
+            <div class="row g-2 mb-2">
+                <div class="col-4">
+                    <label class="small fw-bold text-muted">COSTO $</label>
+                    <input type="number" id="ep-costo" class="form-control text-danger fw-bold" placeholder="0.00" step="0.01" oninput="autoSuggestVentaOnEdit(this.value)">
+                </div>
+                <div class="col-3">
+                    <label class="small fw-bold text-muted">MARGEN $</label>
+                    <input type="number" id="ep-margen" class="form-control fw-bold text-primary" value="20" step="1" min="0" oninput="autoSuggestVentaOnEdit(document.getElementById('ep-costo').value)" style="font-size:0.82rem;">
+                </div>
+                <div class="col-5">
+                    <label class="small fw-bold text-muted">PRECIO VENTA $</label>
+                    <input type="number" id="ep-venta" class="form-control text-success fw-bold" placeholder="0.00" step="0.01">
+                </div>
+            </div>
+            <div class="mb-2">
+                <label class="small fw-bold text-muted">
+                    CADUCIDAD <span style="font-weight:400; font-size:0.6rem;">(opcional · ej: Dic 2026)</span>
+                </label>
+                <input type="text" id="ep-caducidad" class="form-control"
+                    placeholder="Dic 2026"
+                    maxlength="10"
+                    style="font-size:0.88rem; text-transform:capitalize;"
+                    oninput="formatCaducidad(this)">
+            </div>
+            <small class="text-muted d-block mb-3" style="font-size:0.62rem; text-align:center;">
+                💡 Precio = costo + margen → redondeado al $10 más cercano
+            </small>
+            <button class="btn btn-success w-100 py-3 rounded-pill fw-bold mb-2" onclick="confirmProductEdit()">GUARDAR Y COMPARTIR</button>
+            <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="hideProductEditDetails()">CANCELAR</button>
+        </div>
+
         <div class="card-custom text-center mt-4">
             <h6 class="fw-bold mb-3" style="color:var(--primary);">Configuración del Escáner</h6>
             <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="changeGeminiKey()">
@@ -447,7 +499,7 @@ function col(name) {
 window.state = { sales: [], clients: [], stores: [], products: [] };
 let deleteRef       = { col: '', id: '' };
 let editRef         = null;
-let catEditRef      = { type: '', item: null };
+let catEditRef      = { type: '', item: null }; // Usado para editar en 'Gestión'
 let activeSubTab    = 'finanzas';
 let activeCatFilter = 'productos';
 let activeFinanceView = 'compras';
@@ -459,6 +511,10 @@ let scannerStream   = null;
 let pendingNombre   = '';
 let pendingCanvas   = null;
 let pendingExisteId = null;
+
+// Para la edición de productos desde la pestaña 'Productos'
+let editingProductId = null; // Guarda el ID del producto que se está editando
+
 
 // Finanzas fechas
 const getMXTimeParts = () => {
@@ -546,6 +602,7 @@ function startSync() {
     setupAuto('in-tienda',   'sug-tienda',   'stores');
     setupAuto('in-cliente',  'sug-cliente',  'clients');
     setupAuto('in-producto', 'sug-producto', 'products');
+    setupAuto('ep-tienda-escaneo', 'sug-edit-tienda', 'stores'); // Para la edición de productos
 }
 
 function setupAuto(inpId, boxId, key) {
@@ -568,9 +625,20 @@ function setupAuto(inpId, boxId, key) {
         if (key === 'products') {
             const p = window.state.products.find(x => (x.nombre || '').toUpperCase() === val);
             if (p) {
-                document.getElementById('in-costo').value  = p.costo  || 0;
-                document.getElementById('in-precio').value = p.precio || 0;
+                // Si es el input de ventas, precarga costo/precio
+                if (inpId === 'in-producto') {
+                    document.getElementById('in-costo').value  = p.costo  || 0;
+                    document.getElementById('in-precio').value = p.precio || 0;
+                }
+                // Si es el input de productos para edición, abre el formulario de edición
+                if (inpId === 'product-search-input') {
+                    selectProductForEdit(p.id);
+                }
             }
+        }
+        // Para tiendas/clientes, solo establece el valor
+        if (key === 'stores' && inpId === 'ep-tienda-escaneo') {
+            localStorage.setItem('yaute_scan_tienda', val.toUpperCase());
         }
     };
     document.addEventListener('click', e => {
@@ -589,16 +657,13 @@ function showTab(id, btn) {
     if (btn) btn.classList.add('active');
     // Para la pestaña de Gestión, asegurarnos de que muestre el sub-tab correcto
     if (id === 'control') switchSubTab('finanzas');
-    // Para la pestaña de Productos, no hay sub-tabs aquí, solo el botón del escáner
-    // Si queremos que al ir a productos el estado del escaner se resetee se puede añadir aqui
+    // Cuando se va a la pestaña de productos, asegúrate de que el estado inicial sea de búsqueda.
     if (id === 'productos') {
-        // Opcional: Reiniciar estado del modal del scanner o campos si se desea
-        document.getElementById('pm-nombre').value = '';
-        document.getElementById('pm-costo').value = '';
-        document.getElementById('pm-venta').value = '';
-        document.getElementById('pm-caducidad').value = '';
-        document.getElementById('dup-badge').classList.remove('show');
-        pendingNombre = ''; pendingCanvas = null; pendingExisteId = null;
+        resetProductEditDetails();
+        document.getElementById('product-search-section').style.display = 'block';
+        document.getElementById('product-edit-details').style.display = 'none';
+        document.getElementById('product-search-input').value = '';
+        document.getElementById('sug-product-edit').classList.add('d-none');
     }
 }
 
@@ -1038,8 +1103,19 @@ function changeGeminiKey() {
 /* ══════════════════════════════════════════════════════════════════
    SCANNER — CÁMARA
 ══════════════════════════════════════════════════════════════════ */
+// Función general para filtrar sugerencias de tienda (usada por scanner y ahora por edición de producto)
 function filterScanTienda(val) {
-    var box = document.getElementById('sug-scan-tienda');
+    const activeInput = document.activeElement;
+    let boxId = '';
+    if (activeInput.id === 'pm-tienda-escaneo') {
+        boxId = 'sug-scan-tienda';
+    } else if (activeInput.id === 'ep-tienda-escaneo') {
+        boxId = 'sug-edit-tienda';
+    } else {
+        return; // No es un input de tienda relevante
+    }
+
+    var box = document.getElementById(boxId);
     var q   = (val || '').toUpperCase();
     if (!q) { box.classList.add('d-none'); return; }
     var matches = (window.state.stores || [])
@@ -1053,27 +1129,31 @@ function filterScanTienda(val) {
     box.classList.remove('d-none');
 }
 
-function selectScanTienda(val) {
-    document.getElementById('pm-tienda-escaneo').value = val;
-    document.getElementById('sug-scan-tienda').classList.add('d-none');
-    localStorage.setItem('yaute_scan_tienda', val);
-}
-
-// Event delegation para sugerencias de tienda en scanner
+// Event delegation para sugerencias de tienda en scanner/edición
 document.addEventListener('click', function(e) {
-    // Seleccionar tienda al tocar una sugerencia
     var item = e.target.closest('.sug-scan-item');
     if (item) {
-        selectScanTienda(item.dataset.val || item.textContent.trim());
+        const inputId = item.closest('.sug-box').previousElementSibling.id; // Asume que el input está justo antes del sug-box
+        document.getElementById(inputId).value = item.dataset.val || item.textContent.trim();
+        document.getElementById(item.closest('.sug-box').id).classList.add('d-none');
+        if (inputId === 'pm-tienda-escaneo' || inputId === 'ep-tienda-escaneo') {
+            localStorage.setItem('yaute_scan_tienda', document.getElementById(inputId).value.toUpperCase());
+        }
         return;
     }
-    // Cerrar sugerencias al tocar fuera
-    var inp = document.getElementById('pm-tienda-escaneo');
-    var box = document.getElementById('sug-scan-tienda');
-    if (inp && box && !inp.contains(e.target) && !box.contains(e.target)) {
-        box.classList.add('d-none');
+    // Cerrar sugerencias al tocar fuera para ambos
+    var sugScanBox = document.getElementById('sug-scan-tienda');
+    var inpScan    = document.getElementById('pm-tienda-escaneo');
+    if (sugScanBox && inpScan && !inpScan.contains(e.target) && !sugScanBox.contains(e.target)) {
+        sugScanBox.classList.add('d-none');
+    }
+    var sugEditBox = document.getElementById('sug-edit-tienda');
+    var inpEdit    = document.getElementById('ep-tienda-escaneo');
+    if (sugEditBox && inpEdit && !inpEdit.contains(e.target) && !sugEditBox.contains(e.target)) {
+        sugEditBox.classList.add('d-none');
     }
 });
+
 
 async function openScannerModal() {
     // Precargar fecha de hoy y tienda persistida antes de abrir cámara
@@ -1102,21 +1182,10 @@ function closeScanner() {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   SCANNER — PRECIO SUGERIDO
-   Regla: costo + $20 de margen fijo → redondear al múltiplo de $10
-   cercano según el residuo (< 5 → baja, >= 5 → sube):
-     costo $18 → base $38 → redondea a $40
-     costo $22 → base $42 → redondea a $40
-     costo $25 → base $45 → redondea a $50
-     costo $31 → base $51 → redondea a $50
-     costo $44 → base $64 → redondea a $60
-   El campo de margen es editable en pantalla (default $20).
+   PRECIO SUGERIDO LÓGICA (PARA AMBOS CONTEXTOS)
 ══════════════════════════════════════════════════════════════════ */
 var MARGEN_DEFAULT = 20;
 
-/* Formatea la caducidad mientras el usuario escribe.
-   Acepta: "dic", "dic2", "dic 2", "dic 2026" etc.
-   Resultado: primera letra mayúscula + espacio + año */
 function formatCaducidad(input) {
     var meses = {
         'ene':'Ene','feb':'Feb','mar':'Mar','abr':'Abr','may':'May','jun':'Jun',
@@ -1139,9 +1208,7 @@ function redondearA10(valor) {
     return resto < 5 ? entero - resto : entero + (10 - resto);
 }
 
-/* Precarga precios en el panel del scanner.
-   Si el producto ya tiene precio guardado (>0) lo respeta.
-   Si no hay precio previo, calcula: costo + margen → redondeo. */
+/* Precarga precios en el panel del scanner (después de una captura IA) */
 function precargarPrecios(precio, costo) {
     var ventaInput  = document.getElementById('pm-venta');
     var costoInput  = document.getElementById('pm-costo');
@@ -1150,18 +1217,18 @@ function precargarPrecios(precio, costo) {
         ventaInput.value = parseFloat(precio).toFixed(2);
         ventaInput.dataset.suggested = '';
     } else if (costo && parseFloat(costo) > 0) {
-        autoSuggestVenta(String(costo));
+        autoSuggestVenta(String(costo)); // Llama a la versión del scanner
     } else {
         ventaInput.value = '';
     }
 }
 
+/* Auto-sugiere precio de venta para el modal del scanner */
 function autoSuggestVenta(costoStr) {
     var costo      = parseFloat(costoStr);
     var margenEl   = document.getElementById('pm-margen');
     var margen     = margenEl ? (parseFloat(margenEl.value) || MARGEN_DEFAULT) : MARGEN_DEFAULT;
     var ventaInput = document.getElementById('pm-venta');
-    // Recalcula siempre que el usuario edite costo o margen
     if (!isNaN(costo) && costo > 0) {
         var sugerido = redondearA10(costo + margen);
         ventaInput.value = sugerido.toFixed(2);
@@ -1169,34 +1236,35 @@ function autoSuggestVenta(costoStr) {
     }
 }
 
+/* Auto-sugiere precio de venta para la página de edición de productos */
+function autoSuggestVentaOnEdit(costoStr) {
+    var costo      = parseFloat(costoStr);
+    var margenEl   = document.getElementById('ep-margen');
+    var margen     = margenEl ? (parseFloat(margenEl.value) || MARGEN_DEFAULT) : MARGEN_DEFAULT;
+    var ventaInput = document.getElementById('ep-venta');
+    if (!isNaN(costo) && costo > 0) {
+        var sugerido = redondearA10(costo + margen);
+        ventaInput.value = sugerido.toFixed(2);
+        ventaInput.dataset.suggested = sugerido.toFixed(2);
+    }
+}
+
+
 /* ══════════════════════════════════════════════════════════════════
    SCANNER — CORRECCIÓN DE ORIENTACIÓN
-   
-   Solución: capturar el frame tal cual sale del sensor y luego
-   aplicar siempre -90° si es landscape, sin detección condicional.
-   Se ofrecen dos canvases (original y rotado) y se elige el que
-   queda portrait.
 ══════════════════════════════════════════════════════════════════ */
 function captureOrientado(video) {
-    // Dimensiones reales del sensor
     var vw = video.videoWidth;
     var vh = video.videoHeight;
-
-    // Dimensiones del video como se ve en pantalla
     var rw = video.clientWidth  || video.offsetWidth;
     var rh = video.clientHeight || video.offsetHeight;
-
-    // ¿El browser presentó el video rotado? (sensor landscape, pantalla portrait)
     var sensorLandscape  = (vw > vh);
     var vistaPortrait    = (rh > rw);
     var browserRoto      = sensorLandscape && vistaPortrait;
-
-    // Canvas destino siempre portrait
     var c   = document.createElement('canvas');
     var ctx = c.getContext('2d');
 
     if (browserRoto) {
-        // El browser rotó el video por CSS — compensar con +90° CW
         c.width  = vh;
         c.height = vw;
         ctx.save();
@@ -1205,13 +1273,11 @@ function captureOrientado(video) {
         ctx.drawImage(video, 0, 0, vw, vh);
         ctx.restore();
     } else {
-        // Sin rotación del browser — dibujar directo
         c.width  = vw;
         c.height = vh;
         ctx.drawImage(video, 0, 0, vw, vh);
     }
 
-    // Garantía final: si el resultado sigue landscape → forzar rotación
     if (c.width > c.height) {
         var c2   = document.createElement('canvas');
         var ctx2 = c2.getContext('2d');
@@ -1224,7 +1290,6 @@ function captureOrientado(video) {
         ctx2.restore();
         return c2;
     }
-
     return c;
 }
 
@@ -1308,7 +1373,7 @@ async function captureIA() {
             document.getElementById('price-modal').style.display = 'flex';
         } else if (candidatos.length >= 1) {
             // Similares → preguntar al usuario
-            pendingExisteId = null;
+            pendingExisteId = null; // No hay un ID exacto todavía
             document.getElementById('pm-venta').value = '';
             document.getElementById('pm-costo').value = '';
             document.getElementById('dup-badge').classList.remove('show');
@@ -1390,6 +1455,8 @@ function closeDupConfirm() {
 
 /* ══════════════════════════════════════════════════════════════════
    SCANNER — CONFIRMAR PRECIOS (compartir + Storage + Firestore)
+   Esta función es la que se llama después de que el usuario interactúa
+   con el modal de precios del ESCÁNER.
 ══════════════════════════════════════════════════════════════════ */
 async function confirmPrices() {
     const nombre        = document.getElementById('pm-nombre').value.replace(/\n/g,' ').trim().toUpperCase();
@@ -1407,17 +1474,35 @@ async function confirmPrices() {
     document.getElementById('price-modal').style.display = 'none';
 
     // 1. Web Share API — incluir caducidad si existe
+    // Solo compartir la imagen si se realizó un escaneo nuevo
+    let fileToShare = null;
     if (pendingCanvas && navigator.canShare) {
         try {
             const blob = await new Promise(r => pendingCanvas.toBlob(r, 'image/jpeg', 0.88));
-            const file = new File([blob], 'oferta.jpg', { type:'image/jpeg' });
+            fileToShare = new File([blob], 'oferta.jpg', { type:'image/jpeg' });
             let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + nombre + '\n💰 $' + venta;
             if (caducidad)  msgWA += '\n⏳ Cad: ' + caducidad;
-            if (navigator.canShare({ files:[file] })) await navigator.share({ files:[file], text: msgWA });
+            if (navigator.canShare({ files:[fileToShare] })) {
+                await navigator.share({ files:[fileToShare], text: msgWA });
+            } else {
+                window.open(`https://wa.me/?text=${encodeURIComponent(msgWA)}`, '_blank');
+            }
         } catch(e) { if (e.name !== 'AbortError') console.warn('Share:', e.message); }
+    } else {
+        // Si no hay canvas (ej. edición directa sin rescanear), aún se puede compartir el texto
+        if (navigator.share) {
+             let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + nombre + '\n💰 $' + venta;
+            if (caducidad)  msgWA += '\n⏳ Cad: ' + caducidad;
+            try { await navigator.share({ text: msgWA }); } catch(e) { if (e.name !== 'AbortError') console.warn('Share (text only):', e.message); }
+        } else {
+            let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + nombre + '\n💰 $' + venta;
+            if (caducidad)  msgWA += '\n⏳ Cad: ' + caducidad;
+            window.open(`https://wa.me/?text=${encodeURIComponent(msgWA)}`, '_blank');
+        }
     }
 
-    // 2. Subir foto a Storage
+
+    // 2. Subir foto a Storage si hay un nuevo canvas
     let fotoUrl = '';
     if (pendingCanvas) {
         try {
@@ -1448,9 +1533,150 @@ function cancelPrices() {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   MIGRACIÓN ONE-TIME (de ofertas-rapidas-yautepec → cuenta personal)
+   PRODUCTOS TAB — FUNCIONALIDADES ADICIONALES
 ══════════════════════════════════════════════════════════════════ */
 
+// Función para filtrar productos en la pestaña 'Productos' (para edición)
+function filterProductsForEdit(val) {
+    const inp = document.getElementById('product-search-input');
+    const box = document.getElementById('sug-product-edit');
+    const noProductMsg = document.getElementById('no-product-found-msg');
+    hideProductEditDetails(); // Ocultar el formulario de edición al empezar a buscar
+    if (!inp || !box) return;
+
+    const query = val.trim().toUpperCase();
+    if (!query) {
+        box.classList.add('d-none');
+        noProductMsg.style.display = 'block';
+        return;
+    }
+
+    const filtered = (window.state.products || [])
+        .filter(p => (p.nombre || '').toUpperCase().includes(query))
+        .slice(0, 8); // Mostrar un máximo de 8 sugerencias
+
+    if (filtered.length === 0) {
+        box.classList.add('d-none');
+        noProductMsg.style.display = 'block';
+    } else {
+        box.innerHTML = filtered.map(p =>
+            `<div class="sug-item" data-id="${p.id}" data-val="${p.nombre}">${p.nombre}</div>`
+        ).join('');
+        box.classList.remove('d-none');
+        noProductMsg.style.display = 'none';
+    }
+}
+
+// Función para seleccionar un producto de la sugerencia y mostrarlo para edición
+function selectProductForEdit(productId) {
+    const product = window.state.products.find(p => p.id === productId);
+    if (!product) {
+        toastScanner("Producto no encontrado", "danger");
+        return;
+    }
+
+    editingProductId = productId;
+    document.getElementById('product-search-section').style.display = 'none'; // Ocultar buscador
+    document.getElementById('product-edit-details').style.display = 'block'; // Mostrar formulario de edición
+
+    // Rellenar campos de edición
+    document.getElementById('ep-nombre').value          = product.nombre || '';
+    document.getElementById('ep-costo').value           = product.costo  || 0;
+    document.getElementById('ep-venta').value           = product.precio || 0;
+    document.getElementById('ep-margen').value          = product.margen || MARGEN_DEFAULT; // Asume un campo 'margen' o usa default
+    document.getElementById('ep-caducidad').value       = product.caducidad || '';
+    document.getElementById('ep-fecha-escaneo').value   = product.fechaEscaneo || getMXISODate(); // Usar fecha actual si no existe
+    document.getElementById('ep-tienda-escaneo').value  = product.tiendaEscaneo || '';
+
+    // Mostrar foto si existe
+    const photoPreview = document.getElementById('ep-foto-preview');
+    if (product.foto) {
+        photoPreview.src = product.foto;
+        photoPreview.style.display = 'block';
+        document.getElementById('product-photo-label').style.display = 'block';
+    } else {
+        photoPreview.src = '';
+        photoPreview.style.display = 'none';
+        document.getElementById('product-photo-label').style.display = 'none';
+    }
+
+    // Asegurarse de que el campo de tienda tenga las sugerencias activas si hay texto
+    // La función filterScanTienda se encarga de esto al recibir input
+    // Deberíamos re-inicializar el listener oninput para el campo de tienda de edición
+    document.getElementById('ep-tienda-escaneo').oninput = (e) => filterScanTienda(e.target.value);
+}
+
+// Ocultar el formulario de edición y volver a la búsqueda
+function hideProductEditDetails() {
+    editingProductId = null;
+    document.getElementById('product-edit-details').style.display = 'none';
+    document.getElementById('product-search-section').style.display = 'block';
+    document.getElementById('product-search-input').value = ''; // Limpiar búsqueda
+    document.getElementById('sug-product-edit').classList.add('d-none'); // Ocultar sugerencias
+    resetProductEditDetails(); // Limpiar campos del formulario de edición
+}
+
+// Limpia los campos del formulario de edición
+function resetProductEditDetails() {
+    document.getElementById('ep-nombre').value          = '';
+    document.getElementById('ep-costo').value           = '';
+    document.getElementById('ep-venta').value           = '';
+    document.getElementById('ep-margen').value          = MARGEN_DEFAULT;
+    document.getElementById('ep-caducidad').value       = '';
+    document.getElementById('ep-fecha-escaneo').value   = getMXISODate();
+    document.getElementById('ep-tienda-escaneo').value  = '';
+    document.getElementById('ep-foto-preview').src      = '';
+    document.getElementById('ep-foto-preview').style.display = 'none';
+    document.getElementById('product-photo-label').style.display = 'none';
+}
+
+
+// Función para guardar y compartir los datos de un producto editado
+async function confirmProductEdit() {
+    if (!editingProductId) {
+        toastScanner("No hay producto seleccionado para editar.", "danger");
+        return;
+    }
+
+    const nombre        = document.getElementById('ep-nombre').value.replace(/\n/g,' ').trim().toUpperCase();
+    const venta         = parseFloat(document.getElementById('ep-venta').value)  || 0;
+    const costo         = parseFloat(document.getElementById('ep-costo').value)  || 0;
+    const caducidad     = (document.getElementById('ep-caducidad').value   || '').trim();
+    const fechaEscaneo  = (document.getElementById('ep-fecha-escaneo').value || '').trim();
+    const tiendaEscaneo = (document.getElementById('ep-tienda-escaneo').value|| '').trim().toUpperCase();
+
+    if (!nombre) { toastScanner("Nombre vacío", '#ef4444'); return; }
+
+    // Persistir tienda para el próximo escaneo o edición
+    if (tiendaEscaneo) localStorage.setItem('yaute_scan_tienda', tiendaEscaneo);
+
+    // Los datos a actualizar
+    const dataToUpdate = { nombre, costo, precio: venta, fechaEscaneo, tiendaEscaneo };
+    if (caducidad) dataToUpdate.caducidad = caducidad;
+    // La foto no se actualiza desde aquí, solo al escanear un nuevo producto.
+    // Si la foto ya existe en el producto, se mantiene.
+
+    try {
+        await col('products').doc(editingProductId).update(dataToUpdate);
+        toastScanner("✅ Producto actualizado y compartido");
+
+        // Compartir texto (la imagen no se puede compartir desde aquí sin un re-escaneo)
+        if (navigator.share) {
+             let msgWA = '🛒 *OFERTA ACTUALIZADA*\n📦 ' + nombre + '\n💰 $' + venta;
+            if (caducidad)  msgWA += '\n⏳ Cad: ' + caducidad;
+            try { await navigator.share({ text: msgWA }); } catch(e) { if (e.name !== 'AbortError') console.warn('Share (text only) on edit:', e.message); }
+        } else {
+            let msgWA = '🛒 *OFERTA ACTUALIZADA*\n📦 ' + nombre + '\n💰 $' + venta;
+            if (caducidad)  msgWA += '\n⏳ Cad: ' + caducidad;
+            window.open(`https://wa.me/?text=${encodeURIComponent(msgWA)}`, '_blank');
+        }
+
+        hideProductEditDetails(); // Ocultar el formulario de edición y volver al buscador
+    } catch (e) {
+        console.error("Error al actualizar el producto:", e);
+        toastScanner("Error al actualizar: " + e.message, '#ef4444');
+    }
+}
 
 
 /* ══════════════════════════════════════════════════════════════════
