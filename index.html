@@ -1665,23 +1665,52 @@ function buildOfferMessage(nombre, venta, caducidad, tiendaEscaneo, titulo = 'OF
     return msgWA;
 }
 
+function downloadOfferFile(file) {
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file.name || 'oferta-yaute.jpg';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 async function shareOfferData({ nombre, venta, caducidad = '', tiendaEscaneo = '', fotoUrl = '', canvas = null, titulo = 'OFERTA RÁPIDA' }) {
     const msgWA = buildOfferMessage(nombre, venta, caducidad, tiendaEscaneo, titulo);
     let fileToShare = null;
     try {
         fileToShare = await createOfferCardFile({ nombre, venta, caducidad, tiendaEscaneo, fotoUrl, canvas, titulo });
-        if (navigator.share) {
-            const shareData = { title:'Oferta Yaute', text: msgWA };
-            if (fileToShare && navigator.canShare && navigator.canShare({ files:[fileToShare] })) {
-                shareData.files = [fileToShare];
+        if (navigator.share && fileToShare) {
+            const attempts = [
+                { files:[fileToShare], title:'Oferta Yaute', text:msgWA },
+                { files:[fileToShare], title:'Oferta Yaute' },
+                { files:[fileToShare] }
+            ];
+            for (const data of attempts) {
+                try {
+                    if (navigator.canShare && !navigator.canShare(data)) continue;
+                    await navigator.share(data);
+                    return true;
+                } catch(e) {
+                    if (e.name === 'AbortError') return false;
+                    console.warn('Share image attempt:', e.message);
+                }
             }
-            await navigator.share(shareData);
+        }
+
+        if (navigator.share) {
+            await navigator.share({ title:'Oferta Yaute', text: msgWA });
+            downloadOfferFile(fileToShare);
+            toastScanner("Se compartió texto y se descargó la imagen para adjuntarla.", '#f59e0b');
             return true;
         }
     } catch(e) {
         if (e.name === 'AbortError') return false;
         console.warn('Share:', e.message);
     }
+    downloadOfferFile(fileToShare);
     window.open(`https://wa.me/?text=${encodeURIComponent(msgWA)}`, '_blank');
     return true;
 }
