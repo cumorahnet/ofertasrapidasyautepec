@@ -1,16 +1,16 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v35.0 — Sistema Completo</title>
+    <title>Yaute v35.0 â€” Sistema Completo</title>
     <link rel="icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Yaute">
     <meta name="theme-color" content="#0f172a">
-    <!-- iOS: ícono para "Agregar a pantalla de inicio" -->
+    <!-- iOS: Ã­cono para "Agregar a pantalla de inicio" -->
     <link rel="apple-touch-icon" href="logo.png">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -88,10 +88,10 @@
         #ticket-render { position:absolute; top:-5000px; width:450px; background:white; padding:40px; font-family:monospace; color:black; line-height:1.4; border:1px solid #eee; }
         #toast-alert { position:fixed; top:25px; left:50%; transform:translateX(-50%); z-index:30000; padding:14px 28px; border-radius:50px; font-weight:800; display:none; color:white; box-shadow:0 10px 30px rgba(0,0,0,0.25); text-align:center; min-width:280px; }
 
-        /* ══ SCANNER MODAL ══ */
+        /* â•â• SCANNER MODAL â•â• */
         #ia-modal { position:fixed; inset:0; background:#000; z-index:10000; display:none; flex-direction:column; }
         #cam-preview-ia { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-        /* Guía visual ligera — sin sombra que oscurezca la imagen */
+        /* GuÃ­a visual ligera â€” sin sombra que oscurezca la imagen */
         .scan-guide { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:82%; aspect-ratio:4/3; border:2px solid rgba(0,229,192,0.6); border-radius:16px; pointer-events:none; }
         .scan-guide::before, .scan-guide::after { content:''; position:absolute; width:22px; height:22px; border-color:#00e5c0; border-style:solid; }
         .scan-guide::before { top:-2px; left:-2px; border-width:3px 0 0 3px; border-radius:4px 0 0 0; }
@@ -108,7 +108,7 @@
         /* Modal API Key scanner */
         #key-config-modal { position:fixed; inset:0; background:rgba(0,0,0,0.98); z-index:25000; display:none; align-items:center; justify-content:center; padding:20px; }
 
-        /* Modal migración */
+        /* Modal migraciÃ³n */
 .toast-msg { position:fixed; top:22px; left:50%; transform:translateX(-50%); z-index:30000; padding:12px 24px; border-radius:50px; font-weight:800; font-size:0.8rem; display:none; color:white; box-shadow:0 8px 24px rgba(0,0,0,0.25); max-width:88%; text-align:center; }
     </style>
 </head>
@@ -123,13 +123,13 @@
 <div id="toast-alert"></div>
 <div id="toast-msg" class="toast-msg"></div>
 
-<!-- ══ MODAL API KEY GEMINI ══════════════════════════════════════ -->
+<!-- â•â• MODAL API KEY GEMINI â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div id="key-config-modal">
     <div class="card-custom w-100" style="max-width:350px; text-align:center;">
-        <h6 class="fw-bold mb-3">⚙ ACTIVAR ESCÁNER IA</h6>
+        <h6 class="fw-bold mb-3">âš™ ACTIVAR ESCÃNER IA</h6>
         <p style="font-size:0.7rem;" class="text-muted mb-3">
             Pega tu API Key de Gemini.<br>Se guarda solo en este dispositivo.<br><br>
-            Obtén la tuya gratis en<br>
+            ObtÃ©n la tuya gratis en<br>
             <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--accent);">aistudio.google.com</a>
         </p>
         <input type="password" id="user-gemini-key" class="form-control mb-3" placeholder="AIzaSy...">
@@ -137,11 +137,11 @@
     </div>
 </div>
 
-<!-- ══ MODAL REINICIAR CATÁLOGO ══════════════════════════════════ -->
+<!-- â•â• MODAL REINICIAR CATÃLOGO â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div id="reset-modal" class="modal-overlay">
     <div class="modal-content-custom text-center">
         <div class="mb-3 text-danger"><i class="fas fa-trash-can fa-4x"></i></div>
-        <h5 class="fw-bold">¿Limpiar Catálogo?</h5>
+        <h5 class="fw-bold">Â¿Limpiar CatÃ¡logo?</h5>
         <div class="d-flex gap-2 mt-4">
             <button class="btn btn-light flex-fill rounded-pill fw-bold" onclick="closeResetModal()">CANCELAR</button>
             <button class="btn btn-danger flex-fill rounded-pill fw-bold" id="btn-confirm-reset-all">BORRAR TODO</button>
@@ -149,7 +149,7 @@
     </div>
 </div>
 
-<!-- ══ MODAL EDITAR VENTA ════════════════════════════════════════ -->
+<!-- â•â• MODAL EDITAR VENTA â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div id="edit-modal" class="modal-overlay">
     <div class="modal-content-custom">
         <h5 class="fw-bold mb-4 text-primary">Editar Registro</h5>
@@ -171,12 +171,12 @@
     </div>
 </div>
 
-<!-- ══ MODAL EDITAR CATÁLOGO ═════════════════════════════════════ -->
+<!-- â•â• MODAL EDITAR CATÃLOGO â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div id="cat-edit-modal" class="modal-overlay">
     <div class="modal-content-custom">
         <h5 class="fw-bold mb-4" style="color:var(--accent)">Editar Maestro</h5>
         <div id="cat-edit-fields"></div>
-        <p class="text-center text-muted" style="font-size:0.65rem; margin:15px 0;">* Sincroniza automáticamente registros de los últimos 5 días.</p>
+        <p class="text-center text-muted" style="font-size:0.65rem; margin:15px 0;">* Sincroniza automÃ¡ticamente registros de los Ãºltimos 5 dÃ­as.</p>
         <div class="d-flex gap-2">
             <button class="btn btn-light flex-fill rounded-pill" onclick="closeCatEditModal()">CERRAR</button>
             <button class="btn btn-primary flex-fill rounded-pill fw-bold" onclick="confirmCatUpdate()">GUARDAR</button>
@@ -184,23 +184,23 @@
     </div>
 </div>
 
-<!-- ══ MODAL BORRAR ══════════════════════════════════════════════ -->
+<!-- â•â• MODAL BORRAR â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div id="delete-modal" class="modal-overlay">
     <div class="modal-content-custom text-center">
         <div class="mb-3 text-danger"><i class="fas fa-trash-alt fa-4x"></i></div>
-        <h5 class="fw-bold">¿Borrar registro?</h5>
+        <h5 class="fw-bold">Â¿Borrar registro?</h5>
         <div class="d-flex gap-2 mt-4">
             <button class="btn btn-light flex-fill rounded-pill fw-bold" onclick="closeDeleteModal()">NO</button>
-            <button class="btn btn-danger flex-fill rounded-pill fw-bold" id="btn-confirm-delete">SÍ, BORRAR</button>
+            <button class="btn btn-danger flex-fill rounded-pill fw-bold" id="btn-confirm-delete">SÃ, BORRAR</button>
         </div>
     </div>
 </div>
 
-<!-- ══ MODAL AGREGAR PRODUCTO ════════════════════════════════════ -->
+<!-- â•â• MODAL AGREGAR PRODUCTO â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div id="add-product-modal" class="modal-overlay">
     <div class="modal-content-custom">
         <h5 class="fw-bold mb-4 text-primary">Nuevo Producto</h5>
-        <div class="mb-3"><label class="text-uppercase">Descripción</label><input type="text" id="add-prod-name" class="form-control text-uppercase"></div>
+        <div class="mb-3"><label class="text-uppercase">DescripciÃ³n</label><input type="text" id="add-prod-name" class="form-control text-uppercase"></div>
         <div class="row g-2 mb-4">
             <div class="col-6"><label class="text-uppercase">Costo Anaquel</label><input type="number" id="add-prod-costo" class="form-control fw-bold text-danger"></div>
             <div class="col-6"><label class="text-uppercase">Precio Venta</label><input type="number" id="add-prod-precio" class="form-control fw-bold text-success"></div>
@@ -212,7 +212,7 @@
     </div>
 </div>
 
-<!-- ══ MODAL PRECIOS SCANNER (Usado después de escanear) ═════════════════════════════════════ -->
+<!-- â•â• MODAL PRECIOS SCANNER (Usado despuÃ©s de escanear) â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div id="price-modal">
     <div id="price-panel">
         <p class="fw-bold mb-1" style="font-size:0.7rem; color:#94a3b8; letter-spacing:1px;">PRODUCTO IDENTIFICADO</p>
@@ -220,7 +220,7 @@
             <i class="fas fa-exclamation-triangle mt-1" style="flex-shrink:0;"></i>
             <span id="dup-text"></span>
         </div>
-        <!-- Descripción en textarea: hace wrap automático, no se desborda -->
+        <!-- DescripciÃ³n en textarea: hace wrap automÃ¡tico, no se desborda -->
         <textarea id="pm-nombre" class="form-control mb-3"
             rows="3"
             placeholder="Nombre del producto"
@@ -262,10 +262,10 @@
                     placeholder="0.00" step="0.01">
             </div>
         </div>
-        <!-- Caducidad (opcional) — formato libre: Dic 2026 -->
+        <!-- Caducidad (opcional) â€” formato libre: Dic 2026 -->
         <div class="mb-2">
             <label class="small fw-bold text-muted">
-                CADUCIDAD <span style="font-weight:400; font-size:0.6rem;">(opcional · ej: Dic 2026)</span>
+                CADUCIDAD <span style="font-weight:400; font-size:0.6rem;">(opcional Â· ej: Dic 2026)</span>
             </label>
             <input type="text" id="pm-caducidad" class="form-control"
                 placeholder="Dic 2026"
@@ -274,35 +274,35 @@
                 oninput="formatCaducidad(this)">
         </div>
         <small class="text-muted d-block mb-3" style="font-size:0.62rem; text-align:center;">
-            💡 Precio = costo + margen → redondeado al $10 más cercano
+            ðŸ’¡ Precio = costo + margen â†’ redondeado al $10 mÃ¡s cercano
         </small>
-        <button class="btn btn-success w-100 py-3 rounded-pill fw-bold mb-2" onclick="confirmPrices()">📲 COMPARTIR Y GUARDAR</button>
-        <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="cancelPrices()" style="border:none;">CANCELAR — VOLVER A CÁMARA</button>
+        <button class="btn btn-success w-100 py-3 rounded-pill fw-bold mb-2" onclick="confirmPrices()">ðŸ“² COMPARTIR Y GUARDAR</button>
+        <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="cancelPrices()" style="border:none;">CANCELAR â€” VOLVER A CÃMARA</button>
     </div>
 </div>
 
-<!-- ══ MODAL CONFIRMACIÓN DUPLICADO ═════════════════════════════ -->
+<!-- â•â• MODAL CONFIRMACIÃ“N DUPLICADO â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div id="dup-confirm-modal" style="position:fixed; inset:0; background:rgba(0,0,0,0.88); z-index:21000; display:none; align-items:flex-end; justify-content:center; padding:16px;">
     <div style="background:white; border-radius:24px; padding:22px; width:100%; max-width:420px;">
-        <p class="fw-bold mb-1" style="font-size:0.7rem; color:#94a3b8; letter-spacing:1px;">⚠ POSIBLE DUPLICADO</p>
+        <p class="fw-bold mb-1" style="font-size:0.7rem; color:#94a3b8; letter-spacing:1px;">âš  POSIBLE DUPLICADO</p>
         <p style="font-size:0.82rem; color:#0f172a; margin-bottom:14px;">
-            El producto escaneado <strong id="dcm-escaneado"></strong> coincide parcialmente con los siguientes registros. ¿Es alguno de estos?
+            El producto escaneado <strong id="dcm-escaneado"></strong> coincide parcialmente con los siguientes registros. Â¿Es alguno de estos?
         </p>
         <div id="dcm-candidatos" style="max-height:200px; overflow-y:auto; margin-bottom:14px;"></div>
         <button class="btn btn-warning w-100 rounded-pill fw-bold mb-2" onclick="skipDuplicate()">
-            NO — ES UN PRODUCTO NUEVO
+            NO â€” ES UN PRODUCTO NUEVO
         </button>
         <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="closeDupConfirm()" style="border:none; font-size:0.8rem;">
-            CANCELAR — VOLVER A CÁMARA
+            CANCELAR â€” VOLVER A CÃMARA
         </button>
     </div>
 </div>
 
-<!-- ══ HEADER ════════════════════════════════════════════════════ -->
+<!-- â•â• HEADER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <header>
     <div class="d-flex flex-column align-items-center">
         <div class="d-flex align-items-center">
-            <h6 class="m-0 fw-bold">Ofertas Rápidas Yaute</h6>
+            <h6 class="m-0 fw-bold">Ofertas RÃ¡pidas Yaute</h6>
             <img src="logo.png" alt="Yaute" style="height:28px; margin-left:10px; border-radius:6px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHy9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
@@ -316,7 +316,7 @@
     </div>
 </header>
 
-<!-- ══ MAIN ══════════════════════════════════════════════════════ -->
+<!-- â•â• MAIN â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <main>
     <!-- NUEVA TAB DE PRODUCTOS (AHORA LA PRIMERA) -->
     <div id="tab-productos" class="tab-content">
@@ -325,21 +325,21 @@
             <input type="text" id="product-search-input" class="form-control text-uppercase" placeholder="Escribe para buscar..." oninput="filterProductsForEdit(this.value)">
             <div id="sug-product-edit" class="sug-box d-none"></div>
             <p class="text-center text-muted mt-3 mb-0" style="font-size:0.75rem;" id="no-product-found-msg">
-                ¿No encuentras el producto?
+                Â¿No encuentras el producto?
             </p>
             <button class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow mt-2" onclick="openScannerModal()">
                 <i class="fas fa-camera me-2"></i> ESCANEAR NUEVO PRODUCTO
             </button>
         </div>
 
-        <!-- Sección de edición de producto (similar a price-panel, pero para edición directa) -->
+        <!-- SecciÃ³n de ediciÃ³n de producto (similar a price-panel, pero para ediciÃ³n directa) -->
         <div id="product-edit-details" class="card-custom" style="display:none;">
             <h5 class="fw-bold mb-4" style="color:var(--primary)">Editar Detalles del Producto</h5>
             <div class="mb-3 text-center" id="product-photo-preview-container">
                  <img id="ep-foto-preview" src="" style="width:100px; height:100px; object-fit:cover; border-radius:10px; border:1px solid #e2e8f0; display:none;">
                  <small class="text-muted d-block mt-1" id="product-photo-label" style="display:none;">Foto actual (solo se actualiza escaneando)</small>
             </div>
-            <div class="mb-3"><label class="text-uppercase">Descripción</label><textarea id="ep-nombre" class="form-control mb-3" rows="3" placeholder="Nombre del producto" style="resize:none; text-transform:uppercase; font-weight:700; font-size:0.9rem; line-height:1.4; word-break:break-word; white-space:pre-wrap;"></textarea></div>
+            <div class="mb-3"><label class="text-uppercase">DescripciÃ³n</label><textarea id="ep-nombre" class="form-control mb-3" rows="3" placeholder="Nombre del producto" style="resize:none; text-transform:uppercase; font-weight:700; font-size:0.9rem; line-height:1.4; word-break:break-word; white-space:pre-wrap;"></textarea></div>
             <div class="row g-2 mb-2">
                 <div class="col-6">
                     <label class="small fw-bold text-muted">FECHA ESCANEO</label>
@@ -367,7 +367,7 @@
             </div>
             <div class="mb-2">
                 <label class="small fw-bold text-muted">
-                    CADUCIDAD <span style="font-weight:400; font-size:0.6rem;">(opcional · ej: Dic 2026)</span>
+                    CADUCIDAD <span style="font-weight:400; font-size:0.6rem;">(opcional Â· ej: Dic 2026)</span>
                 </label>
                 <input type="text" id="ep-caducidad" class="form-control"
                     placeholder="Dic 2026"
@@ -376,14 +376,14 @@
                     oninput="formatCaducidad(this)">
             </div>
             <small class="text-muted d-block mb-3" style="font-size:0.62rem; text-align:center;">
-                💡 Precio = costo + margen → redondeado al $10 más cercano
+                ðŸ’¡ Precio = costo + margen â†’ redondeado al $10 mÃ¡s cercano
             </small>
             <button class="btn btn-success w-100 py-3 rounded-pill fw-bold mb-2" onclick="confirmProductEdit()">GUARDAR Y COMPARTIR</button>
             <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="hideProductEditDetails()">CANCELAR</button>
         </div>
 
         <div class="card-custom text-center mt-4">
-            <h6 class="fw-bold mb-3" style="color:var(--primary);">Configuración del Escáner</h6>
+            <h6 class="fw-bold mb-3" style="color:var(--primary);">ConfiguraciÃ³n del EscÃ¡ner</h6>
             <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="changeGeminiKey()">
                 <i class="fas fa-gear me-2"></i> Ajustar API Key Gemini
             </button>
@@ -401,7 +401,7 @@
                 <div class="col-3"><label class="text-uppercase">Cant.</label><input type="number" id="in-cantidad" class="form-control text-center fw-bold" value="1"></div>
                 <div class="col" style="position:relative">
                     <label class="text-uppercase">Producto</label>
-                    <input type="text" id="in-producto" class="form-control text-uppercase" placeholder="BUSCAR ARTÍCULO..."><div id="sug-producto" class="sug-box d-none"></div>
+                    <input type="text" id="in-producto" class="form-control text-uppercase" placeholder="BUSCAR ARTÃCULO..."><div id="sug-producto" class="sug-box d-none"></div>
                 </div>
             </div>
             <div class="row g-2 mb-3">
@@ -421,7 +421,7 @@
         <div id="lista-entregas"></div>
     </div>
 
-    <!-- TAB GESTIÓN -->
+    <!-- TAB GESTIÃ“N -->
     <div id="tab-control" class="tab-content" style="display:none;">
         <div class="sub-nav">
             <button class="sub-btn active" id="sub-btn-fin" onclick="switchSubTab('finanzas')"><i class="fas fa-chart-line"></i>FINANZAS</button>
@@ -431,24 +431,24 @@
     </div>
 </main>
 
-<!-- ══ SCANNER MODAL ═════════════════════════════════════════════ -->
+<!-- â•â• SCANNER MODAL â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div id="ia-modal">
     <video id="cam-preview-ia" autoplay playsinline muted></video>
     <div class="scan-guide"></div>
     <div id="cam-top-bar">
-        <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:white; border:1px solid rgba(255,255,255,0.3);" onclick="closeScanner()">✕ SALIR</button>
-        <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:#fbbf24; border:1px solid rgba(255,255,255,0.2); font-size:0.65rem;" onclick="changeGeminiKey()">⚙ API KEY</button>
+        <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:white; border:1px solid rgba(255,255,255,0.3);" onclick="closeScanner()">âœ• SALIR</button>
+        <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:#fbbf24; border:1px solid rgba(255,255,255,0.2); font-size:0.65rem;" onclick="changeGeminiKey()">âš™ API KEY</button>
     </div>
     <div id="snap-btn" onclick="captureIA()">
         <i class="fas fa-camera fa-2x text-primary" id="snap-icon"></i>
     </div>
 </div>
 
-<!-- ══ TICKET RENDER ═════════════════════════════════════════════ -->
+<!-- â•â• TICKET RENDER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <div id="ticket-render">
     <div style="text-align:center; margin-bottom:25px;">
         <img src="logo.png" alt="Yaute" style="width:120px; border-radius:10px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
-        <div style="font-size:1.8rem; font-weight:900; margin-top:15px; color:black;">OFERTAS RÁPIDAS YAUTE</div>
+        <div style="font-size:1.8rem; font-weight:900; margin-top:15px; color:black;">OFERTAS RÃPIDAS YAUTE</div>
     </div>
     <div id="t-fecha" style="text-align:center; margin-bottom:20px; font-size:1.1rem; color:black;"></div>
     <div style="border-top:3px solid #000; margin:15px 0;"></div>
@@ -459,21 +459,21 @@
     </table>
     <div style="border-top:2px dashed #000; margin:25px 0;"></div>
     <div style="display:flex; justify-content:space-between; font-size:1.9rem; font-weight:900; color:black;"><span>TOTAL:</span><span id="t-total"></span></div>
-    <div style="text-align:center; margin-top:45px; font-size:1.1rem; border:1.5px solid #000; padding:12px; font-weight:bold; color:black;">¡Gracias por su compra!</div>
+    <div style="text-align:center; margin-top:45px; font-size:1.1rem; border:1.5px solid #000; padding:12px; font-weight:bold; color:black;">Â¡Gracias por su compra!</div>
 </div>
 
-<!-- ══ BOTTOM NAV ════════════════════════════════════════════════ -->
+<!-- â•â• BOTTOM NAV â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
 <nav class="bottom-nav">
     <button class="tab-btn active" onclick="showTab('productos', this)"><i class="fas fa-box"></i>Productos</button>
     <button class="tab-btn" onclick="showTab('operaciones', this)"><i class="fas fa-cash-register"></i>Ventas</button>
     <button class="tab-btn" onclick="showTab('entregas', this)"><i class="fas fa-truck"></i>Reparto</button>
-    <button class="tab-btn" onclick="showTab('control', this)"><i class="fas fa-shield-halved"></i>Gestión</button>
+    <button class="tab-btn" onclick="showTab('control', this)"><i class="fas fa-shield-halved"></i>GestiÃ³n</button>
 </nav>
 
 <script>
-/* ══════════════════════════════════════════════════════════════════
-   FIREBASE UNIFICADA — ofertas-rapidas-con-scanner (cuenta personal)
-══════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   FIREBASE UNIFICADA â€” ofertas-rapidas-con-scanner (cuenta personal)
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const firebaseConfig = {
     apiKey:            "AIzaSyB3kiLskvkV6cJ0byaCg_zqe-GIWM3jelI",
     authDomain:        "ofertas-rapidas-con-scanner.firebaseapp.com",
@@ -486,20 +486,20 @@ firebase.initializeApp(firebaseConfig);
 const db      = firebase.firestore();
 const storage = firebase.storage();
 
-// Helper de colección — evita bug de slash en path
+// Helper de colecciÃ³n â€” evita bug de slash en path
 const APP_ID = 'yaute-v1-shared';
 function col(name) {
     return db.collection('artifacts').doc(APP_ID)
              .collection('public').doc('data').collection(name);
 }
 
-/* ══════════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    ESTADO GLOBAL
-══════════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 window.state = { sales: [], clients: [], stores: [], products: [] };
 let deleteRef       = { col: '', id: '' };
 let editRef         = null;
-let catEditRef      = { type: '', item: null }; // Usado para editar en 'Gestión'
+let catEditRef      = { type: '', item: null }; // Usado para editar en 'GestiÃ³n'
 let activeSubTab    = 'finanzas';
 let activeCatFilter = 'productos';
 let activeFinanceView = 'compras';
@@ -513,8 +513,8 @@ let pendingCanvas   = null;
 let pendingExisteId = null;
 let pendingFotoUrl  = '';
 
-// Para la edición de productos desde la pestaña 'Productos'
-let editingProductId = null; // Guarda el ID del producto que se está editando
+// Para la ediciÃ³n de productos desde la pestaÃ±a 'Productos'
+let editingProductId = null; // Guarda el ID del producto que se estÃ¡ editando
 
 
 // Finanzas fechas
@@ -529,9 +529,9 @@ const formatProperName = s => s ? s.trim().toLowerCase().split(' ').map(w => w.c
 
 let finDate = getMXISODate(), finDateFrom = getMXISODate(), finDateTo = getMXISODate(), finStore = '', finClient = '', finProduct = '', finAllDates = false;
 
-/* ══════════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    TOAST DOBLE (ventas usa #toast-alert, scanner usa #toast-msg)
-══════════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 const toast = (m, type = 'success') => {
     const el = document.getElementById('toast-alert');
     if (!el) return;
@@ -546,13 +546,13 @@ const toastScanner = (msg, color = '#10b981') => {
     el._t = setTimeout(() => el.style.display = 'none', 3000);
 };
 
-/* ══════════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    SYNC FIREBASE
-══════════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function hideSplash() {
     const splash = document.getElementById('splash-screen');
     if (!splash) return;
-    // Cancelar la animación CSS para que JS tome control
+    // Cancelar la animaciÃ³n CSS para que JS tome control
     splash.style.animation = 'none';
     splash.style.opacity   = '0';
     splash.style.pointerEvents = 'none';
@@ -570,7 +570,7 @@ function startSync() {
         document.getElementById('key-config-modal').style.display = 'flex';
     }
 
-    // Timeout reducido a 3s — si Firebase no responde, la app sigue usable
+    // Timeout reducido a 3s â€” si Firebase no responde, la app sigue usable
     const splashTimeout = setTimeout(hideSplash, 3000);
 
     let colsReady = 0;
@@ -582,7 +582,7 @@ function startSync() {
             document.getElementById('status-dot').style.background = 'var(--success)';
             document.getElementById('status-dot').style.boxShadow  = '0 0 10px var(--success)';
 
-            // Quitar splash cuando la primera colección responda
+            // Quitar splash cuando la primera colecciÃ³n responda
             colsReady++;
             if (colsReady === 1) {
                 clearTimeout(splashTimeout);
@@ -594,7 +594,7 @@ function startSync() {
         }, err => {
             console.error('Sync:', name, err.message);
             document.getElementById('status-dot').style.background = '#ef4444';
-            // Si todas fallaron, quitar splash también
+            // Si todas fallaron, quitar splash tambiÃ©n
             colsReady++;
             if (colsReady === 1) { clearTimeout(splashTimeout); hideSplash(); }
         });
@@ -603,9 +603,9 @@ function startSync() {
     setupAuto('in-tienda',   'sug-tienda',   'stores');
     setupAuto('in-cliente',  'sug-cliente',  'clients');
     setupAuto('in-producto', 'sug-producto', 'products');
-    setupAuto('ep-tienda-escaneo', 'sug-edit-tienda', 'stores'); // Para la edición de productos
+    setupAuto('ep-tienda-escaneo', 'sug-edit-tienda', 'stores'); // Para la ediciÃ³n de productos
 
-    // Manejador para cerrar las sugerencias de búsqueda de productos al hacer clic fuera
+    // Manejador para cerrar las sugerencias de bÃºsqueda de productos al hacer clic fuera
     const productSearchInput = document.getElementById('product-search-input');
     const sugProductEditBox  = document.getElementById('sug-product-edit');
     document.addEventListener('click', e => {
@@ -640,9 +640,9 @@ function setupAuto(inpId, boxId, key) {
                     document.getElementById('in-costo').value  = p.costo  || 0;
                     document.getElementById('in-precio').value = p.precio || 0;
                 }
-                // La lógica para product-search-input se maneja ahora directamente en filterProductsForEdit
+                // La lÃ³gica para product-search-input se maneja ahora directamente en filterProductsForEdit
                 // Este bloque de `if (inpId === 'product-search-input') { selectProductForEdit(p.id); }`
-                // ya no es necesario aquí y se elimina para evitar duplicidad o confusión.
+                // ya no es necesario aquÃ­ y se elimina para evitar duplicidad o confusiÃ³n.
             }
         }
         // Para tiendas/clientes, solo establece el valor
@@ -655,18 +655,18 @@ function setupAuto(inpId, boxId, key) {
     });
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   NAVEGACIÓN
-══════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   NAVEGACIÃ“N
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function showTab(id, btn) {
     document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
     const t = document.getElementById('tab-' + id);
     if (t) t.style.display = 'block';
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
-    // Para la pestaña de Gestión, asegurarnos de que muestre el sub-tab correcto
+    // Para la pestaÃ±a de GestiÃ³n, asegurarnos de que muestre el sub-tab correcto
     if (id === 'control') switchSubTab('finanzas');
-    // Cuando se va a la pestaña de productos, asegúrate de que el estado inicial sea de búsqueda.
+    // Cuando se va a la pestaÃ±a de productos, asegÃºrate de que el estado inicial sea de bÃºsqueda.
     if (id === 'productos') {
         resetProductEditDetails();
         document.getElementById('product-search-section').style.display = 'block';
@@ -683,13 +683,13 @@ function switchSubTab(id) {
     if (id === 'catalogo') renderControlList(); else renderFinanceMenu();
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   VENTAS — GUARDAR
-══════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   VENTAS â€” GUARDAR
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 document.addEventListener('DOMContentLoaded', () => {
     const ed = document.getElementById('entregas-date');
     if (ed) ed.value = getMXISODate();
-    // Inicia mostrando la pestaña de "Productos"
+    // Inicia mostrando la pestaÃ±a de "Productos"
     showTab('productos', document.querySelector('.tab-btn[onclick="showTab(\'productos\', this)"]'));
 
 
@@ -711,7 +711,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!ep) col('products').add({ nombre:p, costo:co, precio:prI });
         else     col('products').doc(ep.id).update({ costo:co, precio:prI });
 
-        toast("¡Venta guardada!");
+        toast("Â¡Venta guardada!");
         document.getElementById('in-cliente').value  = '';
         document.getElementById('in-producto').value = '';
         document.getElementById('in-cantidad').value = '1';
@@ -728,13 +728,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-confirm-reset-all').onclick = async () => {
         const snap = await col('products').get();
         for (const d of snap.docs) await col('products').doc(d.id).delete();
-        toast("Catálogo vaciado"); closeResetModal();
+        toast("CatÃ¡logo vaciado"); closeResetModal();
     };
 });
 
-/* ══════════════════════════════════════════════════════════════════
-   GESTIÓN CATÁLOGO
-══════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   GESTIÃ“N CATÃLOGO
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function openAddProductModal()  { document.getElementById('add-product-modal').style.display = 'flex'; }
 function closeAddProductModal() { document.getElementById('add-product-modal').style.display = 'none'; }
 async function confirmAddProduct() {
@@ -743,7 +743,7 @@ async function confirmAddProduct() {
     const p = parseFloat(document.getElementById('add-prod-precio').value) || 0;
     if (!n) return toast("Ingresa nombre", "danger");
     await col('products').add({ nombre:n, costo:c, precio:p });
-    toast("Agregado ✅"); closeAddProductModal();
+    toast("Agregado âœ…"); closeAddProductModal();
 }
 
 function openResetModal()  { document.getElementById('reset-modal').style.display = 'flex'; }
@@ -751,9 +751,9 @@ function closeResetModal() { document.getElementById('reset-modal').style.displa
 function openDeleteModal(colName, id) { deleteRef = { col:colName, id }; document.getElementById('delete-modal').style.display = 'flex'; }
 function closeDeleteModal() { document.getElementById('delete-modal').style.display = 'none'; }
 
-/* ══════════════════════════════════════════════════════════════════
-   EDITAR REGISTRO (con lógica CRISTO y cascada)
-══════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   EDITAR REGISTRO (con lÃ³gica CRISTO y cascada)
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function openEditModal(record) {
     editRef = record;
     document.getElementById('ed-tienda').value   = record.tienda;
@@ -793,12 +793,12 @@ async function confirmUpdate() {
     if (!ep) col('products').add({ nombre:p, costo:co, precio:prI });
     else     col('products').doc(ep.id).update({ costo:co, precio:prI });
 
-    toast("Sincronizado ✅"); closeEditModal();
+    toast("Sincronizado âœ…"); closeEditModal();
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   EDITAR CATÁLOGO MAESTRO (con cascada 5 días)
-══════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   EDITAR CATÃLOGO MAESTRO (con cascada 5 dÃ­as)
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function openCatEditModal(type, item) {
     catEditRef = { type, item };
     const c = document.getElementById('cat-edit-fields');
@@ -827,12 +827,12 @@ async function confirmCatUpdate() {
         if (type === 'products') { upd.costo=costVal; upd.precio = s.cliente==='CRISTO' ? costVal : priceVal; upd.total = s.cantidad * upd.precio; }
         await col('sales').doc(s.id).update(upd);
     }
-    toast("Sincronizado ✅"); closeCatEditModal();
+    toast("Sincronizado âœ…"); closeCatEditModal();
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   CONTROL — RENDER
-══════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   CONTROL â€” RENDER
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function setCatFilter(f)         { activeCatFilter = f; productSearchTerm = ''; renderControlList(); }
 function handleProductSearch(v)  { productSearchTerm = v.toUpperCase(); renderControlListItems(); }
 
@@ -876,9 +876,9 @@ function renderControlListItems() {
         </div>`).join('');
 }
 
-/* ══════════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    FINANZAS
-══════════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function renderFinanceMenu() {
     const container = document.getElementById('control-content');
     if (!container) return;
@@ -941,7 +941,7 @@ function renderFinanceResults() {
         const s = new Date(finDateFrom+'T00:00:00'), e = new Date(finDateTo+'T23:59:59');
         filtered = window.state.sales.filter(x => { const [d,m,y] = (x.fechaStr||'').split('/'); const dx = new Date(y,m-1,d); return dx>=s && dx<=e; });
     } else if (finAllDates) {
-        // TODAS las fechas — sin filtro de fecha
+        // TODAS las fechas â€” sin filtro de fecha
         filtered = window.state.sales.slice();
     } else {
         const [y,m,d] = finDate.split('-');
@@ -979,7 +979,7 @@ function renderFinanceResults() {
                 return `<div class="card-custom py-2 mb-1 shadow-none border d-flex justify-content-between align-items-center px-3 small"><b><i class="fas fa-store me-2 text-primary"></i>${t}</b><span class="fw-bold text-success">+$${(v-c).toFixed(2)}</span></div>`;
             }).join('');
     } else if (activeFinanceView === 'diezmo') {
-        res.innerHTML = `<div class="stat-card bg-gradient-warning shadow"><i class="fas fa-landmark-dome fa-2x mb-2"></i><h3>$${(totalUtilidad*0.1).toFixed(2)}</h3><small class="fw-bold">10% PARA EL SEÑOR</small><div class="mt-2 small" style="opacity:0.8">Sobre utilidad de $${totalUtilidad.toFixed(2)}</div></div>`;
+        res.innerHTML = `<div class="stat-card bg-gradient-warning shadow"><i class="fas fa-landmark-dome fa-2x mb-2"></i><h3>$${(totalUtilidad*0.1).toFixed(2)}</h3><small class="fw-bold">10% PARA EL SEÃ‘OR</small><div class="mt-2 small" style="opacity:0.8">Sobre utilidad de $${totalUtilidad.toFixed(2)}</div></div>`;
     }
 }
 
@@ -994,7 +994,7 @@ function updateFinFilter(key, val) {
     renderFinanceResults();
 }
 
-// Búsqueda predictiva de producto en finanzas
+// BÃºsqueda predictiva de producto en finanzas
 function filterFinProduct(val) {
     finProduct = val.trim();
     var sug = document.getElementById('fin-product-sug');
@@ -1002,7 +1002,7 @@ function filterFinProduct(val) {
     var q = val.toUpperCase();
     if (!q) { sug.style.display = 'none'; renderFinanceResults(); return; }
 
-    // Obtener productos únicos de las ventas filtradas
+    // Obtener productos Ãºnicos de las ventas filtradas
     var productos = [...new Set(window.state.sales.map(s => (s.producto||'').toUpperCase()))]
         .filter(p => p.includes(q)).sort().slice(0, 8);
 
@@ -1037,9 +1037,9 @@ document.addEventListener('click', function(e) {
 });
 function setFinView(v) { activeFinanceView = v; renderFinanceMenu(); }
 
-/* ══════════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    REPARTO
-══════════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function renderEntregas() {
     const list = document.getElementById('lista-entregas');
     const val  = document.getElementById('entregas-date')?.value;
@@ -1091,29 +1091,29 @@ async function shareTicket(n) {
     const canvas = await html2canvas(document.getElementById('ticket-render'), { scale:2, backgroundColor:'#ffffff' });
     canvas.toBlob(async b => {
         const file = new File([b], 'Ticket.png', { type:'image/png' });
-        const msg  = `hola *${pName}* te envío tu cuenta, gracias por tu preferencia`;
+        const msg  = `hola *${pName}* te envÃ­o tu cuenta, gracias por tu preferencia`;
         if (navigator.share) try { await navigator.share({ files:[file], title:'Nota Yaute', text:msg }); } catch(e) {}
         else window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     }, 'image/png');
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   SCANNER — API KEY GEMINI
-══════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   SCANNER â€” API KEY GEMINI
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function saveGeminiKey() {
     const val = document.getElementById('user-gemini-key').value.trim();
-    if (val && val.length > 10) { localStorage.setItem('yaute_key_v3310', val); document.getElementById('key-config-modal').style.display = 'none'; toastScanner("✅ Key activada"); }
-    else toastScanner("Key inválida", '#ef4444');
+    if (val && val.length > 10) { localStorage.setItem('yaute_key_v3310', val); document.getElementById('key-config-modal').style.display = 'none'; toastScanner("âœ… Key activada"); }
+    else toastScanner("Key invÃ¡lida", '#ef4444');
 }
 function changeGeminiKey() {
     document.getElementById('user-gemini-key').value = localStorage.getItem('yaute_key_v3310') || '';
     document.getElementById('key-config-modal').style.display = 'flex';
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   SCANNER — CÁMARA
-══════════════════════════════════════════════════════════════════ */
-// Función general para filtrar sugerencias de tienda (usada por scanner y ahora por edición de producto)
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   SCANNER â€” CÃMARA
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+// FunciÃ³n general para filtrar sugerencias de tienda (usada por scanner y ahora por ediciÃ³n de producto)
 function filterScanTienda(val) {
     const activeInput = document.activeElement;
     let boxId = '';
@@ -1139,11 +1139,11 @@ function filterScanTienda(val) {
     box.classList.remove('d-none');
 }
 
-// Event delegation para sugerencias de tienda en scanner/edición
+// Event delegation para sugerencias de tienda en scanner/ediciÃ³n
 document.addEventListener('click', function(e) {
     var item = e.target.closest('.sug-scan-item');
     if (item) {
-        const inputId = item.closest('.sug-box').previousElementSibling.id; // Asume que el input está justo antes del sug-box
+        const inputId = item.closest('.sug-box').previousElementSibling.id; // Asume que el input estÃ¡ justo antes del sug-box
         document.getElementById(inputId).value = item.dataset.val || item.textContent.trim();
         document.getElementById(item.closest('.sug-box').id).classList.add('d-none');
         if (inputId === 'pm-tienda-escaneo' || inputId === 'ep-tienda-escaneo') {
@@ -1166,7 +1166,7 @@ document.addEventListener('click', function(e) {
 
 
 async function openScannerModal() {
-    // Precargar fecha de hoy y tienda persistida antes de abrir cámara
+    // Precargar fecha de hoy y tienda persistida antes de abrir cÃ¡mara
     var hoy = new Date().toISOString().slice(0,10);
     var tiendaPersistida = localStorage.getItem('yaute_scan_tienda') || '';
     var fechaEl  = document.getElementById('pm-fecha-escaneo');
@@ -1181,7 +1181,7 @@ async function openScannerModal() {
         });
         document.getElementById('cam-preview-ia').srcObject = scannerStream;
     } catch(e) {
-        toastScanner("Error de cámara: " + e.message, '#ef4444');
+        toastScanner("Error de cÃ¡mara: " + e.message, '#ef4444');
         closeScanner();
     }
 }
@@ -1191,9 +1191,9 @@ function closeScanner() {
     document.getElementById('ia-modal').style.display = 'none';
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   PRECIO SUGERIDO LÓGICA (PARA AMBOS CONTEXTOS)
-══════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   PRECIO SUGERIDO LÃ“GICA (PARA AMBOS CONTEXTOS)
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 var MARGEN_DEFAULT = 20;
 
 function formatCaducidad(input) {
@@ -1218,7 +1218,7 @@ function redondearA10(valor) {
     return resto < 5 ? entero - resto : entero + (10 - resto);
 }
 
-/* Precarga precios en el panel del scanner (después de una captura IA) */
+/* Precarga precios en el panel del scanner (despuÃ©s de una captura IA) */
 function precargarPrecios(precio, costo) {
     var ventaInput  = document.getElementById('pm-venta');
     var costoInput  = document.getElementById('pm-costo');
@@ -1227,7 +1227,7 @@ function precargarPrecios(precio, costo) {
         ventaInput.value = parseFloat(precio).toFixed(2);
         ventaInput.dataset.suggested = '';
     } else if (costo && parseFloat(costo) > 0) {
-        autoSuggestVenta(String(costo)); // Llama a la versión del scanner
+        autoSuggestVenta(String(costo)); // Llama a la versiÃ³n del scanner
     } else {
         ventaInput.value = '';
     }
@@ -1246,7 +1246,7 @@ function autoSuggestVenta(costoStr) {
     }
 }
 
-/* Auto-sugiere precio de venta para la página de edición de productos */
+/* Auto-sugiere precio de venta para la pÃ¡gina de ediciÃ³n de productos */
 function autoSuggestVentaOnEdit(costoStr) {
     var costo      = parseFloat(costoStr);
     var margenEl   = document.getElementById('ep-margen');
@@ -1260,9 +1260,9 @@ function autoSuggestVentaOnEdit(costoStr) {
 }
 
 
-/* ══════════════════════════════════════════════════════════════════
-   SCANNER — CORRECCIÓN DE ORIENTACIÓN
-══════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   SCANNER â€” CORRECCIÃ“N DE ORIENTACIÃ“N
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function captureOrientado(video) {
     var vw = video.videoWidth;
     var vh = video.videoHeight;
@@ -1304,14 +1304,14 @@ function captureOrientado(video) {
 }
 
 
-/* ══════════════════════════════════════════════════════════════════
-   SCANNER — CAPTURA + IA + DETECCIÓN DUPLICADOS
-══════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   SCANNER â€” CAPTURA + IA + DETECCIÃ“N DUPLICADOS
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 async function captureIA() {
     const key   = localStorage.getItem('yaute_key_v3310');
     if (!key) { changeGeminiKey(); return; }
     const video = document.getElementById('cam-preview-ia');
-    if (!video.srcObject || video.videoWidth === 0) { toastScanner("Cámara no lista", '#f59e0b'); return; }
+    if (!video.srcObject || video.videoWidth === 0) { toastScanner("CÃ¡mara no lista", '#f59e0b'); return; }
 
     // Limpiar caducidad en cada nuevo escaneo
     document.getElementById('pm-caducidad').value = '';
@@ -1324,21 +1324,21 @@ async function captureIA() {
     snapIcon.className = 'fas fa-spinner fa-spin fa-2x text-primary';
     document.getElementById('snap-btn').style.pointerEvents = 'none';
 
-    // Reintento automático si Gemini responde 429 (quota por minuto)
+    // Reintento automÃ¡tico si Gemini responde 429 (quota por minuto)
     const callGemini = async (intentos = 3) => {
         const res = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${key}`,
             { method:'POST', headers:{'Content-Type':'application/json'},
               body: JSON.stringify({ contents:[{ parts:[
                   { inline_data:{ mime_type:'image/jpeg', data:b64 } },
-                  { text:"Eres un lector experto de etiquetas de productos de consumo en México. Analiza la imagen y extrae: 1) Marca comercial, 2) Nombre del producto, 3) Presentación (gramaje, volumen, número de piezas, sabor o variante si aparece). Responde SOLO con el resultado en UNA LÍNEA en MAYÚSCULAS con el formato: MARCA NOMBRE PRESENTACIÓN. Sin explicaciones, sin puntos, sin saltos de línea." }
+                  { text:"Eres un lector experto de etiquetas de productos de consumo en MÃ©xico. Analiza la imagen y extrae: 1) Marca comercial, 2) Nombre del producto, 3) PresentaciÃ³n (gramaje, volumen, nÃºmero de piezas, sabor o variante si aparece). Responde SOLO con el resultado en UNA LÃNEA en MAYÃšSCULAS con el formato: MARCA NOMBRE PRESENTACIÃ“N. Sin explicaciones, sin puntos, sin saltos de lÃ­nea." }
               ]}], generationConfig:{ temperature:0.1, maxOutputTokens:120 } })
             }
         );
         const data = await res.json();
         if (res.status === 429 && intentos > 1) {
             const segs = intentos === 3 ? 20 : 40;
-            toastScanner(`⏳ Muchas consultas — reintentando en ${segs}s...`, '#f59e0b');
+            toastScanner(`â³ Muchas consultas â€” reintentando en ${segs}s...`, '#f59e0b');
             await new Promise(r => setTimeout(r, segs * 1000));
             return callGemini(intentos - 1);
         }
@@ -1350,10 +1350,10 @@ async function captureIA() {
         const data = await callGemini();
         pendingNombre = data.candidates[0].content.parts[0].text.trim().toUpperCase();
 
-        // ── Detección de duplicados en 3 niveles ──────────────────────
+        // â”€â”€ DetecciÃ³n de duplicados en 3 niveles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         // Nivel 1: coincidencia exacta
         // Nivel 2: uno contiene al otro (>= 6 chars)
-        // Nivel 3: >= 2 palabras clave de 4+ chars en común
+        // Nivel 3: >= 2 palabras clave de 4+ chars en comÃºn
         const palabrasEsc = pendingNombre.split(' ').filter(w => w.length >= 4);
         const candidatos = window.state.products.filter(p => {
             const g = (p.nombre||'').toUpperCase().trim();
@@ -1366,26 +1366,26 @@ async function captureIA() {
         document.getElementById('pm-nombre').value = pendingNombre;
 
         if (candidatos.length === 1 && (candidatos[0].nombre||'').toUpperCase().trim() === pendingNombre) {
-            // Coincidencia exacta → panel directo con badge
+            // Coincidencia exacta â†’ panel directo con badge
             pendingExisteId = candidatos[0].id;
             pendingFotoUrl = candidatos[0].foto || '';
             precargarPrecios(candidatos[0].precio, candidatos[0].costo);
             const badge = document.getElementById('dup-badge');
             var prev = candidatos[0];
             var infoExtra = '';
-            if (prev.fechaEscaneo) infoExtra += '<br>📅 Escaneado: ' + prev.fechaEscaneo;
-            if (prev.tiendaEscaneo) infoExtra += ' · ' + prev.tiendaEscaneo;
-            if (prev.caducidad)    infoExtra += '<br>⏳ Cad: ' + prev.caducidad;
+            if (prev.fechaEscaneo) infoExtra += '<br>ðŸ“… Escaneado: ' + prev.fechaEscaneo;
+            if (prev.tiendaEscaneo) infoExtra += ' Â· ' + prev.tiendaEscaneo;
+            if (prev.caducidad)    infoExtra += '<br>â³ Cad: ' + prev.caducidad;
             document.getElementById('dup-text').innerHTML =
-                '<strong>¡Ya registrado!</strong><br>"' + prev.nombre + '"<br>' +
+                '<strong>Â¡Ya registrado!</strong><br>"' + prev.nombre + '"<br>' +
                 'Venta: <b>$' + (prev.precio||0) + '</b> | Costo: $' + (prev.costo||0) +
                 infoExtra +
                 '<br><em style="font-size:0.65rem;">Precios precargados, puedes modificar.</em>';
             badge.classList.add('show');
             document.getElementById('price-modal').style.display = 'flex';
         } else if (candidatos.length >= 1) {
-            // Similares → preguntar al usuario
-            pendingExisteId = null; // No hay un ID exacto todavía
+            // Similares â†’ preguntar al usuario
+            pendingExisteId = null; // No hay un ID exacto todavÃ­a
             pendingFotoUrl = '';
             document.getElementById('pm-venta').value = '';
             document.getElementById('pm-costo').value = '';
@@ -1409,9 +1409,9 @@ async function captureIA() {
     }
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   SCANNER — GESTIÓN DE DUPLICADOS
-══════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   SCANNER â€” GESTIÃ“N DE DUPLICADOS
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 function showDupConfirm(candidatos) {
     document.getElementById('dcm-escaneado').textContent = '"' + pendingNombre + '"';
     document.getElementById('dcm-candidatos').innerHTML = candidatos.map(function(p) {
@@ -1426,9 +1426,9 @@ function showDupConfirm(candidatos) {
                '<div style="font-size:0.72rem; color:#64748b; margin-top:2px;">' +
                'Venta: <span style="color:#10b981; font-weight:700;">$' + safePrecio + '</span> &nbsp;|&nbsp; ' +
                'Costo: <span style="color:#ef4444; font-weight:700;">$' + safeCosto + '</span></div>' +
-               ((p.fechaEscaneo || p.tiendaEscaneo) ? '<div style="font-size:0.62rem; color:#94a3b8; margin-top:2px;">📅 ' + (p.fechaEscaneo||'') + (p.tiendaEscaneo ? ' · '+p.tiendaEscaneo : '') + '</div>' : '') +
-               (p.caducidad ? '<div style="font-size:0.62rem; color:#f59e0b; margin-top:1px;">⏳ Cad: ' + p.caducidad + '</div>' : '') +
-               '<div style="font-size:0.65rem; color:#3b82f6; margin-top:4px; font-weight:700;">✓ SÍ, ES ESTE PRODUCTO</div>' +
+               ((p.fechaEscaneo || p.tiendaEscaneo) ? '<div style="font-size:0.62rem; color:#94a3b8; margin-top:2px;">ðŸ“… ' + (p.fechaEscaneo||'') + (p.tiendaEscaneo ? ' Â· '+p.tiendaEscaneo : '') + '</div>' : '') +
+               (p.caducidad ? '<div style="font-size:0.62rem; color:#f59e0b; margin-top:1px;">â³ Cad: ' + p.caducidad + '</div>' : '') +
+               '<div style="font-size:0.65rem; color:#3b82f6; margin-top:4px; font-weight:700;">âœ“ SÃ, ES ESTE PRODUCTO</div>' +
                '</div>';
     }).join('');
     // Usar event delegation en lugar de onclick inline para evitar bugs de comillas
@@ -1469,11 +1469,11 @@ function closeDupConfirm() {
     pendingNombre = ''; pendingCanvas = null; pendingExisteId = null; pendingFotoUrl = '';
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   SCANNER — CONFIRMAR PRECIOS (compartir + Storage + Firestore)
-   Esta función es la que se llama después de que el usuario interactúa
-   con el modal de precios del ESCÁNER.
-══════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   SCANNER â€” CONFIRMAR PRECIOS (compartir + Storage + Firestore)
+   Esta funciÃ³n es la que se llama despuÃ©s de que el usuario interactÃºa
+   con el modal de precios del ESCÃNER.
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 async function confirmPrices() {
     const nombre        = document.getElementById('pm-nombre').value.replace(/\n/g,' ').trim().toUpperCase();
     const venta         = parseFloat(document.getElementById('pm-venta').value)  || 0;
@@ -1483,9 +1483,9 @@ async function confirmPrices() {
     const tiendaEscaneo = (document.getElementById('pm-tienda-escaneo').value|| '').trim().toUpperCase();
     const margen        = parseFloat(document.getElementById('pm-margen').value) || MARGEN_DEFAULT; // Obtener el margen actual
 
-    if (!nombre) { toastScanner("Nombre vacío", '#ef4444'); return; }
+    if (!nombre) { toastScanner("Nombre vacÃ­o", '#ef4444'); return; }
 
-    // Persistir tienda para el próximo escaneo
+    // Persistir tienda para el prÃ³ximo escaneo
     if (tiendaEscaneo) localStorage.setItem('yaute_scan_tienda', tiendaEscaneo);
 
     document.getElementById('price-modal').style.display = 'none';
@@ -1515,12 +1515,12 @@ async function confirmPrices() {
     }
 
     // 3. Guardar / actualizar en Firestore
-    const data = { nombre, costo, precio: venta, fechaEscaneo, tiendaEscaneo, margen }; // Añadir margen aquí
+    const data = { nombre, costo, precio: venta, fechaEscaneo, tiendaEscaneo, margen }; // AÃ±adir margen aquÃ­
     if (fotoUrl)    data.foto      = fotoUrl;
     if (caducidad)  data.caducidad = caducidad;
 
-    if (pendingExisteId) { await col('products').doc(pendingExisteId).update(data); toastScanner("✅ Producto actualizado"); }
-    else                 { await col('products').add(data);                          toastScanner("✅ Producto guardado");    }
+    if (pendingExisteId) { await col('products').doc(pendingExisteId).update(data); toastScanner("âœ… Producto actualizado"); }
+    else                 { await col('products').add(data);                          toastScanner("âœ… Producto guardado");    }
 
     document.getElementById('pm-caducidad').value = '';
     pendingNombre = ''; pendingCanvas = null; pendingExisteId = null; pendingFotoUrl = '';
@@ -1534,9 +1534,9 @@ function cancelPrices() {
     pendingNombre = ''; pendingCanvas = null; pendingExisteId = null; pendingFotoUrl = '';
 }
 
-/* ══════════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    UTILITY FUNCTIONS
-══════════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 async function fetchImageAsFile(url, filename = 'image.jpg') {
     if (!url) return null;
     try {
@@ -1550,10 +1550,10 @@ async function fetchImageAsFile(url, filename = 'image.jpg') {
     }
 }
 
-async function canvasToImageFile(canvas, filename = 'oferta-yaute.jpg') {
+async function canvasToImageFile(canvas, filename = 'oferta-yaute.png') {
     if (!canvas) return null;
-    const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.9));
-    return blob ? new File([blob], filename, { type:'image/jpeg' }) : null;
+    const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+    return blob ? new File([blob], filename, { type:'image/png' }) : null;
 }
 
 function loadImageForCanvas(src) {
@@ -1596,7 +1596,7 @@ function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
     if (line && lines < maxLines) ctx.fillText(line, x, y);
 }
 
-async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscaneo = '', fotoUrl = '', canvas = null, titulo = 'OFERTA RÁPIDA' }) {
+async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscaneo = '', fotoUrl = '', canvas = null, titulo = 'OFERTA RÃPIDA' }) {
     const out = document.createElement('canvas');
     out.width = 1080;
     out.height = 1350;
@@ -1608,7 +1608,7 @@ async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscane
     ctx.fillRect(0, 0, out.width, 210);
     ctx.fillStyle = '#ffffff';
     ctx.font = '900 58px Arial, sans-serif';
-    ctx.fillText('OFERTAS RÁPIDAS YAUTE', 70, 125);
+    ctx.fillText('OFERTAS RÃPIDAS YAUTE', 70, 125);
     ctx.fillStyle = '#3b82f6';
     ctx.font = '800 34px Arial, sans-serif';
     ctx.fillText(titulo, 72, 172);
@@ -1647,7 +1647,7 @@ async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscane
     ctx.fillText('$' + (parseFloat(venta) || 0).toFixed(2), 110, 1155);
     ctx.fillStyle = '#64748b';
     ctx.font = '700 30px Arial, sans-serif';
-    const extra = [caducidad ? 'Cad: ' + caducidad : '', tiendaEscaneo || ''].filter(Boolean).join('  ·  ');
+    const extra = [caducidad ? 'Cad: ' + caducidad : '', tiendaEscaneo || ''].filter(Boolean).join('  Â·  ');
     if (extra) ctx.fillText(extra, 110, 1210);
 
     try {
@@ -1658,10 +1658,10 @@ async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscane
     }
 }
 
-function buildOfferMessage(nombre, venta, caducidad, tiendaEscaneo, titulo = 'OFERTA RÁPIDA') {
-    let msgWA = '🛒 *' + titulo + '*\n📦 ' + nombre + '\n💰 $' + venta;
-    if (caducidad) msgWA += '\n⏳ Cad: ' + caducidad;
-    if (tiendaEscaneo) msgWA += '\n🏪 ' + tiendaEscaneo;
+function buildOfferMessage(nombre, venta, caducidad, tiendaEscaneo, titulo = 'OFERTA RÃPIDA') {
+    let msgWA = 'ðŸ›’ *' + titulo + '*\nðŸ“¦ ' + nombre + '\nðŸ’° $' + venta;
+    if (caducidad) msgWA += '\nâ³ Cad: ' + caducidad;
+    if (tiendaEscaneo) msgWA += '\nðŸª ' + tiendaEscaneo;
     return msgWA;
 }
 
@@ -1670,18 +1670,19 @@ function downloadOfferFile(file) {
     const url = URL.createObjectURL(file);
     const a = document.createElement('a');
     a.href = url;
-    a.download = file.name || 'oferta-yaute.jpg';
+    a.download = file.name || 'oferta-yaute.png';
     document.body.appendChild(a);
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-async function shareOfferData({ nombre, venta, caducidad = '', tiendaEscaneo = '', fotoUrl = '', canvas = null, titulo = 'OFERTA RÁPIDA' }) {
+async function shareOfferData({ nombre, venta, caducidad = '', tiendaEscaneo = '', fotoUrl = '', canvas = null, titulo = 'OFERTA RÃPIDA' }) {
     const msgWA = buildOfferMessage(nombre, venta, caducidad, tiendaEscaneo, titulo);
     let fileToShare = null;
     try {
         fileToShare = await createOfferCardFile({ nombre, venta, caducidad, tiendaEscaneo, fotoUrl, canvas, titulo });
+        toastScanner(fileToShare ? "Preparando imagen para compartir..." : "No se pudo crear imagen", fileToShare ? '#3b82f6' : '#ef4444');
         if (navigator.share && fileToShare) {
             const attempts = [
                 { files:[fileToShare], title:'Oferta Yaute', text:msgWA },
@@ -1703,7 +1704,7 @@ async function shareOfferData({ nombre, venta, caducidad = '', tiendaEscaneo = '
         if (navigator.share) {
             await navigator.share({ title:'Oferta Yaute', text: msgWA });
             downloadOfferFile(fileToShare);
-            toastScanner("Se compartió texto y se descargó la imagen para adjuntarla.", '#f59e0b');
+            toastScanner("Se compartiÃ³ texto y se descargÃ³ la imagen para adjuntarla.", '#f59e0b');
             return true;
         }
     } catch(e) {
@@ -1727,11 +1728,11 @@ async function shareProductRecord(id) {
     });
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   PRODUCTOS TAB — FUNCIONALIDADES ADICIONALES
-══════════════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   PRODUCTOS TAB â€” FUNCIONALIDADES ADICIONALES
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
-// Función para filtrar productos en la pestaña 'Productos' (para edición)
+// FunciÃ³n para filtrar productos en la pestaÃ±a 'Productos' (para ediciÃ³n)
 function filterProductsForEdit(val) {
     const inp = document.getElementById('product-search-input');
     const box = document.getElementById('sug-product-edit');
@@ -1749,7 +1750,7 @@ function filterProductsForEdit(val) {
 
     const filtered = (window.state.products || [])
         .filter(p => (p.nombre || '').toUpperCase().includes(query))
-        .slice(0, 8); // Mostrar un máximo de 8 sugerencias
+        .slice(0, 8); // Mostrar un mÃ¡ximo de 8 sugerencias
 
     if (filtered.length === 0) {
         box.classList.add('d-none');
@@ -1775,7 +1776,7 @@ function filterProductsForEdit(val) {
     }
 }
 
-// Función para seleccionar un producto de la sugerencia y mostrarlo para edición
+// FunciÃ³n para seleccionar un producto de la sugerencia y mostrarlo para ediciÃ³n
 function selectProductForEdit(productId) {
     const product = window.state.products.find(p => p.id === productId);
     if (!product) {
@@ -1785,9 +1786,9 @@ function selectProductForEdit(productId) {
 
     editingProductId = productId;
     document.getElementById('product-search-section').style.display = 'none'; // Ocultar buscador
-    document.getElementById('product-edit-details').style.display = 'block'; // Mostrar formulario de edición
+    document.getElementById('product-edit-details').style.display = 'block'; // Mostrar formulario de ediciÃ³n
 
-    // Rellenar campos de edición
+    // Rellenar campos de ediciÃ³n
     document.getElementById('ep-nombre').value          = product.nombre || '';
     document.getElementById('ep-costo').value           = product.costo  || 0;
     document.getElementById('ep-venta').value           = product.precio || 0;
@@ -1809,22 +1810,22 @@ function selectProductForEdit(productId) {
     }
 
     // Asegurarse de que el campo de tienda tenga las sugerencias activas si hay texto
-    // La función filterScanTienda se encarga de esto al recibir input
-    // Deberíamos re-inicializar el listener oninput para el campo de tienda de edición
+    // La funciÃ³n filterScanTienda se encarga de esto al recibir input
+    // DeberÃ­amos re-inicializar el listener oninput para el campo de tienda de ediciÃ³n
     document.getElementById('ep-tienda-escaneo').oninput = (e) => filterScanTienda(e.target.value);
 }
 
-// Ocultar el formulario de edición y volver a la búsqueda
+// Ocultar el formulario de ediciÃ³n y volver a la bÃºsqueda
 function hideProductEditDetails() {
     editingProductId = null;
     document.getElementById('product-edit-details').style.display = 'none';
     document.getElementById('product-search-section').style.display = 'block';
-    document.getElementById('product-search-input').value = ''; // Limpiar búsqueda
+    document.getElementById('product-search-input').value = ''; // Limpiar bÃºsqueda
     document.getElementById('sug-product-edit').classList.add('d-none'); // Ocultar sugerencias
-    resetProductEditDetails(); // Limpiar campos del formulario de edición
+    resetProductEditDetails(); // Limpiar campos del formulario de ediciÃ³n
 }
 
-// Limpia los campos del formulario de edición
+// Limpia los campos del formulario de ediciÃ³n
 function resetProductEditDetails() {
     document.getElementById('ep-nombre').value          = '';
     document.getElementById('ep-costo').value           = '';
@@ -1839,7 +1840,7 @@ function resetProductEditDetails() {
 }
 
 
-// Función para guardar y compartir los datos de un producto editado
+// FunciÃ³n para guardar y compartir los datos de un producto editado
 async function confirmProductEdit() {
     if (!editingProductId) {
         toastScanner("No hay producto seleccionado para editar.", "danger");
@@ -1854,22 +1855,15 @@ async function confirmProductEdit() {
     const tiendaEscaneo = (document.getElementById('ep-tienda-escaneo').value|| '').trim().toUpperCase();
     const margen        = parseFloat(document.getElementById('ep-margen').value) || MARGEN_DEFAULT;
 
-    if (!nombre) { toastScanner("Nombre vacío", '#ef4444'); return; }
-
-    // Persistir tienda para el próximo escaneo o edición
+    if (!nombre) { toastScanner("Nombre vacio", '#ef4444'); return; }
     if (tiendaEscaneo) localStorage.setItem('yaute_scan_tienda', tiendaEscaneo);
 
-    // Los datos a actualizar en Firestore
     const dataToUpdate = { nombre, costo, precio: venta, fechaEscaneo, tiendaEscaneo, margen };
     if (caducidad) dataToUpdate.caducidad = caducidad;
 
     try {
-        // 1. Actualizar en Firestore primero
-        await col('products').doc(editingProductId).update(dataToUpdate);
-        toastScanner("✅ Producto actualizado");
-
-        // 2. Compartir con una imagen generada de oferta.
         const currentProduct = window.state.products.find(p => p.id === editingProductId);
+        toastScanner("Preparando imagen para compartir...", '#3b82f6');
         const shared = await shareOfferData({
             nombre,
             venta,
@@ -1878,25 +1872,25 @@ async function confirmProductEdit() {
             fotoUrl: currentProduct ? (currentProduct.foto || '') : '',
             titulo: 'OFERTA ACTUALIZADA'
         });
-        if (shared) toastScanner("✅ Producto compartido");
 
-        hideProductEditDetails(); // Cierra el modal de edición si todo salió bien
+        await col('products').doc(editingProductId).update(dataToUpdate);
+        toastScanner(shared ? "Producto compartido y actualizado" : "Producto actualizado");
+        hideProductEditDetails();
     } catch (e) {
         if (e.name === 'AbortError') {
-            // Usuario canceló la acción de compartir. El producto ya se guardó.
-            toastScanner("✅ Producto actualizado (compartir cancelado)", '#f59e0b');
+            await col('products').doc(editingProductId).update(dataToUpdate);
+            toastScanner("Producto actualizado (compartir cancelado)", '#f59e0b');
         } else {
             console.error("Error al actualizar o compartir el producto:", e);
             toastScanner("Error al actualizar o compartir: " + e.message, '#ef4444');
         }
-        hideProductEditDetails(); // Cierra el modal de edición de todos modos
+        hideProductEditDetails();
     }
 }
 
-
-/* ══════════════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    ARRANQUE
-══════════════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 window.onload = startSync;
 </script>
   <script>
@@ -1907,20 +1901,21 @@ window.onload = startSync;
             scope: './'
           })
           .then(function(reg) {
-            console.log('SW registrado para nueva raíz:', reg.scope);
+            console.log('SW registrado para nueva raÃ­z:', reg.scope);
+            reg.update();
           })
           .catch(function(err) {
-            console.warn('SW no disponible en la nueva raíz:', err);
+            console.warn('SW no disponible en la nueva raÃ­z:', err);
           });
       });
     }
 
-    // Banner de instalación en Android Chrome
+    // Banner de instalaciÃ³n en Android Chrome
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', function(e) {
       e.preventDefault();
       deferredPrompt = e;
-      // Mostrar botón de instalar si no está ya instalada
+      // Mostrar botÃ³n de instalar si no estÃ¡ ya instalada
       var btn = document.getElementById('btn-install-pwa');
       if (btn) btn.style.display = 'flex';
     });
@@ -1942,3 +1937,4 @@ window.onload = startSync;
   </script>
 </body>
 </html>
+
