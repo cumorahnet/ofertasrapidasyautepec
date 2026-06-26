@@ -511,6 +511,7 @@ let scannerStream   = null;
 let pendingNombre   = '';
 let pendingCanvas   = null;
 let pendingExisteId = null;
+let pendingFotoUrl  = '';
 
 // Para la edición de productos desde la pestaña 'Productos'
 let editingProductId = null; // Guarda el ID del producto que se está editando
@@ -868,6 +869,7 @@ function renderControlListItems() {
                 ${it.foto ? `<img src="${it.foto}" style="width:40px; height:40px; object-fit:cover; border-radius:6px; margin-top:4px;">` : ''}
             </div>
             <div class="d-flex gap-3 align-items-center">
+                ${activeCatFilter==='productos' ? `<i class="fas fa-share-nodes text-success" onclick="shareProductRecord('${it.id}')"></i>` : ''}
                 <i class="fas fa-pen text-primary" onclick='openCatEditModal("${map[activeCatFilter]}", ${JSON.stringify(it).replace(/'/g,"\\'")})'></i>
                 <i class="fas fa-trash-can text-danger" onclick="openDeleteModal('${map[activeCatFilter]}','${it.id}')"></i>
             </div>
@@ -1313,6 +1315,7 @@ async function captureIA() {
 
     // Limpiar caducidad en cada nuevo escaneo
     document.getElementById('pm-caducidad').value = '';
+    pendingFotoUrl = '';
 
     pendingCanvas = captureOrientado(video);
     const b64 = pendingCanvas.toDataURL('image/jpeg', 0.88).split(',')[1];
@@ -1365,6 +1368,7 @@ async function captureIA() {
         if (candidatos.length === 1 && (candidatos[0].nombre||'').toUpperCase().trim() === pendingNombre) {
             // Coincidencia exacta → panel directo con badge
             pendingExisteId = candidatos[0].id;
+            pendingFotoUrl = candidatos[0].foto || '';
             precargarPrecios(candidatos[0].precio, candidatos[0].costo);
             const badge = document.getElementById('dup-badge');
             var prev = candidatos[0];
@@ -1382,6 +1386,7 @@ async function captureIA() {
         } else if (candidatos.length >= 1) {
             // Similares → preguntar al usuario
             pendingExisteId = null; // No hay un ID exacto todavía
+            pendingFotoUrl = '';
             document.getElementById('pm-venta').value = '';
             document.getElementById('pm-costo').value = '';
             document.getElementById('dup-badge').classList.remove('show');
@@ -1389,6 +1394,7 @@ async function captureIA() {
         } else {
             // Producto nuevo
             pendingExisteId = null;
+            pendingFotoUrl = '';
             document.getElementById('pm-venta').value = '';
             document.getElementById('pm-costo').value = '';
             document.getElementById('dup-badge').classList.remove('show');
@@ -1438,6 +1444,7 @@ function selectDuplicate(id, precio, costo) {
     precargarPrecios(precio, costo);
     var p = window.state.products.find(function(x){ return x.id === id; });
     if (p) {
+        pendingFotoUrl = p.foto || '';
         var badge = document.getElementById('dup-badge');
         document.getElementById('dup-text').innerHTML =
             '<strong>Seleccionado:</strong> "' + p.nombre + '"<br>Precios precargados, puedes modificar.';
@@ -1449,6 +1456,7 @@ function selectDuplicate(id, precio, costo) {
 
 function skipDuplicate() {
     pendingExisteId = null;
+    pendingFotoUrl = '';
     document.getElementById('dup-badge').classList.remove('show');
     document.getElementById('pm-venta').value = '';
     document.getElementById('pm-costo').value = '';
@@ -1458,7 +1466,7 @@ function skipDuplicate() {
 
 function closeDupConfirm() {
     document.getElementById('dup-confirm-modal').style.display = 'none';
-    pendingNombre = ''; pendingCanvas = null; pendingExisteId = null;
+    pendingNombre = ''; pendingCanvas = null; pendingExisteId = null; pendingFotoUrl = '';
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -1482,33 +1490,18 @@ async function confirmPrices() {
 
     document.getElementById('price-modal').style.display = 'none';
 
-    // 1. Web Share API — incluir caducidad si existe
-    // Solo compartir la imagen si se realizó un escaneo nuevo
-    let fileToShare = null;
-    if (pendingCanvas && navigator.canShare) {
-        try {
-            const blob = await new Promise(r => pendingCanvas.toBlob(r, 'image/jpeg', 0.88));
-            fileToShare = new File([blob], 'oferta.jpg', { type:'image/jpeg' });
-            let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + nombre + '\n💰 $' + venta;
-            if (caducidad)  msgWA += '\n⏳ Cad: ' + caducidad;
-            if (navigator.canShare({ files:[fileToShare] })) {
-                await navigator.share({ files:[fileToShare], text: msgWA });
-            } else {
-                window.open(`https://wa.me/?text=${encodeURIComponent(msgWA)}`, '_blank');
-            }
-        } catch(e) { if (e.name !== 'AbortError') console.warn('Share:', e.message); }
-    } else {
-        // Si no hay canvas (ej. edición directa sin rescanear), aún se puede compartir el texto
-        if (navigator.share) {
-             let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + nombre + '\n💰 $' + venta;
-            if (caducidad)  msgWA += '\n⏳ Cad: ' + caducidad;
-            try { await navigator.share({ text: msgWA }); } catch(e) { if (e.name !== 'AbortError') console.warn('Share (text only):', e.message); }
-        } else {
-            let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + nombre + '\n💰 $' + venta;
-            if (caducidad)  msgWA += '\n⏳ Cad: ' + caducidad;
-            window.open(`https://wa.me/?text=${encodeURIComponent(msgWA)}`, '_blank');
-        }
-    }
+    // 1. Compartir oferta: captura nueva, foto guardada del producto localizado o cartel sin foto.
+    const productoExistente = pendingExisteId
+        ? window.state.products.find(p => p.id === pendingExisteId)
+        : null;
+    await shareOfferData({
+        nombre,
+        venta,
+        caducidad,
+        tiendaEscaneo,
+        canvas: pendingCanvas,
+        fotoUrl: pendingFotoUrl || (productoExistente && productoExistente.foto) || ''
+    });
 
 
     // 2. Subir foto a Storage si hay un nuevo canvas
@@ -1530,7 +1523,7 @@ async function confirmPrices() {
     else                 { await col('products').add(data);                          toastScanner("✅ Producto guardado");    }
 
     document.getElementById('pm-caducidad').value = '';
-    pendingNombre = ''; pendingCanvas = null; pendingExisteId = null;
+    pendingNombre = ''; pendingCanvas = null; pendingExisteId = null; pendingFotoUrl = '';
     closeScanner();
 }
 
@@ -1538,7 +1531,7 @@ function cancelPrices() {
     document.getElementById('price-modal').style.display = 'none';
     document.getElementById('dup-badge').classList.remove('show');
     document.getElementById('pm-caducidad').value = '';   // limpiar caducidad
-    pendingNombre = ''; pendingCanvas = null; pendingExisteId = null;
+    pendingNombre = ''; pendingCanvas = null; pendingExisteId = null; pendingFotoUrl = '';
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -1557,6 +1550,154 @@ async function fetchImageAsFile(url, filename = 'image.jpg') {
     }
 }
 
+async function canvasToImageFile(canvas, filename = 'oferta-yaute.jpg') {
+    if (!canvas) return null;
+    const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.9));
+    return blob ? new File([blob], filename, { type:'image/jpeg' }) : null;
+}
+
+function loadImageForCanvas(src) {
+    return new Promise(resolve => {
+        if (!src) { resolve(null); return; }
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = src;
+    });
+}
+
+function drawRoundedRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+}
+
+function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
+    const words = String(text || '').split(/\s+/);
+    let line = '';
+    let lines = 0;
+    for (let i = 0; i < words.length; i++) {
+        const test = line ? line + ' ' + words[i] : words[i];
+        if (ctx.measureText(test).width > maxWidth && line) {
+            ctx.fillText(line, x, y);
+            y += lineHeight;
+            lines++;
+            line = words[i];
+            if (lines >= maxLines - 1) break;
+        } else {
+            line = test;
+        }
+    }
+    if (line && lines < maxLines) ctx.fillText(line, x, y);
+}
+
+async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscaneo = '', fotoUrl = '', canvas = null, titulo = 'OFERTA RÁPIDA' }) {
+    const out = document.createElement('canvas');
+    out.width = 1080;
+    out.height = 1350;
+    const ctx = out.getContext('2d');
+
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(0, 0, out.width, out.height);
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, out.width, 210);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 58px Arial, sans-serif';
+    ctx.fillText('OFERTAS RÁPIDAS YAUTE', 70, 125);
+    ctx.fillStyle = '#3b82f6';
+    ctx.font = '800 34px Arial, sans-serif';
+    ctx.fillText(titulo, 72, 172);
+
+    const img = canvas || await loadImageForCanvas(fotoUrl);
+    if (img) {
+        ctx.save();
+        drawRoundedRect(ctx, 70, 260, 940, 550, 34);
+        ctx.clip();
+        const iw = img.width || img.videoWidth;
+        const ih = img.height || img.videoHeight;
+        const scale = Math.max(940 / iw, 550 / ih);
+        const dw = iw * scale;
+        const dh = ih * scale;
+        ctx.drawImage(img, 70 + (940 - dw) / 2, 260 + (550 - dh) / 2, dw, dh);
+        ctx.restore();
+    } else {
+        ctx.fillStyle = '#e2e8f0';
+        drawRoundedRect(ctx, 70, 260, 940, 550, 34);
+        ctx.fill();
+        ctx.fillStyle = '#64748b';
+        ctx.font = '800 46px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('OFERTA YAUTE', 540, 550);
+        ctx.textAlign = 'left';
+    }
+
+    ctx.fillStyle = '#ffffff';
+    drawRoundedRect(ctx, 70, 860, 940, 380, 28);
+    ctx.fill();
+    ctx.fillStyle = '#0f172a';
+    ctx.font = '900 48px Arial, sans-serif';
+    wrapCanvasText(ctx, nombre, 110, 940, 860, 58, 3);
+    ctx.fillStyle = '#10b981';
+    ctx.font = '900 96px Arial, sans-serif';
+    ctx.fillText('$' + (parseFloat(venta) || 0).toFixed(2), 110, 1155);
+    ctx.fillStyle = '#64748b';
+    ctx.font = '700 30px Arial, sans-serif';
+    const extra = [caducidad ? 'Cad: ' + caducidad : '', tiendaEscaneo || ''].filter(Boolean).join('  ·  ');
+    if (extra) ctx.fillText(extra, 110, 1210);
+
+    try {
+        return await canvasToImageFile(out);
+    } catch(e) {
+        if (fotoUrl && !canvas) return createOfferCardFile({ nombre, venta, caducidad, tiendaEscaneo, fotoUrl:'', canvas:null, titulo });
+        throw e;
+    }
+}
+
+function buildOfferMessage(nombre, venta, caducidad, tiendaEscaneo, titulo = 'OFERTA RÁPIDA') {
+    let msgWA = '🛒 *' + titulo + '*\n📦 ' + nombre + '\n💰 $' + venta;
+    if (caducidad) msgWA += '\n⏳ Cad: ' + caducidad;
+    if (tiendaEscaneo) msgWA += '\n🏪 ' + tiendaEscaneo;
+    return msgWA;
+}
+
+async function shareOfferData({ nombre, venta, caducidad = '', tiendaEscaneo = '', fotoUrl = '', canvas = null, titulo = 'OFERTA RÁPIDA' }) {
+    const msgWA = buildOfferMessage(nombre, venta, caducidad, tiendaEscaneo, titulo);
+    let fileToShare = null;
+    try {
+        fileToShare = await createOfferCardFile({ nombre, venta, caducidad, tiendaEscaneo, fotoUrl, canvas, titulo });
+        if (navigator.share) {
+            const shareData = { title:'Oferta Yaute', text: msgWA };
+            if (fileToShare && navigator.canShare && navigator.canShare({ files:[fileToShare] })) {
+                shareData.files = [fileToShare];
+            }
+            await navigator.share(shareData);
+            return true;
+        }
+    } catch(e) {
+        if (e.name === 'AbortError') return false;
+        console.warn('Share:', e.message);
+    }
+    window.open(`https://wa.me/?text=${encodeURIComponent(msgWA)}`, '_blank');
+    return true;
+}
+
+async function shareProductRecord(id) {
+    const product = (window.state.products || []).find(p => p.id === id);
+    if (!product) { toastScanner("Producto no encontrado", '#ef4444'); return; }
+    await shareOfferData({
+        nombre: product.nombre || 'PRODUCTO',
+        venta: product.precio || 0,
+        caducidad: product.caducidad || '',
+        tiendaEscaneo: product.tiendaEscaneo || '',
+        fotoUrl: product.foto || ''
+    });
+}
+
 /* ══════════════════════════════════════════════════════════════════
    PRODUCTOS TAB — FUNCIONALIDADES ADICIONALES
 ══════════════════════════════════════════════════════════════════ */
@@ -1566,7 +1707,8 @@ function filterProductsForEdit(val) {
     const inp = document.getElementById('product-search-input');
     const box = document.getElementById('sug-product-edit');
     const noProductMsg = document.getElementById('no-product-found-msg');
-    hideProductEditDetails(); // Ocultar el formulario de edición al empezar a buscar
+    editingProductId = null;
+    document.getElementById('product-edit-details').style.display = 'none';
     if (!inp || !box) return;
 
     const query = val.trim().toUpperCase();
@@ -1590,15 +1732,17 @@ function filterProductsForEdit(val) {
         box.classList.remove('d-none');
         noProductMsg.style.display = 'none';
 
-        // Manejador de clic para las sugerencias de búsqueda de productos
-        // Se adjunta cada vez que se actualizan las sugerencias
-        box.onclick = e => {
+        const handleSelect = e => {
             const it = e.target.closest('.sug-item');
             if (!it) return;
+            e.preventDefault();
             const productId = it.dataset.id;
+            inp.value = it.dataset.val || it.textContent.trim();
             selectProductForEdit(productId);
-            box.classList.add('d-none'); // Ocultar sugerencias después de la selección
+            box.classList.add('d-none');
         };
+        box.onpointerdown = handleSelect;
+        box.onclick = handleSelect;
     }
 }
 
@@ -1695,31 +1839,17 @@ async function confirmProductEdit() {
         await col('products').doc(editingProductId).update(dataToUpdate);
         toastScanner("✅ Producto actualizado");
 
-        // 2. Preparar para compartir
-        // Obtener el producto actual para acceder a la URL de la foto
+        // 2. Compartir con una imagen generada de oferta.
         const currentProduct = window.state.products.find(p => p.id === editingProductId);
-        let fileToShare = null;
-        let msgWA = '🛒 *OFERTA ACTUALIZADA*\n📦 ' + nombre + '\n💰 $' + venta;
-        if (caducidad) msgWA += '\n⏳ Cad: ' + caducidad;
-
-        if (currentProduct && currentProduct.foto) {
-            // Intenta descargar la imagen para compartirla si existe
-            fileToShare = await fetchImageAsFile(currentProduct.foto, `oferta_${nombre.replace(/\s+/g, '_')}.jpg`);
-        }
-
-        // 3. Intentar compartir (esto puede ser cancelado por el usuario)
-        if (navigator.share) {
-            const shareData = { text: msgWA };
-            if (fileToShare && navigator.canShare({ files: [fileToShare] })) {
-                shareData.files = [fileToShare];
-            }
-            await navigator.share(shareData);
-            toastScanner("✅ Producto compartido"); // Solo muestra si la acción de compartir fue exitosa
-        } else {
-            // Fallback para entornos que no soportan Web Share API (ej. WhatsApp Web sin integración directa de archivos)
-            window.open(`https://wa.me/?text=${encodeURIComponent(msgWA)}`, '_blank');
-            toastScanner("✅ Producto compartido (navegador)"); // Para entornos sin Web Share API
-        }
+        const shared = await shareOfferData({
+            nombre,
+            venta,
+            caducidad,
+            tiendaEscaneo,
+            fotoUrl: currentProduct ? (currentProduct.foto || '') : '',
+            titulo: 'OFERTA ACTUALIZADA'
+        });
+        if (shared) toastScanner("✅ Producto compartido");
 
         hideProductEditDetails(); // Cierra el modal de edición si todo salió bien
     } catch (e) {
