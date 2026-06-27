@@ -1,8 +1,8 @@
-/* SERVICE WORKER — Yaute PWA
+﻿/* SERVICE WORKER - Yaute PWA
    Scope: /ofertasrapidasyautepec/
 */
 
-const CACHE_NAME = 'yaute-v3';
+const CACHE_NAME = 'yaute-v4';
 
 const PRECACHE = [
   '/ofertasrapidasyautepec/',
@@ -40,13 +40,13 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const url = event.request.url;
 
-  // Firebase y Gemini → siempre red
+  // Firebase y Gemini: siempre red
   if (NETWORK_ONLY_DOMAINS.some(d => url.includes(d))) {
     event.respondWith(fetch(event.request));
     return;
   }
 
-  // CDN (Bootstrap, FontAwesome, etc.) → Cache First
+  // CDN (Bootstrap, FontAwesome, etc.): Cache First
   if (url.includes('cdn.jsdelivr.net') ||
       url.includes('cdnjs.cloudflare.com') ||
       url.includes('gstatic.com')) {
@@ -64,7 +64,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Archivos propios → Network First con fallback a caché
+  // Archivos propios: Network First con fallback a cache
   event.respondWith(
     fetch(event.request)
       .then(res => {
@@ -76,3 +76,4 @@ self.addEventListener('fetch', event => {
       .catch(() => caches.match(event.request))
   );
 });
+
