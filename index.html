@@ -1596,7 +1596,7 @@ function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
     if (line && lines < maxLines) ctx.fillText(line, x, y);
 }
 
-async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscaneo = '', fotoUrl = '', canvas = null, titulo = 'OFERTA RÃPIDA' }) {
+async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscaneo = '', fotoUrl = '', canvas = null, titulo = 'OFERTA RAPIDA' }) {
     const out = document.createElement('canvas');
     out.width = 1080;
     out.height = 1350;
@@ -1608,7 +1608,7 @@ async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscane
     ctx.fillRect(0, 0, out.width, 210);
     ctx.fillStyle = '#ffffff';
     ctx.font = '900 58px Arial, sans-serif';
-    ctx.fillText('OFERTAS RÃPIDAS YAUTE', 70, 125);
+    ctx.fillText('OFERTAS RAPIDAS YAUTE', 70, 125);
     ctx.fillStyle = '#3b82f6';
     ctx.font = '800 34px Arial, sans-serif';
     ctx.fillText(titulo, 72, 172);
@@ -1647,7 +1647,7 @@ async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscane
     ctx.fillText('$' + (parseFloat(venta) || 0).toFixed(2), 110, 1155);
     ctx.fillStyle = '#64748b';
     ctx.font = '700 30px Arial, sans-serif';
-    const extra = [caducidad ? 'Cad: ' + caducidad : '', tiendaEscaneo || ''].filter(Boolean).join('  Â·  ');
+    const extra = [caducidad ? 'Cad: ' + caducidad : '', tiendaEscaneo || ''].filter(Boolean).join('  -  ');
     if (extra) ctx.fillText(extra, 110, 1210);
 
     try {
@@ -1658,10 +1658,10 @@ async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscane
     }
 }
 
-function buildOfferMessage(nombre, venta, caducidad, tiendaEscaneo, titulo = 'OFERTA RÃPIDA') {
-    let msgWA = 'ðŸ›’ *' + titulo + '*\nðŸ“¦ ' + nombre + '\nðŸ’° $' + venta;
-    if (caducidad) msgWA += '\nâ³ Cad: ' + caducidad;
-    if (tiendaEscaneo) msgWA += '\nðŸª ' + tiendaEscaneo;
+function buildOfferMessage(nombre, venta, caducidad, tiendaEscaneo, titulo = 'OFERTA RAPIDA') {
+    let msgWA = '*' + titulo + '*\n' + nombre + '\n$' + venta;
+    if (caducidad) msgWA += '\nCad: ' + caducidad;
+    if (tiendaEscaneo) msgWA += '\n' + tiendaEscaneo;
     return msgWA;
 }
 
@@ -1677,7 +1677,7 @@ function downloadOfferFile(file) {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-async function shareOfferData({ nombre, venta, caducidad = '', tiendaEscaneo = '', fotoUrl = '', canvas = null, titulo = 'OFERTA RÃPIDA' }) {
+async function shareOfferData({ nombre, venta, caducidad = '', tiendaEscaneo = '', fotoUrl = '', canvas = null, titulo = 'OFERTA RAPIDA' }) {
     const msgWA = buildOfferMessage(nombre, venta, caducidad, tiendaEscaneo, titulo);
     let fileToShare = null;
     try {
@@ -1704,7 +1704,7 @@ async function shareOfferData({ nombre, venta, caducidad = '', tiendaEscaneo = '
         if (navigator.share) {
             await navigator.share({ title:'Oferta Yaute', text: msgWA });
             downloadOfferFile(fileToShare);
-            toastScanner("Se compartiÃ³ texto y se descargÃ³ la imagen para adjuntarla.", '#f59e0b');
+            toastScanner("Se compartio texto y se descargo la imagen para adjuntarla.", '#f59e0b');
             return true;
         }
     } catch(e) {
