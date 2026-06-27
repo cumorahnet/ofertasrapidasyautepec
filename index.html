@@ -861,19 +861,22 @@ function renderControlListItems() {
     if (activeCatFilter === 'productos' && productSearchTerm) items = items.filter(it => (it.nombre||'').toUpperCase().includes(productSearchTerm));
     items.sort((a,b) => (a.nombre||'').localeCompare(b.nombre||''));
     if (!items.length) { list.innerHTML = `<div class="text-center py-4 text-muted small fw-bold">SIN REGISTROS</div>`; return; }
-    list.innerHTML = items.map(it => `
+    list.innerHTML = items.map(it => {
+        const photoUrl = getProductPhotoUrl(it);
+        return `
         <div class="card-custom py-2 mb-1 d-flex justify-content-between align-items-center shadow-none border small px-3">
             <div>
                 <div class="text-uppercase fw-bold text-dark">${it.nombre||'S/N'}</div>
                 ${activeCatFilter==='productos' ? `<div class="d-flex align-items-center flex-wrap gap-1" style="font-size:0.65rem;"><span class="text-muted">A:<span class="text-danger fw-bold">$${(it.costo||0).toFixed(2)}</span></span> <span class="text-muted">V:<span class="text-success fw-bold">$${(it.precio||0).toFixed(2)}</span></span>${it.tiendaEscaneo ? ` <span style="background:#eff6ff;color:#2563eb;border-radius:6px;padding:1px 6px;font-weight:800;">${it.tiendaEscaneo}</span>` : ''}${it.fechaEscaneo  ? ` <span style="color:#94a3b8;">${it.fechaEscaneo}</span>` : ''}</div>` : ''}
-                ${it.foto ? `<img src="${it.foto}" style="width:40px; height:40px; object-fit:cover; border-radius:6px; margin-top:4px;">` : ''}
+                ${photoUrl ? `<img src="${photoUrl}" style="width:40px; height:40px; object-fit:cover; border-radius:6px; margin-top:4px;">` : ''}
             </div>
             <div class="d-flex gap-3 align-items-center">
                 ${activeCatFilter==='productos' ? `<i class="fas fa-share-nodes text-success" onclick="shareProductRecord('${it.id}')"></i>` : ''}
                 <i class="fas fa-pen text-primary" onclick='openCatEditModal("${map[activeCatFilter]}", ${JSON.stringify(it).replace(/'/g,"\\'")})'></i>
                 <i class="fas fa-trash-can text-danger" onclick="openDeleteModal('${map[activeCatFilter]}','${it.id}')"></i>
             </div>
-        </div>`).join('');
+        </div>`;
+    }).join('');
 }
 
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
@@ -1368,7 +1371,7 @@ async function captureIA() {
         if (candidatos.length === 1 && (candidatos[0].nombre||'').toUpperCase().trim() === pendingNombre) {
             // Coincidencia exacta â†’ panel directo con badge
             pendingExisteId = candidatos[0].id;
-            pendingFotoUrl = candidatos[0].foto || '';
+            pendingFotoUrl = getProductPhotoUrl(candidatos[0]);
             precargarPrecios(candidatos[0].precio, candidatos[0].costo);
             const badge = document.getElementById('dup-badge');
             var prev = candidatos[0];
@@ -1444,7 +1447,7 @@ function selectDuplicate(id, precio, costo) {
     precargarPrecios(precio, costo);
     var p = window.state.products.find(function(x){ return x.id === id; });
     if (p) {
-        pendingFotoUrl = p.foto || '';
+        pendingFotoUrl = getProductPhotoUrl(p);
         var badge = document.getElementById('dup-badge');
         document.getElementById('dup-text').innerHTML =
             '<strong>Seleccionado:</strong> "' + p.nombre + '"<br>Precios precargados, puedes modificar.';
@@ -1500,7 +1503,7 @@ async function confirmPrices() {
         caducidad,
         tiendaEscaneo,
         canvas: pendingCanvas,
-        fotoUrl: pendingFotoUrl || (productoExistente && productoExistente.foto) || ''
+        fotoUrl: pendingFotoUrl || getProductPhotoUrl(productoExistente)
     });
 
 
@@ -1565,6 +1568,11 @@ function loadImageForCanvas(src) {
         img.onerror = () => resolve(null);
         img.src = src;
     });
+}
+
+function getProductPhotoUrl(product) {
+    if (!product) return '';
+    return product.foto || product.fotoUrl || product.imagen || product.image || product.photo || product.photoUrl || product.urlFoto || '';
 }
 
 function drawRoundedRect(ctx, x, y, w, h, r) {
@@ -1632,7 +1640,7 @@ async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscane
         ctx.fillStyle = '#64748b';
         ctx.font = '800 46px Arial, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('OFERTA YAUTE', 540, 550);
+        ctx.fillText(fotoUrl ? 'FOTO NO DISPONIBLE' : 'SIN FOTO GUARDADA', 540, 550);
         ctx.textAlign = 'left';
     }
 
@@ -1719,12 +1727,14 @@ async function shareOfferData({ nombre, venta, caducidad = '', tiendaEscaneo = '
 async function shareProductRecord(id) {
     const product = (window.state.products || []).find(p => p.id === id);
     if (!product) { toastScanner("Producto no encontrado", '#ef4444'); return; }
+    const fotoUrl = getProductPhotoUrl(product);
+    if (!fotoUrl) toastScanner("Este producto no tiene foto guardada", '#f59e0b');
     await shareOfferData({
         nombre: product.nombre || 'PRODUCTO',
         venta: product.precio || 0,
         caducidad: product.caducidad || '',
         tiendaEscaneo: product.tiendaEscaneo || '',
-        fotoUrl: product.foto || ''
+        fotoUrl
     });
 }
 
@@ -1799,8 +1809,9 @@ function selectProductForEdit(productId) {
 
     // Mostrar foto si existe
     const photoPreview = document.getElementById('ep-foto-preview');
-    if (product.foto) {
-        photoPreview.src = product.foto;
+    const productPhotoUrl = getProductPhotoUrl(product);
+    if (productPhotoUrl) {
+        photoPreview.src = productPhotoUrl;
         photoPreview.style.display = 'block';
         document.getElementById('product-photo-label').style.display = 'block';
     } else {
@@ -1863,13 +1874,15 @@ async function confirmProductEdit() {
 
     try {
         const currentProduct = window.state.products.find(p => p.id === editingProductId);
+        const currentPhotoUrl = getProductPhotoUrl(currentProduct);
+        if (!currentPhotoUrl) toastScanner("Este producto no tiene foto guardada", '#f59e0b');
         toastScanner("Preparando imagen para compartir...", '#3b82f6');
         const shared = await shareOfferData({
             nombre,
             venta,
             caducidad,
             tiendaEscaneo,
-            fotoUrl: currentProduct ? (currentProduct.foto || '') : '',
+            fotoUrl: currentPhotoUrl,
             titulo: 'OFERTA ACTUALIZADA'
         });
 
