@@ -126,10 +126,10 @@
 <!--  MODAL API KEY GEMINI  -->
 <div id="key-config-modal">
     <div class="card-custom w-100" style="max-width:350px; text-align:center;">
-        <h6 class="fw-bold mb-3">ACTIVAR ESCANER IA</h6>
+        <h6 class="fw-bold mb-3">ACTIVAR ESCÁNER IA</h6>
         <p style="font-size:0.7rem;" class="text-muted mb-3">
             Pega tu API Key de Gemini.<br>Se guarda solo en este dispositivo.<br><br>
-            Obten la tuya gratis en<br>
+            Obtén la tuya gratis en<br>
             <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--accent);">aistudio.google.com</a>
         </p>
         <input type="password" id="user-gemini-key" class="form-control mb-3" placeholder="AIzaSy...">
@@ -141,7 +141,7 @@
 <div id="reset-modal" class="modal-overlay">
     <div class="modal-content-custom text-center">
         <div class="mb-3 text-danger"><i class="fas fa-trash-can fa-4x"></i></div>
-        <h5 class="fw-bold">Limpiar Catalogo?</h5>
+        <h5 class="fw-bold">¿Limpiar Catálogo?</h5>
         <div class="d-flex gap-2 mt-4">
             <button class="btn btn-light flex-fill rounded-pill fw-bold" onclick="closeResetModal()">CANCELAR</button>
             <button class="btn btn-danger flex-fill rounded-pill fw-bold" id="btn-confirm-reset-all">BORRAR TODO</button>
@@ -176,7 +176,7 @@
     <div class="modal-content-custom">
         <h5 class="fw-bold mb-4" style="color:var(--accent)">Editar Maestro</h5>
         <div id="cat-edit-fields"></div>
-        <p class="text-center text-muted" style="font-size:0.65rem; margin:15px 0;">* Sincroniza automticamente registros de los ltimos 5 das.</p>
+        <p class="text-center text-muted" style="font-size:0.65rem; margin:15px 0;">* Sincroniza automáticamente registros de los últimos 5 días.</p>
         <div class="d-flex gap-2">
             <button class="btn btn-light flex-fill rounded-pill" onclick="closeCatEditModal()">CERRAR</button>
             <button class="btn btn-primary flex-fill rounded-pill fw-bold" onclick="confirmCatUpdate()">GUARDAR</button>
@@ -188,10 +188,10 @@
 <div id="delete-modal" class="modal-overlay">
     <div class="modal-content-custom text-center">
         <div class="mb-3 text-danger"><i class="fas fa-trash-alt fa-4x"></i></div>
-        <h5 class="fw-bold">Borrar registro?</h5>
+        <h5 class="fw-bold">¿Borrar registro?</h5>
         <div class="d-flex gap-2 mt-4">
             <button class="btn btn-light flex-fill rounded-pill fw-bold" onclick="closeDeleteModal()">NO</button>
-            <button class="btn btn-danger flex-fill rounded-pill fw-bold" id="btn-confirm-delete">SI, BORRAR</button>
+            <button class="btn btn-danger flex-fill rounded-pill fw-bold" id="btn-confirm-delete">SÍ, BORRAR</button>
         </div>
     </div>
 </div>
@@ -200,7 +200,7 @@
 <div id="add-product-modal" class="modal-overlay">
     <div class="modal-content-custom">
         <h5 class="fw-bold mb-4 text-primary">Nuevo Producto</h5>
-        <div class="mb-3"><label class="text-uppercase">Descripcion</label><input type="text" id="add-prod-name" class="form-control text-uppercase"></div>
+        <div class="mb-3"><label class="text-uppercase">Descripción</label><input type="text" id="add-prod-name" class="form-control text-uppercase"></div>
         <div class="row g-2 mb-4">
             <div class="col-6"><label class="text-uppercase">Costo Anaquel</label><input type="number" id="add-prod-costo" class="form-control fw-bold text-danger"></div>
             <div class="col-6"><label class="text-uppercase">Precio Venta</label><input type="number" id="add-prod-precio" class="form-control fw-bold text-success"></div>
@@ -274,10 +274,10 @@
                 oninput="formatCaducidad(this)">
         </div>
         <small class="text-muted d-block mb-3" style="font-size:0.62rem; text-align:center;">
-            Precio = costo + margen -> redondeado al $10 mas cercano
+            Precio = costo + margen -> redondeado al $10 más cercano
         </small>
         <button class="btn btn-success w-100 py-3 rounded-pill fw-bold mb-2" onclick="confirmPrices()">COMPARTIR Y GUARDAR</button>
-        <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="cancelPrices()" style="border:none;">CANCELAR - VOLVER A CAMARA</button>
+        <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="cancelPrices()" style="border:none;">CANCELAR - VOLVER A CÁMARA</button>
     </div>
 </div>
 
@@ -286,14 +286,14 @@
     <div style="background:white; border-radius:24px; padding:22px; width:100%; max-width:420px;">
         <p class="fw-bold mb-1" style="font-size:0.7rem; color:#94a3b8; letter-spacing:1px;">POSIBLE DUPLICADO</p>
         <p style="font-size:0.82rem; color:#0f172a; margin-bottom:14px;">
-            El producto escaneado <strong id="dcm-escaneado"></strong> coincide parcialmente con los siguientes registros. Es alguno de estos?
+            El producto escaneado <strong id="dcm-escaneado"></strong> coincide parcialmente con los siguientes registros. ¿Es alguno de estos?
         </p>
         <div id="dcm-candidatos" style="max-height:200px; overflow-y:auto; margin-bottom:14px;"></div>
         <button class="btn btn-warning w-100 rounded-pill fw-bold mb-2" onclick="skipDuplicate()">
             NO - ES UN PRODUCTO NUEVO
         </button>
         <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="closeDupConfirm()" style="border:none; font-size:0.8rem;">
-            CANCELAR - VOLVER A CAMARA
+            CANCELAR - VOLVER A CÁMARA
         </button>
     </div>
 </div>
@@ -302,7 +302,7 @@
 <header>
     <div class="d-flex flex-column align-items-center">
         <div class="d-flex align-items-center">
-            <h6 class="m-0 fw-bold">Ofertas Rapidas Yaute</h6>
+            <h6 class="m-0 fw-bold">Ofertas Rápidas Yaute</h6>
             <img src="logo.png" alt="Yaute" style="height:28px; margin-left:10px; border-radius:6px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHy9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
@@ -325,7 +325,7 @@
             <input type="text" id="product-search-input" class="form-control text-uppercase" placeholder="Escribe para buscar..." oninput="filterProductsForEdit(this.value)">
             <div id="sug-product-edit" class="sug-box d-none"></div>
             <p class="text-center text-muted mt-3 mb-0" style="font-size:0.75rem;" id="no-product-found-msg">
-                No encuentras el producto?
+                ¿No encuentras el producto?
             </p>
             <button class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow mt-2" onclick="openScannerModal()">
                 <i class="fas fa-camera me-2"></i> ESCANEAR NUEVO PRODUCTO
@@ -339,7 +339,7 @@
                  <img id="ep-foto-preview" src="" style="width:100px; height:100px; object-fit:cover; border-radius:10px; border:1px solid #e2e8f0; display:none;">
                  <small class="text-muted d-block mt-1" id="product-photo-label" style="display:none;">Foto actual (solo se actualiza escaneando)</small>
             </div>
-            <div class="mb-3"><label class="text-uppercase">Descripcion</label><textarea id="ep-nombre" class="form-control mb-3" rows="3" placeholder="Nombre del producto" style="resize:none; text-transform:uppercase; font-weight:700; font-size:0.9rem; line-height:1.4; word-break:break-word; white-space:pre-wrap;"></textarea></div>
+            <div class="mb-3"><label class="text-uppercase">Descripción</label><textarea id="ep-nombre" class="form-control mb-3" rows="3" placeholder="Nombre del producto" style="resize:none; text-transform:uppercase; font-weight:700; font-size:0.9rem; line-height:1.4; word-break:break-word; white-space:pre-wrap;"></textarea></div>
             <div class="row g-2 mb-2">
                 <div class="col-6">
                     <label class="small fw-bold text-muted">FECHA ESCANEO</label>
@@ -376,14 +376,14 @@
                     oninput="formatCaducidad(this)">
             </div>
             <small class="text-muted d-block mb-3" style="font-size:0.62rem; text-align:center;">
-            Precio = costo + margen -> redondeado al $10 mas cercano
+            Precio = costo + margen -> redondeado al $10 más cercano
             </small>
             <button class="btn btn-success w-100 py-3 rounded-pill fw-bold mb-2" onclick="confirmProductEdit()">GUARDAR Y COMPARTIR</button>
             <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="hideProductEditDetails()">CANCELAR</button>
         </div>
 
         <div class="card-custom text-center mt-4">
-            <h6 class="fw-bold mb-3" style="color:var(--primary);">Configuracion del Escaner</h6>
+            <h6 class="fw-bold mb-3" style="color:var(--primary);">Configuración del Escáner</h6>
             <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="changeGeminiKey()">
                 <i class="fas fa-gear me-2"></i> Ajustar API Key Gemini
             </button>
@@ -401,7 +401,7 @@
                 <div class="col-3"><label class="text-uppercase">Cant.</label><input type="number" id="in-cantidad" class="form-control text-center fw-bold" value="1"></div>
                 <div class="col" style="position:relative">
                     <label class="text-uppercase">Producto</label>
-                    <input type="text" id="in-producto" class="form-control text-uppercase" placeholder="BUSCAR ARTICULO..."><div id="sug-producto" class="sug-box d-none"></div>
+                    <input type="text" id="in-producto" class="form-control text-uppercase" placeholder="BUSCAR ARTÍCULO..."><div id="sug-producto" class="sug-box d-none"></div>
                 </div>
             </div>
             <div class="row g-2 mb-3">
@@ -448,7 +448,7 @@
 <div id="ticket-render">
     <div style="text-align:center; margin-bottom:25px;">
         <img src="logo.png" alt="Yaute" style="width:120px; border-radius:10px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
-        <div style="font-size:1.8rem; font-weight:900; margin-top:15px; color:black;">OFERTAS RAPIDAS YAUTE</div>
+        <div style="font-size:1.8rem; font-weight:900; margin-top:15px; color:black;">OFERTAS RÁPIDAS YAUTE</div>
     </div>
     <div id="t-fecha" style="text-align:center; margin-bottom:20px; font-size:1.1rem; color:black;"></div>
     <div style="border-top:3px solid #000; margin:15px 0;"></div>
@@ -467,7 +467,7 @@
     <button class="tab-btn active" onclick="showTab('productos', this)"><i class="fas fa-box"></i>Productos</button>
     <button class="tab-btn" onclick="showTab('operaciones', this)"><i class="fas fa-cash-register"></i>Ventas</button>
     <button class="tab-btn" onclick="showTab('entregas', this)"><i class="fas fa-truck"></i>Reparto</button>
-    <button class="tab-btn" onclick="showTab('control', this)"><i class="fas fa-shield-halved"></i>Gestion</button>
+    <button class="tab-btn" onclick="showTab('control', this)"><i class="fas fa-shield-halved"></i>Gestión</button>
 </nav>
 
 <script>
@@ -728,7 +728,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn-confirm-reset-all').onclick = async () => {
         const snap = await col('products').get();
         for (const d of snap.docs) await col('products').doc(d.id).delete();
-        toast("Catlogo vaciado"); closeResetModal();
+        toast("Catálogo vaciado"); closeResetModal();
     };
 });
 
@@ -982,7 +982,7 @@ function renderFinanceResults() {
                 return `<div class="card-custom py-2 mb-1 shadow-none border d-flex justify-content-between align-items-center px-3 small"><b><i class="fas fa-store me-2 text-primary"></i>${t}</b><span class="fw-bold text-success">+$${(v-c).toFixed(2)}</span></div>`;
             }).join('');
     } else if (activeFinanceView === 'diezmo') {
-        res.innerHTML = `<div class="stat-card bg-gradient-warning shadow"><i class="fas fa-landmark-dome fa-2x mb-2"></i><h3>$${(totalUtilidad*0.1).toFixed(2)}</h3><small class="fw-bold">10% PARA EL SEOR</small><div class="mt-2 small" style="opacity:0.8">Sobre utilidad de $${totalUtilidad.toFixed(2)}</div></div>`;
+        res.innerHTML = `<div class="stat-card bg-gradient-warning shadow"><i class="fas fa-landmark-dome fa-2x mb-2"></i><h3>$${(totalUtilidad*0.1).toFixed(2)}</h3><small class="fw-bold">10% PARA EL SEÑOR</small><div class="mt-2 small" style="opacity:0.8">Sobre utilidad de $${totalUtilidad.toFixed(2)}</div></div>`;
     }
 }
 
@@ -1094,9 +1094,9 @@ async function shareTicket(n) {
     const canvas = await html2canvas(document.getElementById('ticket-render'), { scale:2, backgroundColor:'#ffffff' });
     canvas.toBlob(async b => {
         const file = new File([b], 'Ticket.png', { type:'image/png' });
-        const msg  = `hola *${pName}* te envio tu cuenta, gracias por tu preferencia`;
+        const msg  = `hola *${pName}* te envío tu cuenta, gracias por tu preferencia`;
         if (navigator.share) try { await navigator.share({ files:[file], title:'Nota Yaute', text:msg }); } catch(e) {}
-        else window.open(`https://wa.me/Utext=${encodeURIComponent(msg)}`, '_blank');
+        else window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     }, 'image/png');
 }
 
@@ -1106,7 +1106,7 @@ async function shareTicket(n) {
 function saveGeminiKey() {
     const val = document.getElementById('user-gemini-key').value.trim();
     if (val && val.length > 10) { localStorage.setItem('yaute_key_v3310', val); document.getElementById('key-config-modal').style.display = 'none'; toastScanner("Key activada"); }
-    else toastScanner("Key invalida", '#ef4444');
+    else toastScanner("Key inválida", '#ef4444');
 }
 function changeGeminiKey() {
     document.getElementById('user-gemini-key').value = localStorage.getItem('yaute_key_v3310') || '';
@@ -1184,7 +1184,7 @@ async function openScannerModal() {
         });
         document.getElementById('cam-preview-ia').srcObject = scannerStream;
     } catch(e) {
-        toastScanner("Error de camara: " + e.message, '#ef4444');
+        toastScanner("Error de cámara: " + e.message, '#ef4444');
         closeScanner();
     }
 }
@@ -1314,7 +1314,7 @@ async function captureIA() {
     const key   = localStorage.getItem('yaute_key_v3310');
     if (!key) { changeGeminiKey(); return; }
     const video = document.getElementById('cam-preview-ia');
-    if (!video.srcObject || video.videoWidth === 0) { toastScanner("Camara no lista", '#f59e0b'); return; }
+    if (!video.srcObject || video.videoWidth === 0) { toastScanner("Cámara no lista", '#f59e0b'); return; }
 
     // Limpiar caducidad en cada nuevo escaneo
     document.getElementById('pm-caducidad').value = '';
@@ -1330,7 +1330,7 @@ async function captureIA() {
     // Reintento automtico si Gemini responde 429 (quota por minuto)
     const callGemini = async (intentos = 3) => {
         const res = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContentUkey=${key}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${key}`,
             { method:'POST', headers:{'Content-Type':'application/json'},
               body: JSON.stringify({ contents:[{ parts:[
                   { inline_data:{ mime_type:'image/jpeg', data:b64 } },
@@ -1431,7 +1431,7 @@ function showDupConfirm(candidatos) {
                'Costo: <span style="color:#ef4444; font-weight:700;">$' + safeCosto + '</span></div>' +
                ((p.fechaEscaneo || p.tiendaEscaneo) ? '<div style="font-size:0.62rem; color:#94a3b8; margin-top:2px;"> ' + (p.fechaEscaneo||'') + (p.tiendaEscaneo ? '  '+p.tiendaEscaneo : '') + '</div>' : '') +
                (p.caducidad ? '<div style="font-size:0.62rem; color:#f59e0b; margin-top:1px;"> Cad: ' + p.caducidad + '</div>' : '') +
-               '<div style="font-size:0.65rem; color:#3b82f6; margin-top:4px; font-weight:700;"> S, ES ESTE PRODUCTO</div>' +
+               '<div style="font-size:0.65rem; color:#3b82f6; margin-top:4px; font-weight:700;">SÍ, ES ESTE PRODUCTO</div>' +
                '</div>';
     }).join('');
     // Usar event delegation en lugar de onclick inline para evitar bugs de comillas
@@ -1486,7 +1486,7 @@ async function confirmPrices() {
     const tiendaEscaneo = (document.getElementById('pm-tienda-escaneo').value|| '').trim().toUpperCase();
     const margen        = parseFloat(document.getElementById('pm-margen').value) || MARGEN_DEFAULT; // Obtener el margen actual
 
-    if (!nombre) { toastScanner("Nombre vacio", '#ef4444'); return; }
+    if (!nombre) { toastScanner("Nombre vacío", '#ef4444'); return; }
 
     // Persistir tienda para el prximo escaneo
     if (tiendaEscaneo) localStorage.setItem('yaute_scan_tienda', tiendaEscaneo);
@@ -1604,7 +1604,7 @@ function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
     if (line && lines < maxLines) ctx.fillText(line, x, y);
 }
 
-async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscaneo = '', fotoUrl = '', canvas = null, titulo = 'OFERTA RAPIDA' }) {
+async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscaneo = '', fotoUrl = '', canvas = null, titulo = 'OFERTA RÁPIDA' }) {
     const out = document.createElement('canvas');
     out.width = 1080;
     out.height = 1350;
@@ -1616,7 +1616,7 @@ async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscane
     ctx.fillRect(0, 0, out.width, 210);
     ctx.fillStyle = '#ffffff';
     ctx.font = '900 58px Arial, sans-serif';
-    ctx.fillText('OFERTAS RAPIDAS YAUTE', 70, 125);
+    ctx.fillText('OFERTAS RÁPIDAS YAUTE', 70, 125);
     ctx.fillStyle = '#3b82f6';
     ctx.font = '800 34px Arial, sans-serif';
     ctx.fillText(titulo, 72, 172);
@@ -1666,7 +1666,7 @@ async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscane
     }
 }
 
-function buildOfferMessage(nombre, venta, caducidad, tiendaEscaneo, titulo = 'OFERTA RAPIDA') {
+function buildOfferMessage(nombre, venta, caducidad, tiendaEscaneo, titulo = 'OFERTA RÁPIDA') {
     let msgWA = '*' + titulo + '*\n' + nombre + '\n$' + venta;
     if (caducidad) msgWA += '\nCad: ' + caducidad;
     return msgWA;
@@ -1684,7 +1684,7 @@ function downloadOfferFile(file) {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-async function shareOfferData({ nombre, venta, caducidad = '', tiendaEscaneo = '', fotoUrl = '', canvas = null, titulo = 'OFERTA RAPIDA' }) {
+async function shareOfferData({ nombre, venta, caducidad = '', tiendaEscaneo = '', fotoUrl = '', canvas = null, titulo = 'OFERTA RÁPIDA' }) {
     const msgWA = buildOfferMessage(nombre, venta, caducidad, tiendaEscaneo, titulo);
     let fileToShare = null;
     try {
@@ -1718,7 +1718,7 @@ async function shareOfferData({ nombre, venta, caducidad = '', tiendaEscaneo = '
         if (navigator.share) {
             await navigator.share({ title:'Oferta Yaute', text: msgWA });
             downloadOfferFile(fileToShare);
-            toastScanner("Se compartio texto y se descargo la imagen para adjuntarla.", '#f59e0b');
+            toastScanner("Se compartió texto y se descargó la imagen para adjuntarla.", '#f59e0b');
             return true;
         }
     } catch(e) {
@@ -1726,7 +1726,7 @@ async function shareOfferData({ nombre, venta, caducidad = '', tiendaEscaneo = '
         console.warn('Share:', e.message);
     }
     downloadOfferFile(fileToShare);
-    window.open(`https://wa.me/Utext=${encodeURIComponent(msgWA)}`, '_blank');
+    window.open(`https://wa.me/?text=${encodeURIComponent(msgWA)}`, '_blank');
     return true;
 }
 
@@ -1872,7 +1872,7 @@ async function confirmProductEdit() {
     const tiendaEscaneo = (document.getElementById('ep-tienda-escaneo').value|| '').trim().toUpperCase();
     const margen        = parseFloat(document.getElementById('ep-margen').value) || MARGEN_DEFAULT;
 
-    if (!nombre) { toastScanner("Nombre vacio", '#ef4444'); return; }
+    if (!nombre) { toastScanner("Nombre vacío", '#ef4444'); return; }
     if (tiendaEscaneo) localStorage.setItem('yaute_scan_tienda', tiendaEscaneo);
 
     const dataToUpdate = { nombre, costo, precio: venta, fechaEscaneo, tiendaEscaneo, margen };
@@ -1889,7 +1889,7 @@ async function confirmProductEdit() {
             caducidad,
             tiendaEscaneo,
             fotoUrl: currentPhotoUrl,
-            titulo: 'OFERTA RAPIDA'
+            titulo: 'OFERTA RÁPIDA'
         });
 
         await col('products').doc(editingProductId).update(dataToUpdate);
