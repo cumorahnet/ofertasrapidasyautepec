@@ -1689,7 +1689,14 @@ async function shareOfferData({ nombre, venta, caducidad = '', tiendaEscaneo = '
     const msgWA = buildOfferMessage(nombre, venta, caducidad, tiendaEscaneo, titulo);
     let fileToShare = null;
     try {
-        fileToShare = await createOfferCardFile({ nombre, venta, caducidad, tiendaEscaneo, fotoUrl, canvas, titulo });
+        fileToShare = canvas
+            ? await canvasToImageFile(canvas, 'oferta-yaute.png')
+            : await fetchImageAsFile(fotoUrl, 'oferta-yaute.jpg');
+
+        if (!fileToShare) {
+            fileToShare = await createOfferCardFile({ nombre, venta, caducidad, tiendaEscaneo, fotoUrl, canvas, titulo });
+        }
+
         toastScanner(fileToShare ? "Preparando imagen para compartir..." : "No se pudo crear imagen", fileToShare ? '#3b82f6' : '#ef4444');
         if (navigator.share && fileToShare) {
             const attempts = [
