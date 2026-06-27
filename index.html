@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v35.0 - Sistema Completo</title>
+    <title>Yaute v36.14 - Sistema Completo</title>
     <link rel="icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -117,7 +117,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 36.13</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.14</div>
 </div>
 
 <div id="toast-alert"></div>
@@ -307,7 +307,7 @@
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
-            <span class="version-badge">v36.11</span>
+            <span class="version-badge">v36.14</span>
             <button id="btn-install-pwa" onclick="installPWA()"
                 style="display:none; background:rgba(59,130,246,0.25); border:1px solid rgba(59,130,246,0.5); color:white; border-radius:50px; padding:3px 12px; font-size:0.62rem; font-weight:800; cursor:pointer; align-items:center; gap:5px;">
                 <i class="fas fa-download"></i> INSTALAR APP
@@ -537,14 +537,33 @@ const toast = (m, type = 'success') => {
     if (!el) return;
     el.style.background = type === 'success' ? 'var(--success)' : 'var(--danger)';
     el.innerText = m; el.style.display = 'block';
-    setTimeout(() => { if(el) el.style.display = 'none'; }, 2500);
+    clearTimeout(el._t);
+    el._t = setTimeout(() => { if(el) el.style.display = 'none'; }, 2500);
 };
 const toastScanner = (msg, color = '#10b981') => {
     const el = document.getElementById('toast-msg');
+    if (!el) return;
     el.textContent = msg; el.style.background = color; el.style.display = 'block';
     clearTimeout(el._t);
     el._t = setTimeout(() => el.style.display = 'none', 3000);
 };
+
+function ventaParaCliente(cliente, costo, precio) {
+    return cliente === 'CRISTO' ? costo : precio;
+}
+
+function ensureCatalogItem(collectionName, nombre) {
+    if (!nombre) return;
+    const exists = (window.state[collectionName] || []).some(item => (item.nombre || '').toUpperCase() === nombre);
+    if (!exists) col(collectionName).add({ nombre });
+}
+
+function upsertBasicProduct(nombre, costo, precio) {
+    if (!nombre) return;
+    const existing = (window.state.products || []).find(item => (item.nombre || '').toUpperCase() === nombre);
+    if (!existing) col('products').add({ nombre, costo, precio });
+    else col('products').doc(existing.id).update({ costo, precio });
+}
 
 /* 
    SYNC FIREBASE
@@ -700,16 +719,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const q   = parseInt(document.getElementById('in-cantidad').value) || 1;
         const co  = parseFloat(document.getElementById('in-costo').value)  || 0;
         const prI = parseFloat(document.getElementById('in-precio').value) || 0;
-        const salePrice = (c === 'CRISTO') ? co : prI;
+        const salePrice = ventaParaCliente(c, co, prI);
         if (!t || !c || !p) return toast("Faltan datos", "danger");
 
         await col('sales').add({ tienda:t, cliente:c, producto:p, cantidad:q, costo:co, precio:salePrice, total:q*salePrice, fechaStr:getMXDateStr(), timestamp:Date.now(), entregado:false, pagado:false });
 
-        if (!window.state.stores.some(s  => (s.nombre||'').toUpperCase()===t))  col('stores').add({ nombre:t });
-        if (!window.state.clients.some(s => (s.nombre||'').toUpperCase()===c))  col('clients').add({ nombre:c });
-        const ep = window.state.products.find(s => (s.nombre||'').toUpperCase()===p);
-        if (!ep) col('products').add({ nombre:p, costo:co, precio:prI });
-        else     col('products').doc(ep.id).update({ costo:co, precio:prI });
+        ensureCatalogItem('stores', t);
+        ensureCatalogItem('clients', c);
+        upsertBasicProduct(p, co, prI);
 
         toast("Venta guardada!");
         document.getElementById('in-cliente').value  = '';
@@ -780,18 +797,16 @@ async function confirmUpdate() {
     const co  = parseFloat(document.getElementById('ed-costo').value)  || 0;
     const prI = parseFloat(document.getElementById('ed-precio').value) || 0;
     const fVal = document.getElementById('ed-fecha').value;
-    const salePrice = (c === 'CRISTO') ? co : prI;
+    const salePrice = ventaParaCliente(c, co, prI);
     const dp = fVal.split('-');
     const newFechaStr  = `${parseInt(dp[2])}/${parseInt(dp[1])}/${dp[0]}`;
     const newTimestamp = new Date(dp[0], dp[1]-1, dp[2], 12, 0, 0).getTime();
 
     await col('sales').doc(editRef.id).update({ tienda:t, cliente:c, producto:p, cantidad:q, costo:co, precio:salePrice, total:q*salePrice, fechaStr:newFechaStr, timestamp:newTimestamp });
 
-    if (!window.state.stores.some(s  => (s.nombre||'').toUpperCase()===t))  col('stores').add({ nombre:t });
-    if (!window.state.clients.some(s => (s.nombre||'').toUpperCase()===c))  col('clients').add({ nombre:c });
-    const ep = window.state.products.find(s => (s.nombre||'').toUpperCase()===p);
-    if (!ep) col('products').add({ nombre:p, costo:co, precio:prI });
-    else     col('products').doc(ep.id).update({ costo:co, precio:prI });
+    ensureCatalogItem('stores', t);
+    ensureCatalogItem('clients', c);
+    upsertBasicProduct(p, co, prI);
 
     toast("Sincronizado "); closeEditModal();
 }
@@ -1236,12 +1251,12 @@ function precargarPrecios(precio, costo) {
     }
 }
 
-/* Auto-sugiere precio de venta para el modal del scanner */
-function autoSuggestVenta(costoStr) {
+function setSuggestedVenta(costoStr, margenId, ventaId) {
     var costo      = parseFloat(costoStr);
-    var margenEl   = document.getElementById('pm-margen');
+    var margenEl   = document.getElementById(margenId);
     var margen     = margenEl ? (parseFloat(margenEl.value) || MARGEN_DEFAULT) : MARGEN_DEFAULT;
-    var ventaInput = document.getElementById('pm-venta');
+    var ventaInput = document.getElementById(ventaId);
+    if (!ventaInput) return;
     if (!isNaN(costo) && costo > 0) {
         var sugerido = redondearA10(costo + margen);
         ventaInput.value = sugerido.toFixed(2);
@@ -1249,17 +1264,14 @@ function autoSuggestVenta(costoStr) {
     }
 }
 
+/* Auto-sugiere precio de venta para el modal del scanner */
+function autoSuggestVenta(costoStr) {
+    setSuggestedVenta(costoStr, 'pm-margen', 'pm-venta');
+}
+
 /* Auto-sugiere precio de venta para la pgina de edicin de productos */
 function autoSuggestVentaOnEdit(costoStr) {
-    var costo      = parseFloat(costoStr);
-    var margenEl   = document.getElementById('ep-margen');
-    var margen     = margenEl ? (parseFloat(margenEl.value) || MARGEN_DEFAULT) : MARGEN_DEFAULT;
-    var ventaInput = document.getElementById('ep-venta');
-    if (!isNaN(costo) && costo > 0) {
-        var sugerido = redondearA10(costo + margen);
-        ventaInput.value = sugerido.toFixed(2);
-        ventaInput.dataset.suggested = sugerido.toFixed(2);
-    }
+    setSuggestedVenta(costoStr, 'ep-margen', 'ep-venta');
 }
 
 
@@ -1893,7 +1905,6 @@ async function confirmProductEdit() {
         });
 
         await col('products').doc(editingProductId).update(dataToUpdate);
-    if (pendingExisteId) { await col('products').doc(pendingExisteId).update(data); toastScanner("Producto actualizado"); }
         hideProductEditDetails();
     } catch (e) {
         if (e.name === 'AbortError') {
@@ -1920,7 +1931,6 @@ window.onload = startSync;
             scope: './'
           })
           .then(function(reg) {
-            console.log('SW registrado para nueva raz:', reg.scope);
             reg.update();
           })
           .catch(function(err) {
