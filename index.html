@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v36.15 - Sistema Completo</title>
+    <title>Yaute v36.16 - Sistema Completo</title>
     <link rel="icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -117,7 +117,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.15</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.16</div>
 </div>
 
 <div id="toast-alert"></div>
@@ -307,7 +307,7 @@
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
-            <span class="version-badge">v36.15</span>
+            <span class="version-badge">v36.16</span>
             <button id="btn-install-pwa" onclick="installPWA()"
                 style="display:none; background:rgba(59,130,246,0.25); border:1px solid rgba(59,130,246,0.5); color:white; border-radius:50px; padding:3px 12px; font-size:0.62rem; font-weight:800; cursor:pointer; align-items:center; gap:5px;">
                 <i class="fas fa-download"></i> INSTALAR APP
@@ -1318,6 +1318,23 @@ function captureOrientado(video) {
     return c;
 }
 
+function cropProductForeground(source) {
+    if (!source || !source.width || !source.height) return source;
+    var guideW = source.width * 0.86;
+    var guideH = guideW * 0.75;
+    if (guideH > source.height * 0.72) {
+        guideH = source.height * 0.72;
+        guideW = guideH * (4 / 3);
+    }
+    var sx = Math.max(0, (source.width - guideW) / 2);
+    var sy = Math.max(0, (source.height - guideH) * 0.46);
+    var out = document.createElement('canvas');
+    out.width = Math.round(guideW);
+    out.height = Math.round(guideH);
+    out.getContext('2d').drawImage(source, sx, sy, guideW, guideH, 0, 0, out.width, out.height);
+    return out;
+}
+
 
 /* 
    SCANNER  CAPTURA + IA + DETECCIN DUPLICADOS
@@ -1332,7 +1349,7 @@ async function captureIA() {
     document.getElementById('pm-caducidad').value = '';
     pendingFotoUrl = '';
 
-    pendingCanvas = captureOrientado(video);
+    pendingCanvas = cropProductForeground(captureOrientado(video));
     const b64 = pendingCanvas.toDataURL('image/jpeg', 0.88).split(',')[1];
 
     const snapIcon = document.getElementById('snap-icon');
