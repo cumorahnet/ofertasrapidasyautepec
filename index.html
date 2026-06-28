@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v36.24 - Sistema Completo</title>
+    <title>Yaute v36.22 - Sistema Completo</title>
     <link rel="icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -93,15 +93,11 @@
         #cam-preview-ia { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
         /* Gua visual ligera  sin sombra que oscurezca la imagen */
         .scan-guide { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:82%; aspect-ratio:4/3; border:2px solid rgba(0,229,192,0.6); border-radius:16px; pointer-events:none; }
-        .scan-guide.ready { border-color:#10b981; box-shadow:0 0 0 9999px rgba(0,0,0,0.18), 0 0 24px rgba(16,185,129,0.75); }
-        .scan-guide.warn { border-color:#f59e0b; box-shadow:0 0 0 9999px rgba(0,0,0,0.12), 0 0 20px rgba(245,158,11,0.55); }
         .scan-guide::before, .scan-guide::after { content:''; position:absolute; width:22px; height:22px; border-color:#00e5c0; border-style:solid; }
         .scan-guide::before { top:-2px; left:-2px; border-width:3px 0 0 3px; border-radius:4px 0 0 0; }
         .scan-guide::after  { bottom:-2px; right:-2px; border-width:0 3px 3px 0; border-radius:0 0 4px 0; }
         #cam-top-bar { position:absolute; top:0; left:0; right:0; z-index:20; padding:40px 18px 20px; background:linear-gradient(to bottom,rgba(0,0,0,0.55),transparent); display:flex; justify-content:space-between; align-items:center; }
         #snap-btn { position:absolute; bottom:35px; left:50%; transform:translateX(-50%); width:72px; height:72px; border-radius:50%; background:white; border:5px solid rgba(255,255,255,0.4); display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:20; box-shadow:0 6px 20px rgba(0,0,0,0.4); }
-        #snap-btn.locked { opacity:0.45; filter:grayscale(1); }
-        #scan-status { position:absolute; left:50%; bottom:122px; transform:translateX(-50%); z-index:21; color:white; background:rgba(15,23,42,0.78); border:1px solid rgba(255,255,255,0.25); border-radius:999px; padding:10px 18px; font-size:0.78rem; font-weight:900; letter-spacing:0.5px; text-align:center; min-width:220px; box-shadow:0 8px 24px rgba(0,0,0,0.28); }
 
         /* Panel resultado scanner */
         #price-modal { position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:20000; display:none; align-items:flex-end; justify-content:center; padding:16px; }
@@ -121,7 +117,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.24</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.22</div>
 </div>
 
 <div id="toast-alert"></div>
@@ -311,7 +307,7 @@
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
-            <span class="version-badge">v36.24</span>
+            <span class="version-badge">v36.22</span>
             <button id="btn-install-pwa" onclick="installPWA()"
                 style="display:none; background:rgba(59,130,246,0.25); border:1px solid rgba(59,130,246,0.5); color:white; border-radius:50px; padding:3px 12px; font-size:0.62rem; font-weight:800; cursor:pointer; align-items:center; gap:5px;">
                 <i class="fas fa-download"></i> INSTALAR APP
@@ -439,7 +435,6 @@
 <div id="ia-modal">
     <video id="cam-preview-ia" autoplay playsinline muted></video>
     <div class="scan-guide"></div>
-    <div id="scan-status">CENTRA EL PRODUCTO</div>
     <div id="cam-top-bar">
         <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:white; border:1px solid rgba(255,255,255,0.3);" onclick="closeScanner()">X SALIR</button>
         <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:#fbbf24; border:1px solid rgba(255,255,255,0.2); font-size:0.65rem;" onclick="changeGeminiKey()">API KEY</button>
@@ -517,10 +512,6 @@ let pendingNombre   = '';
 let pendingCanvas   = null;
 let pendingExisteId = null;
 let pendingFotoUrl  = '';
-let scannerReady    = false;
-let scannerStable   = 0;
-let scannerFrameId  = null;
-let scannerStatusMsg = 'CENTRA EL PRODUCTO';
 
 // Para la edicin de productos desde la pestaa 'Productos'
 let editingProductId = null; // Guarda el ID del producto que se est editando
@@ -1207,14 +1198,12 @@ async function openScannerModal() {
             video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
         });
         document.getElementById('cam-preview-ia').srcObject = scannerStream;
-        startScannerGuide();
     } catch(e) {
         toastScanner("Error de cámara: " + e.message, '#ef4444');
         closeScanner();
     }
 }
 function closeScanner() {
-    stopScannerGuide();
     if (scannerStream) scannerStream.getTracks().forEach(t => t.stop());
     scannerStream = null;
     document.getElementById('ia-modal').style.display = 'none';
@@ -1446,113 +1435,6 @@ function cropProductForeground(source) {
     return out;
 }
 
-function setScannerGuideState(state, msg) {
-    scannerStatusMsg = msg || scannerStatusMsg;
-    const guide = document.querySelector('.scan-guide');
-    const status = document.getElementById('scan-status');
-    const snap = document.getElementById('snap-btn');
-    if (guide) {
-        guide.classList.toggle('ready', state === 'ready');
-        guide.classList.toggle('warn', state === 'warn');
-    }
-    if (status) status.textContent = scannerStatusMsg;
-    if (snap) snap.classList.toggle('locked', state !== 'ready');
-}
-
-function stopScannerGuide() {
-    if (scannerFrameId) cancelAnimationFrame(scannerFrameId);
-    scannerFrameId = null;
-    scannerReady = false;
-    scannerStable = 0;
-    setScannerGuideState('warn', 'CENTRA EL PRODUCTO');
-}
-
-function startScannerGuide() {
-    stopScannerGuide();
-    const video = document.getElementById('cam-preview-ia');
-    const scan = document.createElement('canvas');
-    scan.width = 180;
-    scan.height = 240;
-    const ctx = scan.getContext('2d', { willReadFrequently:true });
-
-    const loop = () => {
-        if (!video || !video.srcObject || video.videoWidth === 0) {
-            setScannerGuideState('warn', 'ESPERANDO CÁMARA');
-            scannerFrameId = requestAnimationFrame(loop);
-            return;
-        }
-
-        ctx.drawImage(video, 0, 0, scan.width, scan.height);
-        const data = ctx.getImageData(0, 0, scan.width, scan.height).data;
-        const roi = { x:22, y:54, w:136, h:130 };
-        const cell = 10;
-        const blocks = [];
-        let sum = 0;
-
-        for (let y = roi.y; y < roi.y + roi.h - cell; y += cell) {
-            for (let x = roi.x; x < roi.x + roi.w - cell; x += cell) {
-                let score = 0;
-                let samples = 0;
-                for (let yy = y; yy < y + cell; yy += 3) {
-                    for (let xx = x; xx < x + cell; xx += 3) {
-                        const i = (yy * scan.width + xx) * 4;
-                        const ir = (yy * scan.width + xx + 1) * 4;
-                        const id = ((yy + 1) * scan.width + xx) * 4;
-                        const lum = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
-                        const lumR = data[ir] * 0.299 + data[ir + 1] * 0.587 + data[ir + 2] * 0.114;
-                        const lumD = data[id] * 0.299 + data[id + 1] * 0.587 + data[id + 2] * 0.114;
-                        score += Math.abs(lum - lumR) + Math.abs(lum - lumD);
-                        samples++;
-                    }
-                }
-                score = samples ? score / samples : 0;
-                blocks.push({ x, y, score });
-                sum += score;
-            }
-        }
-
-        const mean = blocks.length ? sum / blocks.length : 0;
-        const variance = blocks.reduce((acc, b) => acc + Math.pow(b.score - mean, 2), 0) / Math.max(blocks.length, 1);
-        const threshold = mean + Math.sqrt(variance) * 0.55;
-        let minX = roi.x + roi.w, minY = roi.y + roi.h, maxX = roi.x, maxY = roi.y, hits = 0;
-
-        blocks.forEach(b => {
-            if (b.score >= threshold && b.score > 5) {
-                minX = Math.min(minX, b.x);
-                minY = Math.min(minY, b.y);
-                maxX = Math.max(maxX, b.x + cell);
-                maxY = Math.max(maxY, b.y + cell);
-                hits++;
-            }
-        });
-
-        let state = 'warn';
-        let msg = 'CENTRA EL PRODUCTO';
-        if (hits < 5) {
-            msg = 'ACERCA EL PRODUCTO';
-        } else {
-            const bw = maxX - minX;
-            const bh = maxY - minY;
-            const coverage = (bw * bh) / (roi.w * roi.h);
-            const cx = minX + bw / 2;
-            const cy = minY + bh / 2;
-            const centered = Math.abs(cx - (roi.x + roi.w / 2)) < roi.w * 0.24 && Math.abs(cy - (roi.y + roi.h / 2)) < roi.h * 0.28;
-
-            if (!centered) msg = 'CENTRA EL PRODUCTO';
-            else if (coverage < 0.12) msg = 'ACÉRCATE UN POCO';
-            else if (coverage > 0.82) msg = 'ALEJA UN POCO';
-            else { state = 'ready'; msg = 'LISTO PARA CAPTURAR'; }
-        }
-
-        scannerStable = state === 'ready' ? Math.min(scannerStable + 1, 8) : 0;
-        scannerReady = scannerStable >= 4;
-        setScannerGuideState(scannerReady ? 'ready' : 'warn', scannerReady ? 'LISTO PARA CAPTURAR' : msg);
-        scannerFrameId = requestAnimationFrame(loop);
-    };
-
-    scannerFrameId = requestAnimationFrame(loop);
-}
-
 
 /* 
    SCANNER  CAPTURA + IA + DETECCIN DUPLICADOS
@@ -1562,10 +1444,6 @@ async function captureIA() {
     if (!key) { changeGeminiKey(); return; }
     const video = document.getElementById('cam-preview-ia');
     if (!video.srcObject || video.videoWidth === 0) { toastScanner("Cámara no lista", '#f59e0b'); return; }
-    if (!scannerReady) {
-        toastScanner(scannerStatusMsg || "Centra el producto", '#f59e0b');
-        return;
-    }
 
     // Limpiar caducidad en cada nuevo escaneo
     document.getElementById('pm-caducidad').value = '';
@@ -1873,48 +1751,44 @@ async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscane
     ctx.fillText(titulo, 72, 172);
 
     const img = canvas || await loadImageForCanvas(fotoUrl);
-    const photoX = 70, photoY = 245, photoW = 940, photoH = 650;
     if (img) {
         ctx.save();
         ctx.fillStyle = '#e2e8f0';
-        drawRoundedRect(ctx, photoX, photoY, photoW, photoH, 34);
+        drawRoundedRect(ctx, 70, 260, 940, 550, 34);
         ctx.fill();
-        drawRoundedRect(ctx, photoX, photoY, photoW, photoH, 34);
+        drawRoundedRect(ctx, 70, 260, 940, 550, 34);
         ctx.clip();
         const iw = img.width || img.videoWidth;
         const ih = img.height || img.videoHeight;
-        const scale = Math.max(photoW / iw, photoH / ih);
+        const scale = Math.min(900 / iw, 510 / ih);
         const dw = iw * scale;
         const dh = ih * scale;
-        const dx = photoX + (photoW - dw) / 2;
-        let dy = photoY + (photoH - dh) * 0.56;
-        dy = Math.min(photoY, Math.max(photoY + photoH - dh, dy));
-        ctx.drawImage(img, dx, dy, dw, dh);
+        ctx.drawImage(img, 90 + (900 - dw) / 2, 280 + (510 - dh) / 2, dw, dh);
         ctx.restore();
     } else {
         ctx.fillStyle = '#e2e8f0';
-        drawRoundedRect(ctx, photoX, photoY, photoW, photoH, 34);
+        drawRoundedRect(ctx, 70, 260, 940, 550, 34);
         ctx.fill();
         ctx.fillStyle = '#64748b';
         ctx.font = '800 46px Arial, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(fotoUrl ? 'FOTO NO DISPONIBLE' : 'SIN FOTO GUARDADA', 540, 570);
+        ctx.fillText(fotoUrl ? 'FOTO NO DISPONIBLE' : 'SIN FOTO GUARDADA', 540, 550);
         ctx.textAlign = 'left';
     }
 
     ctx.fillStyle = '#ffffff';
-    drawRoundedRect(ctx, 70, 940, 940, 310, 28);
+    drawRoundedRect(ctx, 70, 860, 940, 380, 28);
     ctx.fill();
     ctx.fillStyle = '#0f172a';
     ctx.font = '900 48px Arial, sans-serif';
-    wrapCanvasText(ctx, nombre, 110, 1015, 860, 58, 3);
+    wrapCanvasText(ctx, nombre, 110, 940, 860, 58, 3);
     ctx.fillStyle = '#10b981';
     ctx.font = '900 96px Arial, sans-serif';
-    ctx.fillText('$' + (parseFloat(venta) || 0).toFixed(2), 110, 1210);
+    ctx.fillText('$' + (parseFloat(venta) || 0).toFixed(2), 110, 1155);
     ctx.fillStyle = '#64748b';
     ctx.font = '700 30px Arial, sans-serif';
     const extra = [caducidad ? 'Cad: ' + caducidad : '', tiendaEscaneo || ''].filter(Boolean).join('  -  ');
-    if (extra) ctx.fillText(extra, 110, 1260);
+    if (extra) ctx.fillText(extra, 110, 1210);
 
     try {
         return await canvasToImageFile(out);
