@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v36.30 - Sistema Completo</title>
+    <title>Yaute v36.31 - Sistema Completo</title>
     <link rel="icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -117,7 +117,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.30</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.31</div>
 </div>
 
 <div id="toast-alert"></div>
@@ -225,6 +225,14 @@
             rows="3"
             placeholder="Nombre del producto"
             style="resize:none; text-transform:uppercase; font-weight:700; font-size:0.9rem; line-height:1.4; word-break:break-word; white-space:pre-wrap;"></textarea>
+        <div id="pm-photo-tools" class="mb-3" style="display:none;">
+            <div style="display:flex; align-items:center; gap:10px; background:#f8fafc; border-radius:16px; padding:10px;">
+                <img id="pm-photo-preview" alt="Foto capturada" style="width:74px; height:74px; object-fit:cover; border-radius:12px; background:#e2e8f0;">
+                <button type="button" class="btn btn-outline-primary rounded-pill fw-bold flex-fill" onclick="rotatePendingPhoto()">
+                    <i class="fas fa-rotate-right me-2"></i> GIRAR FOTO
+                </button>
+            </div>
+        </div>
         <!-- Fecha de escaneo + Tienda (persiste) -->
         <div class="row g-2 mb-2">
             <div class="col-6">
@@ -307,7 +315,7 @@
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
-            <span class="version-badge">v36.30</span>
+            <span class="version-badge">v36.31</span>
             <button id="btn-install-pwa" onclick="installPWA()"
                 style="display:none; background:rgba(59,130,246,0.25); border:1px solid rgba(59,130,246,0.5); color:white; border-radius:50px; padding:3px 12px; font-size:0.62rem; font-weight:800; cursor:pointer; align-items:center; gap:5px;">
                 <i class="fas fa-download"></i> INSTALAR APP
@@ -1378,6 +1386,26 @@ function getCaptureRotateHint() {
     return 0;
 }
 
+function refreshPendingPhotoPreview() {
+    var box = document.getElementById('pm-photo-tools');
+    var img = document.getElementById('pm-photo-preview');
+    if (!box || !img) return;
+    if (!pendingCanvas) {
+        box.style.display = 'none';
+        img.removeAttribute('src');
+        return;
+    }
+    img.src = pendingCanvas.toDataURL('image/jpeg', 0.72);
+    box.style.display = 'block';
+}
+
+function rotatePendingPhoto() {
+    if (!pendingCanvas) return;
+    pendingCanvas = rotateCanvas90(pendingCanvas, -1);
+    refreshPendingPhotoPreview();
+    toastScanner("Foto girada");
+}
+
 
 /* 
    SCANNER  CAPTURA + IA + DETECCIN DUPLICADOS
@@ -1394,6 +1422,7 @@ async function captureIA() {
 
     pendingRotateHint = getCaptureRotateHint();
     pendingCanvas = prepareSharePhoto(cropProductForeground(captureOrientado(video)), pendingRotateHint);
+    refreshPendingPhotoPreview();
     const b64 = pendingCanvas.toDataURL('image/jpeg', 0.88).split(',')[1];
 
     const snapIcon = document.getElementById('snap-icon');
