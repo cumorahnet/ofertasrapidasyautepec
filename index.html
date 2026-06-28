@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v36.22 - Sistema Completo</title>
+    <title>Yaute v36.26-auto - Sistema Completo</title>
     <link rel="icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -93,11 +93,15 @@
         #cam-preview-ia { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
         /* Gua visual ligera  sin sombra que oscurezca la imagen */
         .scan-guide { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:82%; aspect-ratio:4/3; border:2px solid rgba(0,229,192,0.6); border-radius:16px; pointer-events:none; }
+        .scan-guide.ready { border-color:#10b981; box-shadow:0 0 0 9999px rgba(0,0,0,0.14), 0 0 26px rgba(16,185,129,0.75); }
+        .scan-guide.warn { border-color:#f59e0b; box-shadow:0 0 0 9999px rgba(0,0,0,0.10), 0 0 20px rgba(245,158,11,0.55); }
         .scan-guide::before, .scan-guide::after { content:''; position:absolute; width:22px; height:22px; border-color:#00e5c0; border-style:solid; }
         .scan-guide::before { top:-2px; left:-2px; border-width:3px 0 0 3px; border-radius:4px 0 0 0; }
         .scan-guide::after  { bottom:-2px; right:-2px; border-width:0 3px 3px 0; border-radius:0 0 4px 0; }
         #cam-top-bar { position:absolute; top:0; left:0; right:0; z-index:20; padding:40px 18px 20px; background:linear-gradient(to bottom,rgba(0,0,0,0.55),transparent); display:flex; justify-content:space-between; align-items:center; }
         #snap-btn { position:absolute; bottom:35px; left:50%; transform:translateX(-50%); width:72px; height:72px; border-radius:50%; background:white; border:5px solid rgba(255,255,255,0.4); display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:20; box-shadow:0 6px 20px rgba(0,0,0,0.4); }
+        #scan-status { position:absolute; left:50%; bottom:120px; transform:translateX(-50%); z-index:21; color:white; background:rgba(15,23,42,0.78); border:1px solid rgba(255,255,255,0.25); border-radius:999px; padding:9px 16px; font-size:0.72rem; font-weight:900; letter-spacing:0.4px; text-align:center; min-width:210px; display:none; }
+        #scan-auto-btn.active { background:#10b981 !important; color:white !important; border-color:rgba(255,255,255,0.4) !important; }
 
         /* Panel resultado scanner */
         #price-modal { position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:20000; display:none; align-items:flex-end; justify-content:center; padding:16px; }
@@ -117,7 +121,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.22</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.26 AUTO</div>
 </div>
 
 <div id="toast-alert"></div>
@@ -307,7 +311,7 @@
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
-            <span class="version-badge">v36.22</span>
+            <span class="version-badge">v36.26-auto</span>
             <button id="btn-install-pwa" onclick="installPWA()"
                 style="display:none; background:rgba(59,130,246,0.25); border:1px solid rgba(59,130,246,0.5); color:white; border-radius:50px; padding:3px 12px; font-size:0.62rem; font-weight:800; cursor:pointer; align-items:center; gap:5px;">
                 <i class="fas fa-download"></i> INSTALAR APP
@@ -435,9 +439,13 @@
 <div id="ia-modal">
     <video id="cam-preview-ia" autoplay playsinline muted></video>
     <div class="scan-guide"></div>
+    <div id="scan-status">MODO ENCUADRE</div>
     <div id="cam-top-bar">
         <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:white; border:1px solid rgba(255,255,255,0.3);" onclick="closeScanner()">X SALIR</button>
-        <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:#fbbf24; border:1px solid rgba(255,255,255,0.2); font-size:0.65rem;" onclick="changeGeminiKey()">API KEY</button>
+        <div class="d-flex gap-2">
+            <button id="scan-auto-btn" class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:#34d399; border:1px solid rgba(255,255,255,0.2); font-size:0.65rem;" onclick="toggleAutoFrame()">AUTO</button>
+            <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:#fbbf24; border:1px solid rgba(255,255,255,0.2); font-size:0.65rem;" onclick="changeGeminiKey()">API KEY</button>
+        </div>
     </div>
     <div id="snap-btn" onclick="captureIA()">
         <i class="fas fa-camera fa-2x text-primary" id="snap-icon"></i>
@@ -512,6 +520,10 @@ let pendingNombre   = '';
 let pendingCanvas   = null;
 let pendingExisteId = null;
 let pendingFotoUrl  = '';
+let autoFrameEnabled = false;
+let autoFrameReady   = false;
+let autoFrameLoopId  = null;
+let autoFrameMessage = 'CENTRA EL PRODUCTO';
 
 // Para la edicin de productos desde la pestaa 'Productos'
 let editingProductId = null; // Guarda el ID del producto que se est editando
@@ -1207,6 +1219,116 @@ function closeScanner() {
     if (scannerStream) scannerStream.getTracks().forEach(t => t.stop());
     scannerStream = null;
     document.getElementById('ia-modal').style.display = 'none';
+    stopAutoFrameGuide();
+}
+
+function setAutoFrameState(state, msg) {
+    autoFrameMessage = msg || autoFrameMessage;
+    const guide = document.querySelector('.scan-guide');
+    const status = document.getElementById('scan-status');
+    const btn = document.getElementById('scan-auto-btn');
+    if (guide) {
+        guide.classList.toggle('ready', state === 'ready');
+        guide.classList.toggle('warn', autoFrameEnabled && state !== 'ready');
+    }
+    if (status) {
+        status.style.display = autoFrameEnabled ? 'block' : 'none';
+        status.textContent = autoFrameMessage;
+    }
+    if (btn) btn.classList.toggle('active', autoFrameEnabled);
+}
+
+function stopAutoFrameGuide() {
+    if (autoFrameLoopId) cancelAnimationFrame(autoFrameLoopId);
+    autoFrameLoopId = null;
+    autoFrameReady = false;
+    setAutoFrameState('idle', 'MODO ENCUADRE');
+}
+
+function toggleAutoFrame() {
+    autoFrameEnabled = !autoFrameEnabled;
+    if (autoFrameEnabled) startAutoFrameGuide();
+    else stopAutoFrameGuide();
+}
+
+function startAutoFrameGuide() {
+    stopAutoFrameGuide();
+    autoFrameEnabled = true;
+    const video = document.getElementById('cam-preview-ia');
+    const scan = document.createElement('canvas');
+    scan.width = 180;
+    scan.height = 240;
+    const ctx = scan.getContext('2d', { willReadFrequently:true });
+    let stable = 0;
+
+    const loop = () => {
+        if (!autoFrameEnabled) return;
+        if (!video || !video.srcObject || video.videoWidth === 0) {
+            setAutoFrameState('warn', 'ESPERANDO CÁMARA');
+            autoFrameLoopId = requestAnimationFrame(loop);
+            return;
+        }
+
+        ctx.drawImage(video, 0, 0, scan.width, scan.height);
+        const data = ctx.getImageData(0, 0, scan.width, scan.height).data;
+        const roi = { x:20, y:52, w:140, h:136 };
+        const cell = 10;
+        let active = 0;
+        let minX = roi.x + roi.w, minY = roi.y + roi.h, maxX = roi.x, maxY = roi.y;
+
+        for (let y = roi.y; y < roi.y + roi.h - cell; y += cell) {
+            for (let x = roi.x; x < roi.x + roi.w - cell; x += cell) {
+                let score = 0;
+                let samples = 0;
+                for (let yy = y; yy < y + cell; yy += 4) {
+                    for (let xx = x; xx < x + cell; xx += 4) {
+                        const i = (yy * scan.width + xx) * 4;
+                        const ir = (yy * scan.width + xx + 1) * 4;
+                        const id = ((yy + 1) * scan.width + xx) * 4;
+                        const lum = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+                        const lumR = data[ir] * 0.299 + data[ir + 1] * 0.587 + data[ir + 2] * 0.114;
+                        const lumD = data[id] * 0.299 + data[id + 1] * 0.587 + data[id + 2] * 0.114;
+                        score += Math.abs(lum - lumR) + Math.abs(lum - lumD);
+                        samples++;
+                    }
+                }
+                score = samples ? score / samples : 0;
+                if (score > 9) {
+                    active++;
+                    minX = Math.min(minX, x);
+                    minY = Math.min(minY, y);
+                    maxX = Math.max(maxX, x + cell);
+                    maxY = Math.max(maxY, y + cell);
+                }
+            }
+        }
+
+        let state = 'warn';
+        let msg = 'CENTRA EL PRODUCTO';
+        if (active < 7) {
+            msg = 'ACERCA EL PRODUCTO';
+        } else {
+            const bw = maxX - minX;
+            const bh = maxY - minY;
+            const coverage = (bw * bh) / (roi.w * roi.h);
+            const cx = minX + bw / 2;
+            const cy = minY + bh / 2;
+            const centered = Math.abs(cx - (roi.x + roi.w / 2)) < roi.w * 0.30 && Math.abs(cy - (roi.y + roi.h / 2)) < roi.h * 0.32;
+
+            if (!centered) msg = 'CENTRA EL PRODUCTO';
+            else if (coverage < 0.16) msg = 'ACÉRCATE UN POCO';
+            else if (coverage > 0.88) msg = 'ALEJA UN POCO';
+            else { state = 'ready'; msg = 'LISTO PARA CAPTURAR'; }
+        }
+
+        stable = state === 'ready' ? Math.min(stable + 1, 8) : 0;
+        autoFrameReady = stable >= 3;
+        setAutoFrameState(autoFrameReady ? 'ready' : 'warn', autoFrameReady ? 'LISTO PARA CAPTURAR' : msg);
+        autoFrameLoopId = requestAnimationFrame(loop);
+    };
+
+    setAutoFrameState('warn', 'CENTRA EL PRODUCTO');
+    autoFrameLoopId = requestAnimationFrame(loop);
 }
 
 /* 
@@ -1444,6 +1566,10 @@ async function captureIA() {
     if (!key) { changeGeminiKey(); return; }
     const video = document.getElementById('cam-preview-ia');
     if (!video.srcObject || video.videoWidth === 0) { toastScanner("Cámara no lista", '#f59e0b'); return; }
+    if (autoFrameEnabled && !autoFrameReady) {
+        toastScanner(autoFrameMessage || "Centra el producto", '#f59e0b');
+        return;
+    }
 
     // Limpiar caducidad en cada nuevo escaneo
     document.getElementById('pm-caducidad').value = '';
