@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v36.24 - Sistema Completo</title>
+    <title>Yaute v36.25 - Sistema Completo</title>
     <link rel="icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -121,7 +121,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.24</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.25</div>
 </div>
 
 <div id="toast-alert"></div>
@@ -311,7 +311,7 @@
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
-            <span class="version-badge">v36.24</span>
+            <span class="version-badge">v36.25</span>
             <button id="btn-install-pwa" onclick="installPWA()"
                 style="display:none; background:rgba(59,130,246,0.25); border:1px solid rgba(59,130,246,0.5); color:white; border-radius:50px; padding:3px 12px; font-size:0.62rem; font-weight:800; cursor:pointer; align-items:center; gap:5px;">
                 <i class="fas fa-download"></i> INSTALAR APP
@@ -1942,6 +1942,18 @@ function downloadOfferFile(file) {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+async function copyOfferText(text) {
+    try {
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(text);
+            return true;
+        }
+    } catch(e) {
+        console.warn('Clipboard:', e.message);
+    }
+    return false;
+}
+
 async function shareOfferData({ nombre, venta, caducidad = '', tiendaEscaneo = '', fotoUrl = '', canvas = null, titulo = 'OFERTA RÁPIDA' }) {
     const msgWA = buildOfferMessage(nombre, venta, caducidad, tiendaEscaneo, titulo);
     let fileToShare = null;
@@ -1954,8 +1966,7 @@ async function shareOfferData({ nombre, venta, caducidad = '', tiendaEscaneo = '
         if (navigator.share && fileToShare) {
             const attempts = [
                 { files:[fileToShare], title:'Oferta Yaute', text:msgWA },
-                { files:[fileToShare], title:'Oferta Yaute' },
-                { files:[fileToShare] }
+                { files:[fileToShare], title:'Oferta Yaute' }
             ];
             for (const data of attempts) {
                 try {
@@ -1971,7 +1982,7 @@ async function shareOfferData({ nombre, venta, caducidad = '', tiendaEscaneo = '
 
         if (navigator.share) {
             await navigator.share({ title:'Oferta Yaute', text: msgWA });
-            downloadOfferFile(fileToShare);
+            if (fileToShare) downloadOfferFile(fileToShare);
             toastScanner("Se compartió texto y se descargó la imagen para adjuntarla.", '#f59e0b');
             return true;
         }
@@ -1979,8 +1990,9 @@ async function shareOfferData({ nombre, venta, caducidad = '', tiendaEscaneo = '
         if (e.name === 'AbortError') return false;
         console.warn('Share:', e.message);
     }
-    downloadOfferFile(fileToShare);
-    window.open(`https://wa.me/?text=${encodeURIComponent(msgWA)}`, '_blank');
+    if (fileToShare) downloadOfferFile(fileToShare);
+    const copied = await copyOfferText(msgWA);
+    toastScanner(copied ? "Texto copiado e imagen descargada." : "Imagen descargada. Copia el texto manualmente.", '#f59e0b');
     return true;
 }
 
