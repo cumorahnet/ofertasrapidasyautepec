@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v36.28-auto - Sistema Completo</title>
+    <title>Yaute v36.27-auto - Sistema Completo</title>
     <link rel="icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -91,11 +91,6 @@
         /*  SCANNER MODAL  */
         #ia-modal { position:fixed; inset:0; background:#000; z-index:10000; display:none; flex-direction:column; }
         #cam-preview-ia { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-        #cam-preview-blur { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; filter:blur(10px); transform:scale(1.04); opacity:0; pointer-events:none; transition:opacity .18s ease; }
-        #ia-modal.auto-frame-on #cam-preview-blur { opacity:0.82; }
-        .scan-focus-window { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:82%; aspect-ratio:4/3; overflow:hidden; border-radius:16px; opacity:0; pointer-events:none; transition:opacity .18s ease; }
-        .scan-focus-window video { position:absolute; top:50%; left:50%; width:100vw; height:100vh; object-fit:cover; transform:translate(-50%,-50%); }
-        #ia-modal.auto-frame-on .scan-focus-window { opacity:1; }
         /* Gua visual ligera  sin sombra que oscurezca la imagen */
         .scan-guide { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:82%; aspect-ratio:4/3; border:2px solid rgba(0,229,192,0.6); border-radius:16px; pointer-events:none; }
         .scan-guide.ready { border-color:#10b981; box-shadow:0 0 0 9999px rgba(0,0,0,0.14), 0 0 26px rgba(16,185,129,0.75); }
@@ -126,7 +121,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.28 AUTO</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.27 AUTO</div>
 </div>
 
 <div id="toast-alert"></div>
@@ -316,7 +311,7 @@
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
-            <span class="version-badge">v36.28-auto</span>
+            <span class="version-badge">v36.27-auto</span>
             <button id="btn-install-pwa" onclick="installPWA()"
                 style="display:none; background:rgba(59,130,246,0.25); border:1px solid rgba(59,130,246,0.5); color:white; border-radius:50px; padding:3px 12px; font-size:0.62rem; font-weight:800; cursor:pointer; align-items:center; gap:5px;">
                 <i class="fas fa-download"></i> INSTALAR APP
@@ -443,8 +438,6 @@
 <!--  SCANNER MODAL  -->
 <div id="ia-modal">
     <video id="cam-preview-ia" autoplay playsinline muted></video>
-    <video id="cam-preview-blur" autoplay playsinline muted></video>
-    <div class="scan-focus-window"><video id="cam-preview-focus" autoplay playsinline muted></video></div>
     <div class="scan-guide"></div>
     <div id="scan-status">MODO ENCUADRE</div>
     <div id="cam-top-bar">
@@ -1219,8 +1212,6 @@ async function openScannerModal() {
             video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } }
         });
         document.getElementById('cam-preview-ia').srcObject = scannerStream;
-        document.getElementById('cam-preview-blur').srcObject = scannerStream;
-        document.getElementById('cam-preview-focus').srcObject = scannerStream;
         startAutoFrameGuide();
     } catch(e) {
         toastScanner("Error de cámara: " + e.message, '#ef4444');
@@ -1230,10 +1221,6 @@ async function openScannerModal() {
 function closeScanner() {
     if (scannerStream) scannerStream.getTracks().forEach(t => t.stop());
     scannerStream = null;
-    ['cam-preview-ia','cam-preview-blur','cam-preview-focus'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.srcObject = null;
-    });
     document.getElementById('ia-modal').style.display = 'none';
     stopAutoFrameGuide();
 }
@@ -1243,7 +1230,6 @@ function setAutoFrameState(state, msg) {
     const guide = document.querySelector('.scan-guide');
     const status = document.getElementById('scan-status');
     const btn = document.getElementById('scan-auto-btn');
-    const modal = document.getElementById('ia-modal');
     if (guide) {
         guide.classList.toggle('ready', state === 'ready');
         guide.classList.toggle('warn', autoFrameEnabled && state !== 'ready');
@@ -1253,7 +1239,6 @@ function setAutoFrameState(state, msg) {
         status.textContent = autoFrameMessage;
     }
     if (btn) btn.classList.toggle('active', autoFrameEnabled);
-    if (modal) modal.classList.toggle('auto-frame-on', autoFrameEnabled);
 }
 
 function stopAutoFrameGuide() {
