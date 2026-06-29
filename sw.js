@@ -2,7 +2,7 @@
    Scope: /ofertasrapidasyautepec/
 */
 
-const CACHE_NAME = 'yaute-v29';
+const CACHE_NAME = 'yaute-v30';
 
 const PRECACHE = [
   '/ofertasrapidasyautepec/',
