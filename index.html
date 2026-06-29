@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v36.38 - Sistema Completo</title>
+    <title>Yaute v36.39 - Sistema Completo</title>
     <link rel="icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -83,6 +83,8 @@
         .sales-store-meta { font-size:0.68rem; color:#64748b; font-weight:700; margin-top:2px; }
         .sales-store-total { text-align:right; flex-shrink:0; font-weight:900; color:var(--success); }
         .sales-store-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:2px; }
+        .promo-box { display:none; background:#f8fafc; border:1px solid #dbeafe; border-radius:16px; padding:12px; margin-bottom:12px; }
+        .promo-result { background:white; border-radius:12px; padding:9px 12px; display:flex; justify-content:space-between; align-items:center; font-weight:900; color:var(--primary); }
 
         /* SUGERENCIAS */
         .sug-box { position:absolute; top:100%; left:0; right:0; background:white; border-radius:14px; max-height:220px; overflow-y:auto; z-index:1500; border:1px solid #e2e8f0; box-shadow:0 15px 30px rgba(0,0,0,0.15); margin-top:5px; touch-action:pan-y; overscroll-behavior:contain; }
@@ -125,7 +127,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.38</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.39</div>
 </div>
 
 <div id="toast-alert"></div>
@@ -323,7 +325,7 @@
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
-            <span class="version-badge">v36.38</span>
+            <span class="version-badge">v36.39</span>
             <button id="btn-install-pwa" onclick="installPWA()"
                 style="display:none; background:rgba(59,130,246,0.25); border:1px solid rgba(59,130,246,0.5); color:white; border-radius:50px; padding:3px 12px; font-size:0.62rem; font-weight:800; cursor:pointer; align-items:center; gap:5px;">
                 <i class="fas fa-download"></i> INSTALAR APP
@@ -431,6 +433,30 @@
             <div class="row g-2 mb-3">
                 <div class="col-6"><label class="text-uppercase">Costo Anaquel</label><input type="number" id="in-costo" class="form-control fw-bold border-danger" step="0.01"></div>
                 <div class="col-6"><label class="text-uppercase">Precio Venta</label><input type="number" id="in-precio" class="form-control fw-bold border-success" step="0.01"></div>
+            </div>
+            <button type="button" id="btn-promo-toggle" class="btn btn-outline-primary w-100 rounded-pill fw-bold mb-2" onclick="togglePromoPanel()">
+                <i class="fas fa-tags me-2"></i> PROMO
+            </button>
+            <div id="promo-box" class="promo-box">
+                <div class="row g-2 mb-2">
+                    <div class="col-4">
+                        <label class="small fw-bold text-muted">PAGAS $</label>
+                        <input type="number" id="promo-total" class="form-control fw-bold" step="0.01" placeholder="0.00" oninput="calcPromoUnitCost()">
+                    </div>
+                    <div class="col-4">
+                        <label class="small fw-bold text-muted">RECIBES</label>
+                        <input type="number" id="promo-recibes" class="form-control fw-bold text-center" step="1" min="1" placeholder="3" oninput="syncPromoRecover(); calcPromoUnitCost()">
+                    </div>
+                    <div class="col-4">
+                        <label class="small fw-bold text-muted">RECUPERAS</label>
+                        <input type="number" id="promo-recuperas" class="form-control fw-bold text-center" step="1" min="1" placeholder="2" oninput="calcPromoUnitCost()">
+                    </div>
+                </div>
+                <div class="promo-result mb-2">
+                    <span>Costo unitario</span>
+                    <span id="promo-unit">$0.00</span>
+                </div>
+                <button type="button" class="btn btn-primary w-100 rounded-pill fw-bold" onclick="applyPromoCost()">USAR COMO COSTO</button>
             </div>
             <button id="btn-save-record" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow">GUARDAR REGISTRO</button>
         </div>
@@ -753,6 +779,54 @@ function switchSubTab(id) {
 /* 
    VENTAS  GUARDAR
  */
+function togglePromoPanel(force) {
+    const box = document.getElementById('promo-box');
+    const btn = document.getElementById('btn-promo-toggle');
+    if (!box || !btn) return;
+    const show = typeof force === 'boolean' ? force : box.style.display !== 'block';
+    box.style.display = show ? 'block' : 'none';
+    btn.classList.toggle('btn-primary', show);
+    btn.classList.toggle('btn-outline-primary', !show);
+}
+
+function syncPromoRecover() {
+    const recibes = document.getElementById('promo-recibes');
+    const recuperas = document.getElementById('promo-recuperas');
+    if (recibes && recuperas && !recuperas.value) recuperas.value = recibes.value;
+}
+
+function getPromoUnitCost() {
+    const total = parseFloat(document.getElementById('promo-total')?.value) || 0;
+    const recuperas = parseInt(document.getElementById('promo-recuperas')?.value) || 0;
+    return total > 0 && recuperas > 0 ? total / recuperas : 0;
+}
+
+function calcPromoUnitCost() {
+    const unit = getPromoUnitCost();
+    const out = document.getElementById('promo-unit');
+    if (out) out.textContent = '$' + unit.toFixed(2);
+    return unit;
+}
+
+function applyPromoCost() {
+    const unit = calcPromoUnitCost();
+    if (!unit) {
+        toast("Completa la promo", "danger");
+        return;
+    }
+    document.getElementById('in-costo').value = unit.toFixed(2);
+    toast("Costo de promo aplicado");
+}
+
+function resetPromoPanel() {
+    ['promo-total', 'promo-recibes', 'promo-recuperas'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    calcPromoUnitCost();
+    togglePromoPanel(false);
+}
+
 function renderCurrentStoreSales() {
     const tiendaInput = document.getElementById('in-tienda');
     const title = document.getElementById('current-store-sales-title');
@@ -820,7 +894,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const salePrice = ventaParaCliente(c, co, prI);
         if (!t || !c || !p) return toast("Faltan datos", "danger");
 
-        await col('sales').add({ tienda:t, cliente:c, producto:p, cantidad:q, costo:co, precio:salePrice, total:q*salePrice, fechaStr:getMXDateStr(), timestamp:Date.now(), entregado:false, pagado:false });
+        const promoVisible = document.getElementById('promo-box')?.style.display === 'block';
+        const promoTotal = parseFloat(document.getElementById('promo-total')?.value) || 0;
+        const promoRecibes = parseInt(document.getElementById('promo-recibes')?.value) || 0;
+        const promoRecuperas = parseInt(document.getElementById('promo-recuperas')?.value) || 0;
+        const saleData = { tienda:t, cliente:c, producto:p, cantidad:q, costo:co, precio:salePrice, total:q*salePrice, fechaStr:getMXDateStr(), timestamp:Date.now(), entregado:false, pagado:false };
+        if (promoVisible && promoTotal && promoRecuperas) {
+            saleData.promo = {
+                totalPagado: promoTotal,
+                piezasRecibidas: promoRecibes,
+                piezasRecuperar: promoRecuperas,
+                costoUnitario: co
+            };
+        }
+
+        await col('sales').add(saleData);
 
         ensureCatalogItem('stores', t);
         ensureCatalogItem('clients', c);
@@ -832,6 +920,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('in-cantidad').value = '1';
         document.getElementById('in-costo').value    = '';
         document.getElementById('in-precio').value   = '';
+        resetPromoPanel();
         renderCurrentStoreSales();
         document.getElementById('in-cliente').focus();
     };
