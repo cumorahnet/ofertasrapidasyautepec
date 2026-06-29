@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v36.35 - Sistema Completo</title>
+    <title>Yaute v36.37 - Sistema Completo</title>
     <link rel="icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -75,6 +75,7 @@
         .bg-gradient-success { background:linear-gradient(135deg,#10b981,#059669); }
         .bg-gradient-warning { background:linear-gradient(135deg,#f59e0b,#d97706); }
         .finance-item { border-left:5px solid var(--accent); }
+        #current-store-sales-list { max-height:360px; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
         .sales-store-row { display:flex; justify-content:space-between; gap:10px; align-items:center; border-bottom:1px solid #eef2f7; padding:10px 0; }
         .sales-store-row:last-child { border-bottom:none; }
         .sales-store-main { min-width:0; }
@@ -124,7 +125,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.35</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.37</div>
 </div>
 
 <div id="toast-alert"></div>
@@ -322,7 +323,7 @@
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
-            <span class="version-badge">v36.35</span>
+            <span class="version-badge">v36.37</span>
             <button id="btn-install-pwa" onclick="installPWA()"
                 style="display:none; background:rgba(59,130,246,0.25); border:1px solid rgba(59,130,246,0.5); color:white; border-radius:50px; padding:3px 12px; font-size:0.62rem; font-weight:800; cursor:pointer; align-items:center; gap:5px;">
                 <i class="fas fa-download"></i> INSTALAR APP
@@ -439,7 +440,7 @@
                     <div class="fw-bold" style="color:var(--primary); font-size:0.9rem;">Ventas de hoy</div>
                     <small class="text-muted fw-bold" id="current-store-sales-title">Selecciona una tienda</small>
                 </div>
-                <span class="badge rounded-pill bg-success" id="current-store-sales-total">$0.00</span>
+                <span class="badge rounded-pill bg-success" id="current-store-sales-total">Anaquel $0.00</span>
             </div>
             <div id="current-store-sales-list" class="small text-muted py-3 text-center fw-bold">
                 SIN TIENDA SELECCIONADA
@@ -762,7 +763,7 @@ function renderCurrentStoreSales() {
     const tienda = tiendaInput.value.trim().toUpperCase();
     if (!tienda) {
         title.textContent = 'Selecciona una tienda';
-        totalBadge.textContent = '$0.00';
+        totalBadge.textContent = 'Anaquel $0.00';
         list.innerHTML = 'SIN TIENDA SELECCIONADA';
         return;
     }
@@ -776,29 +777,30 @@ function renderCurrentStoreSales() {
         .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
     const totalCompras = ventas.reduce((sum, s) => sum + ((s.costo || 0) * (s.cantidad || 0)), 0);
-    title.textContent = ventas.length + ' registros';
-    totalBadge.textContent = '$' + totalCompras.toFixed(2);
+    const totalPiezas = ventas.reduce((sum, s) => sum + (s.cantidad || 0), 0);
+    title.textContent = 'Registros: ' + ventas.length + ' · Productos: ' + totalPiezas;
+    totalBadge.textContent = 'Anaquel $' + totalCompras.toFixed(2);
 
     if (!ventas.length) {
         list.innerHTML = '<div class="py-3 text-center text-muted fw-bold">SIN VENTAS HOY EN ESTA TIENDA</div>';
         return;
     }
 
-    list.innerHTML = ventas.slice(0, 20).map(s => `
+    list.innerHTML = ventas.map(s => `
         <div class="sales-store-row">
             <div class="sales-store-main">
                 <div class="sales-store-product">${s.cantidad || 0} pz · ${s.producto || ''}</div>
                 <div class="sales-store-meta">${s.cliente || 'SIN CLIENTE'} · ${s.fechaStr || ''}</div>
             </div>
             <div class="sales-store-total">
-                $${(s.costo || 0).toFixed(2)} c/u
+                Anaquel $${(s.costo || 0).toFixed(2)}
                 <div class="sales-store-actions">
                     <i class="fas fa-pen-to-square text-primary" onclick='openEditModal(${JSON.stringify(s).replace(/'/g,"\\'")})'></i>
                     <i class="fas fa-trash-can text-danger" onclick="openDeleteModal('sales','${s.id}')"></i>
                 </div>
             </div>
         </div>
-    `).join('') + (ventas.length > 20 ? '<div class="text-center text-muted fw-bold pt-2">Mostrando los 20 más recientes</div>' : '');
+    `).join('');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
