@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v36.31 - Sistema Completo</title>
+    <title>Yaute v36.32 - Sistema Completo</title>
     <link rel="icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -117,7 +117,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.31</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.32</div>
 </div>
 
 <div id="toast-alert"></div>
@@ -315,7 +315,7 @@
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
-            <span class="version-badge">v36.31</span>
+            <span class="version-badge">v36.32</span>
             <button id="btn-install-pwa" onclick="installPWA()"
                 style="display:none; background:rgba(59,130,246,0.25); border:1px solid rgba(59,130,246,0.5); color:white; border-radius:50px; padding:3px 12px; font-size:0.62rem; font-weight:800; cursor:pointer; align-items:center; gap:5px;">
                 <i class="fas fa-download"></i> INSTALAR APP
@@ -345,7 +345,15 @@
             <h5 class="fw-bold mb-4" style="color:var(--primary)">Editar Detalles del Producto</h5>
             <div class="mb-3 text-center" id="product-photo-preview-container">
                  <img id="ep-foto-preview" src="" style="width:100px; height:100px; object-fit:cover; border-radius:10px; border:1px solid #e2e8f0; display:none;">
-                 <small class="text-muted d-block mt-1" id="product-photo-label" style="display:none;">Foto actual (solo se actualiza escaneando)</small>
+                 <small class="text-muted d-block mt-1" id="product-photo-label" style="display:none;">Foto actual</small>
+                 <div class="d-flex gap-2 mt-2">
+                    <button type="button" class="btn btn-outline-primary rounded-pill fw-bold flex-fill" onclick="openScannerModal('editPhoto')">
+                        <i class="fas fa-camera me-1"></i> CAMBIAR FOTO
+                    </button>
+                    <button type="button" id="btn-rotate-edit-photo" class="btn btn-outline-secondary rounded-pill fw-bold" onclick="rotateEditPhoto()" style="display:none;">
+                        <i class="fas fa-rotate-right"></i>
+                    </button>
+                 </div>
             </div>
             <div class="mb-3"><label class="text-uppercase">Descripción</label><textarea id="ep-nombre" class="form-control mb-3" rows="3" placeholder="Nombre del producto" style="resize:none; text-transform:uppercase; font-weight:700; font-size:0.9rem; line-height:1.4; word-break:break-word; white-space:pre-wrap;"></textarea></div>
             <div class="row g-2 mb-2">
@@ -522,6 +530,8 @@ let pendingExisteId = null;
 let pendingFotoUrl  = '';
 let pendingRotateHint = 0;
 let lastDeviceGamma = 0;
+let scannerMode = 'scan';
+let pendingEditCanvas = null;
 
 if (window.DeviceOrientationEvent) {
     window.addEventListener('deviceorientation', function(e) {
@@ -1199,7 +1209,8 @@ document.addEventListener('click', function(e) {
 });
 
 
-async function openScannerModal() {
+async function openScannerModal(mode = 'scan') {
+    scannerMode = mode;
     // Precargar fecha de hoy y tienda persistida antes de abrir cmara
     var hoy = new Date().toISOString().slice(0,10);
     var tiendaPersistida = localStorage.getItem('yaute_scan_tienda') || '';
@@ -1222,6 +1233,7 @@ async function openScannerModal() {
 function closeScanner() {
     if (scannerStream) scannerStream.getTracks().forEach(t => t.stop());
     scannerStream = null;
+    scannerMode = 'scan';
     document.getElementById('ia-modal').style.display = 'none';
 }
 
@@ -1406,13 +1418,34 @@ function rotatePendingPhoto() {
     toastScanner("Foto girada");
 }
 
+function setEditPhotoCanvas(canvas) {
+    pendingEditCanvas = canvas;
+    var preview = document.getElementById('ep-foto-preview');
+    var label = document.getElementById('product-photo-label');
+    var rotateBtn = document.getElementById('btn-rotate-edit-photo');
+    if (!preview || !pendingEditCanvas) return;
+    preview.src = pendingEditCanvas.toDataURL('image/jpeg', 0.72);
+    preview.style.display = 'inline-block';
+    if (label) {
+        label.textContent = 'Nueva foto pendiente';
+        label.style.display = 'block';
+    }
+    if (rotateBtn) rotateBtn.style.display = 'inline-block';
+}
+
+function rotateEditPhoto() {
+    if (!pendingEditCanvas) return;
+    setEditPhotoCanvas(rotateCanvas90(pendingEditCanvas, -1));
+    toastScanner("Foto girada");
+}
+
 
 /* 
    SCANNER  CAPTURA + IA + DETECCIN DUPLICADOS
  */
 async function captureIA() {
     const key   = localStorage.getItem('yaute_key_v3310');
-    if (!key) { changeGeminiKey(); return; }
+    if (scannerMode !== 'editPhoto' && !key) { changeGeminiKey(); return; }
     const video = document.getElementById('cam-preview-ia');
     if (!video.srcObject || video.videoWidth === 0) { toastScanner("Cámara no lista", '#f59e0b'); return; }
 
@@ -1423,6 +1456,15 @@ async function captureIA() {
     pendingRotateHint = getCaptureRotateHint();
     pendingCanvas = prepareSharePhoto(cropProductForeground(captureOrientado(video)), pendingRotateHint);
     refreshPendingPhotoPreview();
+    if (scannerMode === 'editPhoto') {
+        setEditPhotoCanvas(pendingCanvas);
+        pendingCanvas = null;
+        refreshPendingPhotoPreview();
+        closeScanner();
+        document.getElementById('product-edit-details').style.display = 'block';
+        toastScanner("Nueva foto lista");
+        return;
+    }
     const b64 = pendingCanvas.toDataURL('image/jpeg', 0.88).split(',')[1];
 
     const snapIcon = document.getElementById('snap-icon');
@@ -1922,6 +1964,7 @@ function selectProductForEdit(productId) {
     }
 
     editingProductId = productId;
+    pendingEditCanvas = null;
     document.getElementById('product-search-section').style.display = 'none'; // Ocultar buscador
     document.getElementById('product-edit-details').style.display = 'block'; // Mostrar formulario de edicin
 
@@ -1946,6 +1989,8 @@ function selectProductForEdit(productId) {
         photoPreview.style.display = 'none';
         document.getElementById('product-photo-label').style.display = 'none';
     }
+    var rotateBtn = document.getElementById('btn-rotate-edit-photo');
+    if (rotateBtn) rotateBtn.style.display = 'none';
 
     // Asegurarse de que el campo de tienda tenga las sugerencias activas si hay texto
     // La funcin filterScanTienda se encarga de esto al recibir input
@@ -1956,6 +2001,7 @@ function selectProductForEdit(productId) {
 // Ocultar el formulario de edicin y volver a la bsqueda
 function hideProductEditDetails() {
     editingProductId = null;
+    pendingEditCanvas = null;
     document.getElementById('product-edit-details').style.display = 'none';
     document.getElementById('product-search-section').style.display = 'block';
     document.getElementById('product-search-input').value = ''; // Limpiar bsqueda
@@ -1975,6 +2021,8 @@ function resetProductEditDetails() {
     document.getElementById('ep-foto-preview').src      = '';
     document.getElementById('ep-foto-preview').style.display = 'none';
     document.getElementById('product-photo-label').style.display = 'none';
+    var rotateBtn = document.getElementById('btn-rotate-edit-photo');
+    if (rotateBtn) rotateBtn.style.display = 'none';
 }
 
 
@@ -2001,15 +2049,24 @@ async function confirmProductEdit() {
 
     try {
         const currentProduct = window.state.products.find(p => p.id === editingProductId);
-        const currentPhotoUrl = getProductPhotoUrl(currentProduct);
-        if (!currentPhotoUrl) toastScanner("Este producto no tiene foto guardada", '#f59e0b');
+        let currentPhotoUrl = getProductPhotoUrl(currentProduct);
+        if (pendingEditCanvas) {
+            toastScanner("Subiendo nueva foto...", '#3b82f6');
+            const blob = await new Promise(r => pendingEditCanvas.toBlob(r, 'image/jpeg', 0.82));
+            const ref = storage.ref('productos/' + Date.now() + '_' + nombre.replace(/\s+/g,'_') + '.jpg');
+            await ref.put(blob);
+            currentPhotoUrl = await ref.getDownloadURL();
+            dataToUpdate.foto = currentPhotoUrl;
+        }
+        if (!currentPhotoUrl && !pendingEditCanvas) toastScanner("Este producto no tiene foto guardada", '#f59e0b');
         toastScanner("Preparando imagen para compartir...", '#3b82f6');
         const shared = await shareOfferData({
             nombre,
             venta,
             caducidad,
             tiendaEscaneo,
-            fotoUrl: currentPhotoUrl,
+            fotoUrl: pendingEditCanvas ? '' : currentPhotoUrl,
+            canvas: pendingEditCanvas,
             titulo: 'OFERTA RÁPIDA'
         });
 
