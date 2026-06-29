@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v36.39 - Sistema Completo</title>
+    <title>Yaute v36.40 - Sistema Completo</title>
     <link rel="icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -127,7 +127,7 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.39</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.40</div>
 </div>
 
 <div id="toast-alert"></div>
@@ -325,7 +325,7 @@
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
-            <span class="version-badge">v36.39</span>
+            <span class="version-badge">v36.40</span>
             <button id="btn-install-pwa" onclick="installPWA()"
                 style="display:none; background:rgba(59,130,246,0.25); border:1px solid rgba(59,130,246,0.5); color:white; border-radius:50px; padding:3px 12px; font-size:0.62rem; font-weight:800; cursor:pointer; align-items:center; gap:5px;">
                 <i class="fas fa-download"></i> INSTALAR APP
@@ -439,21 +439,31 @@
             </button>
             <div id="promo-box" class="promo-box">
                 <div class="row g-2 mb-2">
-                    <div class="col-4">
-                        <label class="small fw-bold text-muted">PAGAS $</label>
-                        <input type="number" id="promo-total" class="form-control fw-bold" step="0.01" placeholder="0.00" oninput="calcPromoUnitCost()">
+                    <div class="col-6">
+                        <label class="small fw-bold text-muted">PRECIO NORMAL $</label>
+                        <input type="number" id="promo-precio" class="form-control fw-bold" step="0.01" placeholder="0.00">
                     </div>
-                    <div class="col-4">
-                        <label class="small fw-bold text-muted">RECIBES</label>
-                        <input type="number" id="promo-recibes" class="form-control fw-bold text-center" step="1" min="1" placeholder="3" oninput="syncPromoRecover(); calcPromoUnitCost()">
+                    <div class="col-6">
+                        <label class="small fw-bold text-muted">PAGAS PIEZAS</label>
+                        <input type="number" id="promo-pagas" class="form-control fw-bold text-center" step="0.01" min="0" placeholder="2">
                     </div>
-                    <div class="col-4">
+                </div>
+                <div class="row g-2 mb-2">
+                    <div class="col-6">
+                        <label class="small fw-bold text-muted">RECIBES PIEZAS</label>
+                        <input type="number" id="promo-recibes" class="form-control fw-bold text-center" step="1" min="1" placeholder="3">
+                    </div>
+                    <div class="col-6">
                         <label class="small fw-bold text-muted">RECUPERAS</label>
-                        <input type="number" id="promo-recuperas" class="form-control fw-bold text-center" step="1" min="1" placeholder="2" oninput="calcPromoUnitCost()">
+                        <input type="number" id="promo-recuperas" class="form-control fw-bold text-center" step="1" min="1" placeholder="2">
                     </div>
                 </div>
                 <div class="promo-result mb-2">
-                    <span>Costo unitario</span>
+                    <span>Total caja</span>
+                    <span id="promo-total-label">$0.00</span>
+                </div>
+                <div class="promo-result mb-2">
+                    <span>Costo para vender</span>
                     <span id="promo-unit">$0.00</span>
                 </div>
                 <button type="button" class="btn btn-primary w-100 rounded-pill fw-bold" onclick="applyPromoCost()">USAR COMO COSTO</button>
@@ -795,17 +805,23 @@ function syncPromoRecover() {
     if (recibes && recuperas && !recuperas.value) recuperas.value = recibes.value;
 }
 
-function getPromoUnitCost() {
-    const total = parseFloat(document.getElementById('promo-total')?.value) || 0;
-    const recuperas = parseInt(document.getElementById('promo-recuperas')?.value) || 0;
-    return total > 0 && recuperas > 0 ? total / recuperas : 0;
+function getPromoCalc() {
+    const precio = parseFloat(document.getElementById('promo-precio')?.value) || 0;
+    const pagas = parseFloat(document.getElementById('promo-pagas')?.value) || 0;
+    const recuperas = parseFloat(document.getElementById('promo-recuperas')?.value) || 0;
+    const total = precio * pagas;
+    const unit = total > 0 && recuperas > 0 ? total / recuperas : 0;
+    return { precio, pagas, recuperas, total, unit };
 }
 
 function calcPromoUnitCost() {
-    const unit = getPromoUnitCost();
+    syncPromoRecover();
+    const calc = getPromoCalc();
+    const totalOut = document.getElementById('promo-total-label');
     const out = document.getElementById('promo-unit');
-    if (out) out.textContent = '$' + unit.toFixed(2);
-    return unit;
+    if (totalOut) totalOut.textContent = '$' + calc.total.toFixed(2);
+    if (out) out.textContent = '$' + calc.unit.toFixed(2);
+    return calc.unit;
 }
 
 function applyPromoCost() {
@@ -819,12 +835,19 @@ function applyPromoCost() {
 }
 
 function resetPromoPanel() {
-    ['promo-total', 'promo-recibes', 'promo-recuperas'].forEach(id => {
+    ['promo-precio', 'promo-pagas', 'promo-recibes', 'promo-recuperas'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = '';
     });
     calcPromoUnitCost();
     togglePromoPanel(false);
+}
+
+function initPromoInputs() {
+    ['promo-precio', 'promo-pagas', 'promo-recibes', 'promo-recuperas'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.oninput = calcPromoUnitCost;
+    });
 }
 
 function renderCurrentStoreSales() {
@@ -880,6 +903,7 @@ function renderCurrentStoreSales() {
 document.addEventListener('DOMContentLoaded', () => {
     const ed = document.getElementById('entregas-date');
     if (ed) ed.value = getMXISODate();
+    initPromoInputs();
     // Inicia mostrando la pestaa de "Productos"
     showTab('productos', document.querySelector('.tab-btn[onclick="showTab(\'productos\', this)"]'));
 
@@ -895,13 +919,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!t || !c || !p) return toast("Faltan datos", "danger");
 
         const promoVisible = document.getElementById('promo-box')?.style.display === 'block';
-        const promoTotal = parseFloat(document.getElementById('promo-total')?.value) || 0;
+        const promoCalc = getPromoCalc();
         const promoRecibes = parseInt(document.getElementById('promo-recibes')?.value) || 0;
         const promoRecuperas = parseInt(document.getElementById('promo-recuperas')?.value) || 0;
         const saleData = { tienda:t, cliente:c, producto:p, cantidad:q, costo:co, precio:salePrice, total:q*salePrice, fechaStr:getMXDateStr(), timestamp:Date.now(), entregado:false, pagado:false };
-        if (promoVisible && promoTotal && promoRecuperas) {
+        if (promoVisible && promoCalc.total && promoRecuperas) {
             saleData.promo = {
-                totalPagado: promoTotal,
+                precioNormal: promoCalc.precio,
+                piezasPagadas: promoCalc.pagas,
+                totalPagado: promoCalc.total,
                 piezasRecibidas: promoRecibes,
                 piezasRecuperar: promoRecuperas,
                 costoUnitario: co
