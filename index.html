@@ -1095,7 +1095,7 @@ function renderControlListItems() {
         return `
         <div class="card-custom py-2 mb-1 d-flex justify-content-between align-items-center shadow-none border small px-3">
             <div>
-                <div class="text-uppercase fw-bold text-dark">${it.nombre||'S/N'}</div>
+                <b class="text-uppercase">${it.nombre||'S/N'}</b>
                 ${activeCatFilter==='productos' ? `<div class="d-flex align-items-center flex-wrap gap-1" style="font-size:0.65rem;"><span class="text-muted">A:<span class="text-danger fw-bold">$${(it.costo||0).toFixed(2)}</span></span> <span class="text-muted">V:<span class="text-success fw-bold">$${(it.precio||0).toFixed(2)}</span></span>${it.tiendaEscaneo ? ` <span style="background:#eff6ff;color:#2563eb;border-radius:6px;padding:1px 6px;font-weight:800;">${it.tiendaEscaneo}</span>` : ''}${it.fechaEscaneo  ? ` <span style="color:#94a3b8;">${it.fechaEscaneo}</span>` : ''}</div>` : ''}
                 ${photoUrl ? `<img src="${photoUrl}" style="width:40px; height:40px; object-fit:cover; border-radius:6px; margin-top:4px;">` : ''}
             </div>
@@ -1560,19 +1560,32 @@ function prepareSharePhoto(source, rotateHint = 0) {
     var img = source;
     if (rotateHint) img = rotateCanvas90(img, rotateHint);
     else if (img.width > img.height) img = rotateCanvas90(img, -1);
+
     var out = document.createElement('canvas');
     out.width = 1080;
-    out.height = 1350;
+    out.height = 1350; // Fixed aspect ratio for sharing (e.g., social media vertical post)
     var ctx = out.getContext('2d');
-    ctx.fillStyle = '#dcfce7';
-    ctx.fillRect(0, 0, out.width, out.height);
-    var pad = 36;
-    var boxW = out.width - pad * 2;
-    var boxH = out.height - pad * 2;
-    var scale = Math.min(boxW / img.width, boxH / img.height);
-    var dw = img.width * scale;
-    var dh = img.height * scale;
-    ctx.drawImage(img, pad + (boxW - dw) / 2, pad + (boxH - dh) / 2, dw, dh);
+
+    // Calculate object-fit: cover for the image to fill the canvas
+    const imgAspect = img.width / img.height;
+    const canvasAspect = out.width / out.height;
+
+    let sx = 0, sy = 0, sWidth = img.width, sHeight = img.height; // Source image cropping parameters
+    let dx = 0, dy = 0, dWidth = out.width, dHeight = out.height; // Destination canvas drawing parameters
+
+    if (imgAspect > canvasAspect) {
+        // Image is wider than the canvas. Crop width of the image.
+        sWidth = img.height * canvasAspect;
+        sx = (img.width - sWidth) / 2;
+    } else {
+        // Image is taller than the canvas. Crop height of the image.
+        sHeight = img.width / canvasAspect;
+        sy = (img.height - sHeight) / 2;
+    }
+
+    // Draw the image, covering the entire canvas
+    ctx.drawImage(img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+
     return out;
 }
 
@@ -2182,7 +2195,7 @@ function selectProductForEdit(productId) {
 
     // Asegurarse de que el campo de tienda tenga las sugerencias activas si hay texto
     // La funcin filterScanTienda se encarga de esto al recibir input
-    // Deberamos re-inicializar el listener oninput para el campo de tienda de edicin
+    // Deberíamos re-inicializar el listener oninput para el campo de tienda de edicin
     document.getElementById('ep-tienda-escaneo').oninput = (e) => filterScanTienda(e.target.value);
 }
 
@@ -2320,4 +2333,3 @@ window.onload = startSync;
   </script>
 </body>
 </html>
-

@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Yaute v35.0 — Sistema Completo</title>
+    <title>Yaute v36.40 - Sistema Completo</title>
     <link rel="icon" href="logo.png">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Yaute">
     <meta name="theme-color" content="#0f172a">
-    <!-- iOS: ícono para "Agregar a pantalla de inicio" -->
+    <!-- iOS: cono para "Agregar a pantalla de inicio" -->
     <link rel="apple-touch-icon" href="logo.png">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -75,9 +75,19 @@
         .bg-gradient-success { background:linear-gradient(135deg,#10b981,#059669); }
         .bg-gradient-warning { background:linear-gradient(135deg,#f59e0b,#d97706); }
         .finance-item { border-left:5px solid var(--accent); }
+        #current-store-sales-list { max-height:360px; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; }
+        .sales-store-row { display:flex; justify-content:space-between; gap:10px; align-items:center; border-bottom:1px solid #eef2f7; padding:10px 0; }
+        .sales-store-row:last-child { border-bottom:none; }
+        .sales-store-main { min-width:0; }
+        .sales-store-product { font-size:0.78rem; font-weight:900; color:var(--primary); line-height:1.25; text-transform:uppercase; overflow-wrap:anywhere; }
+        .sales-store-meta { font-size:0.68rem; color:#64748b; font-weight:700; margin-top:2px; }
+        .sales-store-total { text-align:right; flex-shrink:0; font-weight:900; color:var(--success); }
+        .sales-store-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:2px; }
+        .promo-box { display:none; background:#f8fafc; border:1px solid #dbeafe; border-radius:16px; padding:12px; margin-bottom:12px; }
+        .promo-result { background:white; border-radius:12px; padding:9px 12px; display:flex; justify-content:space-between; align-items:center; font-weight:900; color:var(--primary); }
 
         /* SUGERENCIAS */
-        .sug-box { position:absolute; top:100%; left:0; right:0; background:white; border-radius:14px; max-height:220px; overflow-y:auto; z-index:1500; border:1px solid #e2e8f0; box-shadow:0 15px 30px rgba(0,0,0,0.15); margin-top:5px; }
+        .sug-box { position:absolute; top:100%; left:0; right:0; background:white; border-radius:14px; max-height:220px; overflow-y:auto; z-index:1500; border:1px solid #e2e8f0; box-shadow:0 15px 30px rgba(0,0,0,0.15); margin-top:5px; touch-action:pan-y; overscroll-behavior:contain; }
         .sug-item { padding:14px 18px; border-bottom:1px solid #f1f5f9; cursor:pointer; font-size:0.95rem; text-transform:uppercase; font-weight:700; color:var(--primary); }
 
         /* REPARTO */
@@ -88,10 +98,10 @@
         #ticket-render { position:absolute; top:-5000px; width:450px; background:white; padding:40px; font-family:monospace; color:black; line-height:1.4; border:1px solid #eee; }
         #toast-alert { position:fixed; top:25px; left:50%; transform:translateX(-50%); z-index:30000; padding:14px 28px; border-radius:50px; font-weight:800; display:none; color:white; box-shadow:0 10px 30px rgba(0,0,0,0.25); text-align:center; min-width:280px; }
 
-        /* ══ SCANNER MODAL ══ */
+        /*  SCANNER MODAL  */
         #ia-modal { position:fixed; inset:0; background:#000; z-index:10000; display:none; flex-direction:column; }
         #cam-preview-ia { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
-        /* Guía visual ligera — sin sombra que oscurezca la imagen */
+        /* Gua visual ligera  sin sombra que oscurezca la imagen */
         .scan-guide { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:82%; aspect-ratio:4/3; border:2px solid rgba(0,229,192,0.6); border-radius:16px; pointer-events:none; }
         .scan-guide::before, .scan-guide::after { content:''; position:absolute; width:22px; height:22px; border-color:#00e5c0; border-style:solid; }
         .scan-guide::before { top:-2px; left:-2px; border-width:3px 0 0 3px; border-radius:4px 0 0 0; }
@@ -108,7 +118,7 @@
         /* Modal API Key scanner */
         #key-config-modal { position:fixed; inset:0; background:rgba(0,0,0,0.98); z-index:25000; display:none; align-items:center; justify-content:center; padding:20px; }
 
-        /* Modal migración */
+        /* Modal migracin */
 .toast-msg { position:fixed; top:22px; left:50%; transform:translateX(-50%); z-index:30000; padding:12px 24px; border-radius:50px; font-weight:800; font-size:0.8rem; display:none; color:white; box-shadow:0 8px 24px rgba(0,0,0,0.25); max-width:88%; text-align:center; }
     </style>
 </head>
@@ -117,16 +127,16 @@
 <div id="splash-screen">
     <img src="logo.png" alt="Yaute" style="width:100px; height:100px; object-fit:contain; border-radius:18px; margin-bottom:16px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
     <div class="splash-loader"></div>
-    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSION 36.12</div>
+    <div style="margin-top:20px; font-size:0.8rem; font-weight:900; letter-spacing:2px; color:var(--primary);">VERSIÓN 36.40</div>
 </div>
 
 <div id="toast-alert"></div>
 <div id="toast-msg" class="toast-msg"></div>
 
-<!-- ══ MODAL API KEY GEMINI ══════════════════════════════════════ -->
+<!--  MODAL API KEY GEMINI  -->
 <div id="key-config-modal">
     <div class="card-custom w-100" style="max-width:350px; text-align:center;">
-        <h6 class="fw-bold mb-3">⚙ ACTIVAR ESCÁNER IA</h6>
+        <h6 class="fw-bold mb-3">ACTIVAR ESCÁNER IA</h6>
         <p style="font-size:0.7rem;" class="text-muted mb-3">
             Pega tu API Key de Gemini.<br>Se guarda solo en este dispositivo.<br><br>
             Obtén la tuya gratis en<br>
@@ -137,7 +147,7 @@
     </div>
 </div>
 
-<!-- ══ MODAL REINICIAR CATÁLOGO ══════════════════════════════════ -->
+<!--  MODAL REINICIAR CATLOGO  -->
 <div id="reset-modal" class="modal-overlay">
     <div class="modal-content-custom text-center">
         <div class="mb-3 text-danger"><i class="fas fa-trash-can fa-4x"></i></div>
@@ -149,7 +159,7 @@
     </div>
 </div>
 
-<!-- ══ MODAL EDITAR VENTA ════════════════════════════════════════ -->
+<!--  MODAL EDITAR VENTA  -->
 <div id="edit-modal" class="modal-overlay">
     <div class="modal-content-custom">
         <h5 class="fw-bold mb-4 text-primary">Editar Registro</h5>
@@ -171,7 +181,7 @@
     </div>
 </div>
 
-<!-- ══ MODAL EDITAR CATÁLOGO ═════════════════════════════════════ -->
+<!--  MODAL EDITAR CATLOGO  -->
 <div id="cat-edit-modal" class="modal-overlay">
     <div class="modal-content-custom">
         <h5 class="fw-bold mb-4" style="color:var(--accent)">Editar Maestro</h5>
@@ -184,7 +194,7 @@
     </div>
 </div>
 
-<!-- ══ MODAL BORRAR ══════════════════════════════════════════════ -->
+<!--  MODAL BORRAR  -->
 <div id="delete-modal" class="modal-overlay">
     <div class="modal-content-custom text-center">
         <div class="mb-3 text-danger"><i class="fas fa-trash-alt fa-4x"></i></div>
@@ -196,7 +206,7 @@
     </div>
 </div>
 
-<!-- ══ MODAL AGREGAR PRODUCTO ════════════════════════════════════ -->
+<!--  MODAL AGREGAR PRODUCTO  -->
 <div id="add-product-modal" class="modal-overlay">
     <div class="modal-content-custom">
         <h5 class="fw-bold mb-4 text-primary">Nuevo Producto</h5>
@@ -212,7 +222,7 @@
     </div>
 </div>
 
-<!-- ══ MODAL PRECIOS SCANNER (Usado después de escanear) ═════════════════════════════════════ -->
+<!--  MODAL PRECIOS SCANNER (Usado despus de escanear)  -->
 <div id="price-modal">
     <div id="price-panel">
         <p class="fw-bold mb-1" style="font-size:0.7rem; color:#94a3b8; letter-spacing:1px;">PRODUCTO IDENTIFICADO</p>
@@ -220,11 +230,19 @@
             <i class="fas fa-exclamation-triangle mt-1" style="flex-shrink:0;"></i>
             <span id="dup-text"></span>
         </div>
-        <!-- Descripción en textarea: hace wrap automático, no se desborda -->
+        <!-- Descripcin en textarea: hace wrap automtico, no se desborda -->
         <textarea id="pm-nombre" class="form-control mb-3"
             rows="3"
             placeholder="Nombre del producto"
             style="resize:none; text-transform:uppercase; font-weight:700; font-size:0.9rem; line-height:1.4; word-break:break-word; white-space:pre-wrap;"></textarea>
+        <div id="pm-photo-tools" class="mb-3" style="display:none;">
+            <div style="display:flex; align-items:center; gap:10px; background:#f8fafc; border-radius:16px; padding:10px;">
+                <img id="pm-photo-preview" alt="Foto capturada" style="width:74px; height:74px; object-fit:cover; border-radius:12px; background:#e2e8f0;">
+                <button type="button" class="btn btn-outline-primary rounded-pill fw-bold flex-fill" onclick="rotatePendingPhoto()">
+                    <i class="fas fa-rotate-right me-2"></i> GIRAR FOTO
+                </button>
+            </div>
+        </div>
         <!-- Fecha de escaneo + Tienda (persiste) -->
         <div class="row g-2 mb-2">
             <div class="col-6">
@@ -262,10 +280,10 @@
                     placeholder="0.00" step="0.01">
             </div>
         </div>
-        <!-- Caducidad (opcional) — formato libre: Dic 2026 -->
+        <!-- Caducidad (opcional)  formato libre: Dic 2026 -->
         <div class="mb-2">
             <label class="small fw-bold text-muted">
-                CADUCIDAD <span style="font-weight:400; font-size:0.6rem;">(opcional · ej: Dic 2026)</span>
+                CADUCIDAD <span style="font-weight:400; font-size:0.6rem;">(opcional - ej: Dic 2026)</span>
             </label>
             <input type="text" id="pm-caducidad" class="form-control"
                 placeholder="Dic 2026"
@@ -274,31 +292,31 @@
                 oninput="formatCaducidad(this)">
         </div>
         <small class="text-muted d-block mb-3" style="font-size:0.62rem; text-align:center;">
-            💡 Precio = costo + margen → redondeado al $10 más cercano
+            Precio = costo + margen -> redondeado al $10 más cercano
         </small>
-        <button class="btn btn-success w-100 py-3 rounded-pill fw-bold mb-2" onclick="confirmPrices()">📲 COMPARTIR Y GUARDAR</button>
-        <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="cancelPrices()" style="border:none;">CANCELAR — VOLVER A CÁMARA</button>
+        <button class="btn btn-success w-100 py-3 rounded-pill fw-bold mb-2" onclick="confirmPrices()">COMPARTIR Y GUARDAR</button>
+        <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="cancelPrices()" style="border:none;">CANCELAR - VOLVER A CÁMARA</button>
     </div>
 </div>
 
-<!-- ══ MODAL CONFIRMACIÓN DUPLICADO ═════════════════════════════ -->
+<!--  MODAL CONFIRMACIN DUPLICADO  -->
 <div id="dup-confirm-modal" style="position:fixed; inset:0; background:rgba(0,0,0,0.88); z-index:21000; display:none; align-items:flex-end; justify-content:center; padding:16px;">
     <div style="background:white; border-radius:24px; padding:22px; width:100%; max-width:420px;">
-        <p class="fw-bold mb-1" style="font-size:0.7rem; color:#94a3b8; letter-spacing:1px;">⚠ POSIBLE DUPLICADO</p>
+        <p class="fw-bold mb-1" style="font-size:0.7rem; color:#94a3b8; letter-spacing:1px;">POSIBLE DUPLICADO</p>
         <p style="font-size:0.82rem; color:#0f172a; margin-bottom:14px;">
             El producto escaneado <strong id="dcm-escaneado"></strong> coincide parcialmente con los siguientes registros. ¿Es alguno de estos?
         </p>
         <div id="dcm-candidatos" style="max-height:200px; overflow-y:auto; margin-bottom:14px;"></div>
         <button class="btn btn-warning w-100 rounded-pill fw-bold mb-2" onclick="skipDuplicate()">
-            NO — ES UN PRODUCTO NUEVO
+            NO - ES UN PRODUCTO NUEVO
         </button>
         <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="closeDupConfirm()" style="border:none; font-size:0.8rem;">
-            CANCELAR — VOLVER A CÁMARA
+            CANCELAR - VOLVER A CÁMARA
         </button>
     </div>
 </div>
 
-<!-- ══ HEADER ════════════════════════════════════════════════════ -->
+<!--  HEADER  -->
 <header>
     <div class="d-flex flex-column align-items-center">
         <div class="d-flex align-items-center">
@@ -307,7 +325,7 @@
             <div id="status-dot" class="status-dot" style="background:orange;"></div>
         </div>
         <div style="margin-top:6px; display:flex; align-items:center; gap:8px;">
-            <span class="version-badge">v36.11</span>
+            <span class="version-badge">v36.40</span>
             <button id="btn-install-pwa" onclick="installPWA()"
                 style="display:none; background:rgba(59,130,246,0.25); border:1px solid rgba(59,130,246,0.5); color:white; border-radius:50px; padding:3px 12px; font-size:0.62rem; font-weight:800; cursor:pointer; align-items:center; gap:5px;">
                 <i class="fas fa-download"></i> INSTALAR APP
@@ -316,7 +334,7 @@
     </div>
 </header>
 
-<!-- ══ MAIN ══════════════════════════════════════════════════════ -->
+<!--  MAIN  -->
 <main>
     <!-- NUEVA TAB DE PRODUCTOS (AHORA LA PRIMERA) -->
     <div id="tab-productos" class="tab-content">
@@ -332,12 +350,20 @@
             </button>
         </div>
 
-        <!-- Sección de edición de producto (similar a price-panel, pero para edición directa) -->
+        <!-- Seccin de edicin de producto (similar a price-panel, pero para edicin directa) -->
         <div id="product-edit-details" class="card-custom" style="display:none;">
             <h5 class="fw-bold mb-4" style="color:var(--primary)">Editar Detalles del Producto</h5>
             <div class="mb-3 text-center" id="product-photo-preview-container">
                  <img id="ep-foto-preview" src="" style="width:100px; height:100px; object-fit:cover; border-radius:10px; border:1px solid #e2e8f0; display:none;">
-                 <small class="text-muted d-block mt-1" id="product-photo-label" style="display:none;">Foto actual (solo se actualiza escaneando)</small>
+                 <small class="text-muted d-block mt-1" id="product-photo-label" style="display:none;">Foto actual</small>
+                 <div class="d-flex gap-2 mt-2">
+                    <button type="button" class="btn btn-outline-primary rounded-pill fw-bold flex-fill" onclick="openScannerModal('editPhoto')">
+                        <i class="fas fa-camera me-1"></i> CAMBIAR FOTO
+                    </button>
+                    <button type="button" id="btn-rotate-edit-photo" class="btn btn-outline-secondary rounded-pill fw-bold" onclick="rotateEditPhoto()" style="display:none;">
+                        <i class="fas fa-rotate-right"></i>
+                    </button>
+                 </div>
             </div>
             <div class="mb-3"><label class="text-uppercase">Descripción</label><textarea id="ep-nombre" class="form-control mb-3" rows="3" placeholder="Nombre del producto" style="resize:none; text-transform:uppercase; font-weight:700; font-size:0.9rem; line-height:1.4; word-break:break-word; white-space:pre-wrap;"></textarea></div>
             <div class="row g-2 mb-2">
@@ -367,7 +393,7 @@
             </div>
             <div class="mb-2">
                 <label class="small fw-bold text-muted">
-                    CADUCIDAD <span style="font-weight:400; font-size:0.6rem;">(opcional · ej: Dic 2026)</span>
+                CADUCIDAD <span style="font-weight:400; font-size:0.6rem;">(opcional - ej: Dic 2026)</span>
                 </label>
                 <input type="text" id="ep-caducidad" class="form-control"
                     placeholder="Dic 2026"
@@ -376,7 +402,7 @@
                     oninput="formatCaducidad(this)">
             </div>
             <small class="text-muted d-block mb-3" style="font-size:0.62rem; text-align:center;">
-                💡 Precio = costo + margen → redondeado al $10 más cercano
+            Precio = costo + margen -> redondeado al $10 más cercano
             </small>
             <button class="btn btn-success w-100 py-3 rounded-pill fw-bold mb-2" onclick="confirmProductEdit()">GUARDAR Y COMPARTIR</button>
             <button class="btn btn-outline-secondary w-100 rounded-pill" onclick="hideProductEditDetails()">CANCELAR</button>
@@ -408,7 +434,53 @@
                 <div class="col-6"><label class="text-uppercase">Costo Anaquel</label><input type="number" id="in-costo" class="form-control fw-bold border-danger" step="0.01"></div>
                 <div class="col-6"><label class="text-uppercase">Precio Venta</label><input type="number" id="in-precio" class="form-control fw-bold border-success" step="0.01"></div>
             </div>
+            <button type="button" id="btn-promo-toggle" class="btn btn-outline-primary w-100 rounded-pill fw-bold mb-2" onclick="togglePromoPanel()">
+                <i class="fas fa-tags me-2"></i> PROMO
+            </button>
+            <div id="promo-box" class="promo-box">
+                <div class="row g-2 mb-2">
+                    <div class="col-6">
+                        <label class="small fw-bold text-muted">PRECIO NORMAL $</label>
+                        <input type="number" id="promo-precio" class="form-control fw-bold" step="0.01" placeholder="0.00">
+                    </div>
+                    <div class="col-6">
+                        <label class="small fw-bold text-muted">PAGAS PIEZAS</label>
+                        <input type="number" id="promo-pagas" class="form-control fw-bold text-center" step="0.01" min="0" placeholder="2">
+                    </div>
+                </div>
+                <div class="row g-2 mb-2">
+                    <div class="col-6">
+                        <label class="small fw-bold text-muted">RECIBES PIEZAS</label>
+                        <input type="number" id="promo-recibes" class="form-control fw-bold text-center" step="1" min="1" placeholder="3">
+                    </div>
+                    <div class="col-6">
+                        <label class="small fw-bold text-muted">RECUPERAS</label>
+                        <input type="number" id="promo-recuperas" class="form-control fw-bold text-center" step="1" min="1" placeholder="2">
+                    </div>
+                </div>
+                <div class="promo-result mb-2">
+                    <span>Total caja</span>
+                    <span id="promo-total-label">$0.00</span>
+                </div>
+                <div class="promo-result mb-2">
+                    <span>Costo para vender</span>
+                    <span id="promo-unit">$0.00</span>
+                </div>
+                <button type="button" class="btn btn-primary w-100 rounded-pill fw-bold" onclick="applyPromoCost()">USAR COMO COSTO</button>
+            </div>
             <button id="btn-save-record" class="btn btn-primary w-100 py-3 rounded-pill fw-bold shadow">GUARDAR REGISTRO</button>
+        </div>
+        <div class="card-custom mt-3" id="current-store-sales-card">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div>
+                    <div class="fw-bold" style="color:var(--primary); font-size:0.9rem;">Ventas de hoy</div>
+                    <small class="text-muted fw-bold" id="current-store-sales-title">Selecciona una tienda</small>
+                </div>
+                <span class="badge rounded-pill bg-success" id="current-store-sales-total">$0.00</span>
+            </div>
+            <div id="current-store-sales-list" class="small text-muted py-3 text-center fw-bold">
+                SIN TIENDA SELECCIONADA
+            </div>
         </div>
     </div>
 
@@ -421,7 +493,7 @@
         <div id="lista-entregas"></div>
     </div>
 
-    <!-- TAB GESTIÓN -->
+    <!-- TAB GESTIN -->
     <div id="tab-control" class="tab-content" style="display:none;">
         <div class="sub-nav">
             <button class="sub-btn active" id="sub-btn-fin" onclick="switchSubTab('finanzas')"><i class="fas fa-chart-line"></i>FINANZAS</button>
@@ -431,20 +503,20 @@
     </div>
 </main>
 
-<!-- ══ SCANNER MODAL ═════════════════════════════════════════════ -->
+<!--  SCANNER MODAL  -->
 <div id="ia-modal">
     <video id="cam-preview-ia" autoplay playsinline muted></video>
     <div class="scan-guide"></div>
     <div id="cam-top-bar">
-        <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:white; border:1px solid rgba(255,255,255,0.3);" onclick="closeScanner()">✕ SALIR</button>
-        <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:#fbbf24; border:1px solid rgba(255,255,255,0.2); font-size:0.65rem;" onclick="changeGeminiKey()">⚙ API KEY</button>
+        <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:white; border:1px solid rgba(255,255,255,0.3);" onclick="closeScanner()">X SALIR</button>
+        <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:#fbbf24; border:1px solid rgba(255,255,255,0.2); font-size:0.65rem;" onclick="changeGeminiKey()">API KEY</button>
     </div>
     <div id="snap-btn" onclick="captureIA()">
         <i class="fas fa-camera fa-2x text-primary" id="snap-icon"></i>
     </div>
 </div>
 
-<!-- ══ TICKET RENDER ═════════════════════════════════════════════ -->
+<!--  TICKET RENDER  -->
 <div id="ticket-render">
     <div style="text-align:center; margin-bottom:25px;">
         <img src="logo.png" alt="Yaute" style="width:120px; border-radius:10px;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAgMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgcng9IjIyIiBmaWxsPSIjMGYxNzJhIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwgQmxhY2ssQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0MCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzNiODJmNiI+T1JZPC90ZXh0Pjwvc3ZnPg=='; this.onerror=null;">
@@ -459,10 +531,10 @@
     </table>
     <div style="border-top:2px dashed #000; margin:25px 0;"></div>
     <div style="display:flex; justify-content:space-between; font-size:1.9rem; font-weight:900; color:black;"><span>TOTAL:</span><span id="t-total"></span></div>
-    <div style="text-align:center; margin-top:45px; font-size:1.1rem; border:1.5px solid #000; padding:12px; font-weight:bold; color:black;">¡Gracias por su compra!</div>
+    <div style="text-align:center; margin-top:45px; font-size:1.1rem; border:1.5px solid #000; padding:12px; font-weight:bold; color:black;">Gracias por su compra!</div>
 </div>
 
-<!-- ══ BOTTOM NAV ════════════════════════════════════════════════ -->
+<!--  BOTTOM NAV  -->
 <nav class="bottom-nav">
     <button class="tab-btn active" onclick="showTab('productos', this)"><i class="fas fa-box"></i>Productos</button>
     <button class="tab-btn" onclick="showTab('operaciones', this)"><i class="fas fa-cash-register"></i>Ventas</button>
@@ -471,9 +543,9 @@
 </nav>
 
 <script>
-/* ══════════════════════════════════════════════════════════════════
-   FIREBASE UNIFICADA — ofertas-rapidas-con-scanner (cuenta personal)
-══════════════════════════════════════════════════════════════════ */
+/* 
+   FIREBASE UNIFICADA  ofertas-rapidas-con-scanner (cuenta personal)
+ */
 const firebaseConfig = {
     apiKey:            "AIzaSyB3kiLskvkV6cJ0byaCg_zqe-GIWM3jelI",
     authDomain:        "ofertas-rapidas-con-scanner.firebaseapp.com",
@@ -486,20 +558,20 @@ firebase.initializeApp(firebaseConfig);
 const db      = firebase.firestore();
 const storage = firebase.storage();
 
-// Helper de colección — evita bug de slash en path
+// Helper de coleccin  evita bug de slash en path
 const APP_ID = 'yaute-v1-shared';
 function col(name) {
     return db.collection('artifacts').doc(APP_ID)
              .collection('public').doc('data').collection(name);
 }
 
-/* ══════════════════════════════════════════════════════════════════
+/* 
    ESTADO GLOBAL
-══════════════════════════════════════════════════════════════════ */
+ */
 window.state = { sales: [], clients: [], stores: [], products: [] };
 let deleteRef       = { col: '', id: '' };
 let editRef         = null;
-let catEditRef      = { type: '', item: null }; // Usado para editar en 'Gestión'
+let catEditRef      = { type: '', item: null }; // Usado para editar en 'Gestin'
 let activeSubTab    = 'finanzas';
 let activeCatFilter = 'productos';
 let activeFinanceView = 'compras';
@@ -511,9 +583,20 @@ let scannerStream   = null;
 let pendingNombre   = '';
 let pendingCanvas   = null;
 let pendingExisteId = null;
+let pendingFotoUrl  = '';
+let pendingRotateHint = 0;
+let lastDeviceGamma = 0;
+let scannerMode = 'scan';
+let pendingEditCanvas = null;
 
-// Para la edición de productos desde la pestaña 'Productos'
-let editingProductId = null; // Guarda el ID del producto que se está editando
+if (window.DeviceOrientationEvent) {
+    window.addEventListener('deviceorientation', function(e) {
+        if (typeof e.gamma === 'number') lastDeviceGamma = e.gamma;
+    }, true);
+}
+
+// Para la edicin de productos desde la pestaa 'Productos'
+let editingProductId = null; // Guarda el ID del producto que se est editando
 
 
 // Finanzas fechas
@@ -528,30 +611,49 @@ const formatProperName = s => s ? s.trim().toLowerCase().split(' ').map(w => w.c
 
 let finDate = getMXISODate(), finDateFrom = getMXISODate(), finDateTo = getMXISODate(), finStore = '', finClient = '', finProduct = '', finAllDates = false;
 
-/* ══════════════════════════════════════════════════════════════════
+/* 
    TOAST DOBLE (ventas usa #toast-alert, scanner usa #toast-msg)
-══════════════════════════════════════════════════════════════════ */
+ */
 const toast = (m, type = 'success') => {
     const el = document.getElementById('toast-alert');
     if (!el) return;
     el.style.background = type === 'success' ? 'var(--success)' : 'var(--danger)';
     el.innerText = m; el.style.display = 'block';
-    setTimeout(() => { if(el) el.style.display = 'none'; }, 2500);
+    clearTimeout(el._t);
+    el._t = setTimeout(() => { if(el) el.style.display = 'none'; }, 2500);
 };
 const toastScanner = (msg, color = '#10b981') => {
     const el = document.getElementById('toast-msg');
+    if (!el) return;
     el.textContent = msg; el.style.background = color; el.style.display = 'block';
     clearTimeout(el._t);
     el._t = setTimeout(() => el.style.display = 'none', 3000);
 };
 
-/* ══════════════════════════════════════════════════════════════════
+function ventaParaCliente(cliente, costo, precio) {
+    return cliente === 'CRISTO' ? costo : precio;
+}
+
+function ensureCatalogItem(collectionName, nombre) {
+    if (!nombre) return;
+    const exists = (window.state[collectionName] || []).some(item => (item.nombre || '').toUpperCase() === nombre);
+    if (!exists) col(collectionName).add({ nombre });
+}
+
+function upsertBasicProduct(nombre, costo, precio) {
+    if (!nombre) return;
+    const existing = (window.state.products || []).find(item => (item.nombre || '').toUpperCase() === nombre);
+    if (!existing) col('products').add({ nombre, costo, precio });
+    else col('products').doc(existing.id).update({ costo, precio });
+}
+
+/* 
    SYNC FIREBASE
-══════════════════════════════════════════════════════════════════ */
+ */
 function hideSplash() {
     const splash = document.getElementById('splash-screen');
     if (!splash) return;
-    // Cancelar la animación CSS para que JS tome control
+    // Cancelar la animacin CSS para que JS tome control
     splash.style.animation = 'none';
     splash.style.opacity   = '0';
     splash.style.pointerEvents = 'none';
@@ -569,7 +671,7 @@ function startSync() {
         document.getElementById('key-config-modal').style.display = 'flex';
     }
 
-    // Timeout reducido a 3s — si Firebase no responde, la app sigue usable
+    // Timeout reducido a 3s  si Firebase no responde, la app sigue usable
     const splashTimeout = setTimeout(hideSplash, 3000);
 
     let colsReady = 0;
@@ -581,19 +683,19 @@ function startSync() {
             document.getElementById('status-dot').style.background = 'var(--success)';
             document.getElementById('status-dot').style.boxShadow  = '0 0 10px var(--success)';
 
-            // Quitar splash cuando la primera colección responda
+            // Quitar splash cuando la primera coleccin responda
             colsReady++;
             if (colsReady === 1) {
                 clearTimeout(splashTimeout);
                 hideSplash();
             }
 
-            if (name === 'sales') { renderEntregas(); if (activeSubTab === 'finanzas') renderFinanceMenu(); }
+            if (name === 'sales') { renderEntregas(); renderCurrentStoreSales(); if (activeSubTab === 'finanzas') renderFinanceMenu(); }
             if (name !== 'sales' && activeSubTab === 'catalogo') renderControlList();
         }, err => {
             console.error('Sync:', name, err.message);
             document.getElementById('status-dot').style.background = '#ef4444';
-            // Si todas fallaron, quitar splash también
+            // Si todas fallaron, quitar splash tambin
             colsReady++;
             if (colsReady === 1) { clearTimeout(splashTimeout); hideSplash(); }
         });
@@ -602,9 +704,9 @@ function startSync() {
     setupAuto('in-tienda',   'sug-tienda',   'stores');
     setupAuto('in-cliente',  'sug-cliente',  'clients');
     setupAuto('in-producto', 'sug-producto', 'products');
-    setupAuto('ep-tienda-escaneo', 'sug-edit-tienda', 'stores'); // Para la edición de productos
+    setupAuto('ep-tienda-escaneo', 'sug-edit-tienda', 'stores'); // Para la edicin de productos
 
-    // Manejador para cerrar las sugerencias de búsqueda de productos al hacer clic fuera
+    // Manejador para cerrar las sugerencias de bsqueda de productos al hacer clic fuera
     const productSearchInput = document.getElementById('product-search-input');
     const sugProductEditBox  = document.getElementById('sug-product-edit');
     document.addEventListener('click', e => {
@@ -620,6 +722,7 @@ function setupAuto(inpId, boxId, key) {
     if (!inp || !box) return;
     inp.oninput = () => {
         const val = inp.value.toUpperCase();
+        if (inpId === 'in-tienda') renderCurrentStoreSales();
         if (!val) { box.classList.add('d-none'); return; }
         const filtered = (window.state[key] || [])
             .map(x => (x.nombre || '').toUpperCase())
@@ -631,6 +734,7 @@ function setupAuto(inpId, boxId, key) {
         const it = e.target.closest('.sug-item'); if (!it) return;
         const val = it.dataset.val.trim();
         inp.value = val; box.classList.add('d-none');
+        if (inpId === 'in-tienda') renderCurrentStoreSales();
         if (key === 'products') {
             const p = window.state.products.find(x => (x.nombre || '').toUpperCase() === val);
             if (p) {
@@ -639,9 +743,9 @@ function setupAuto(inpId, boxId, key) {
                     document.getElementById('in-costo').value  = p.costo  || 0;
                     document.getElementById('in-precio').value = p.precio || 0;
                 }
-                // La lógica para product-search-input se maneja ahora directamente en filterProductsForEdit
+                // La lgica para product-search-input se maneja ahora directamente en filterProductsForEdit
                 // Este bloque de `if (inpId === 'product-search-input') { selectProductForEdit(p.id); }`
-                // ya no es necesario aquí y se elimina para evitar duplicidad o confusión.
+                // ya no es necesario aqui y se elimina para evitar duplicidad o confusion.
             }
         }
         // Para tiendas/clientes, solo establece el valor
@@ -654,18 +758,18 @@ function setupAuto(inpId, boxId, key) {
     });
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   NAVEGACIÓN
-══════════════════════════════════════════════════════════════════ */
+/* 
+   NAVEGACIN
+ */
 function showTab(id, btn) {
     document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
     const t = document.getElementById('tab-' + id);
     if (t) t.style.display = 'block';
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     if (btn) btn.classList.add('active');
-    // Para la pestaña de Gestión, asegurarnos de que muestre el sub-tab correcto
+    // Para la pestaa de Gestin, asegurarnos de que muestre el sub-tab correcto
     if (id === 'control') switchSubTab('finanzas');
-    // Cuando se va a la pestaña de productos, asegúrate de que el estado inicial sea de búsqueda.
+    // Cuando se va a la pestaa de productos, asegrate de que el estado inicial sea de bsqueda.
     if (id === 'productos') {
         resetProductEditDetails();
         document.getElementById('product-search-section').style.display = 'block';
@@ -682,13 +786,125 @@ function switchSubTab(id) {
     if (id === 'catalogo') renderControlList(); else renderFinanceMenu();
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   VENTAS — GUARDAR
-══════════════════════════════════════════════════════════════════ */
+/* 
+   VENTAS  GUARDAR
+ */
+function togglePromoPanel(force) {
+    const box = document.getElementById('promo-box');
+    const btn = document.getElementById('btn-promo-toggle');
+    if (!box || !btn) return;
+    const show = typeof force === 'boolean' ? force : box.style.display !== 'block';
+    box.style.display = show ? 'block' : 'none';
+    btn.classList.toggle('btn-primary', show);
+    btn.classList.toggle('btn-outline-primary', !show);
+}
+
+function syncPromoRecover() {
+    const recibes = document.getElementById('promo-recibes');
+    const recuperas = document.getElementById('promo-recuperas');
+    if (recibes && recuperas && !recuperas.value) recuperas.value = recibes.value;
+}
+
+function getPromoCalc() {
+    const precio = parseFloat(document.getElementById('promo-precio')?.value) || 0;
+    const pagas = parseFloat(document.getElementById('promo-pagas')?.value) || 0;
+    const recuperas = parseFloat(document.getElementById('promo-recuperas')?.value) || 0;
+    const total = precio * pagas;
+    const unit = total > 0 && recuperas > 0 ? total / recuperas : 0;
+    return { precio, pagas, recuperas, total, unit };
+}
+
+function calcPromoUnitCost() {
+    syncPromoRecover();
+    const calc = getPromoCalc();
+    const totalOut = document.getElementById('promo-total-label');
+    const out = document.getElementById('promo-unit');
+    if (totalOut) totalOut.textContent = '$' + calc.total.toFixed(2);
+    if (out) out.textContent = '$' + calc.unit.toFixed(2);
+    return calc.unit;
+}
+
+function applyPromoCost() {
+    const unit = calcPromoUnitCost();
+    if (!unit) {
+        toast("Completa la promo", "danger");
+        return;
+    }
+    document.getElementById('in-costo').value = unit.toFixed(2);
+    toast("Costo de promo aplicado");
+}
+
+function resetPromoPanel() {
+    ['promo-precio', 'promo-pagas', 'promo-recibes', 'promo-recuperas'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = '';
+    });
+    calcPromoUnitCost();
+    togglePromoPanel(false);
+}
+
+function initPromoInputs() {
+    ['promo-precio', 'promo-pagas', 'promo-recibes', 'promo-recuperas'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.oninput = calcPromoUnitCost;
+    });
+}
+
+function renderCurrentStoreSales() {
+    const tiendaInput = document.getElementById('in-tienda');
+    const title = document.getElementById('current-store-sales-title');
+    const totalBadge = document.getElementById('current-store-sales-total');
+    const list = document.getElementById('current-store-sales-list');
+    if (!tiendaInput || !title || !totalBadge || !list) return;
+
+    const tienda = tiendaInput.value.trim().toUpperCase();
+    if (!tienda) {
+        title.textContent = 'Selecciona una tienda';
+        totalBadge.textContent = '$0.00';
+        list.innerHTML = 'SIN TIENDA SELECCIONADA';
+        return;
+    }
+
+    const today = normalizeDateStr(getMXDateStr());
+    const ventas = (window.state.sales || [])
+        .filter(s =>
+            (s.tienda || '').trim().toUpperCase() === tienda &&
+            normalizeDateStr(s.fechaStr) === today
+        )
+        .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+    const totalCompras = ventas.reduce((sum, s) => sum + ((s.costo || 0) * (s.cantidad || 0)), 0);
+    const totalPiezas = ventas.reduce((sum, s) => sum + (s.cantidad || 0), 0);
+    title.textContent = 'Registros: ' + ventas.length + ' · Productos: ' + totalPiezas;
+    totalBadge.textContent = '$' + totalCompras.toFixed(2);
+
+    if (!ventas.length) {
+        list.innerHTML = '<div class="py-3 text-center text-muted fw-bold">SIN VENTAS HOY EN ESTA TIENDA</div>';
+        return;
+    }
+
+    list.innerHTML = ventas.map(s => `
+        <div class="sales-store-row">
+            <div class="sales-store-main">
+                <div class="sales-store-product">${s.cantidad || 0} pz · ${s.producto || ''}</div>
+                <div class="sales-store-meta">${s.cliente || 'SIN CLIENTE'} · ${s.fechaStr || ''}</div>
+            </div>
+            <div class="sales-store-total">
+                $${(s.costo || 0).toFixed(2)}
+                <div class="sales-store-actions">
+                    <i class="fas fa-pen-to-square text-primary" onclick='openEditModal(${JSON.stringify(s).replace(/'/g,"\\'")})'></i>
+                    <i class="fas fa-trash-can text-danger" onclick="openDeleteModal('sales','${s.id}')"></i>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const ed = document.getElementById('entregas-date');
     if (ed) ed.value = getMXISODate();
-    // Inicia mostrando la pestaña de "Productos"
+    initPromoInputs();
+    // Inicia mostrando la pestaa de "Productos"
     showTab('productos', document.querySelector('.tab-btn[onclick="showTab(\'productos\', this)"]'));
 
 
@@ -699,23 +915,39 @@ document.addEventListener('DOMContentLoaded', () => {
         const q   = parseInt(document.getElementById('in-cantidad').value) || 1;
         const co  = parseFloat(document.getElementById('in-costo').value)  || 0;
         const prI = parseFloat(document.getElementById('in-precio').value) || 0;
-        const salePrice = (c === 'CRISTO') ? co : prI;
+        const salePrice = ventaParaCliente(c, co, prI);
         if (!t || !c || !p) return toast("Faltan datos", "danger");
 
-        await col('sales').add({ tienda:t, cliente:c, producto:p, cantidad:q, costo:co, precio:salePrice, total:q*salePrice, fechaStr:getMXDateStr(), timestamp:Date.now(), entregado:false, pagado:false });
+        const promoVisible = document.getElementById('promo-box')?.style.display === 'block';
+        const promoCalc = getPromoCalc();
+        const promoRecibes = parseInt(document.getElementById('promo-recibes')?.value) || 0;
+        const promoRecuperas = parseInt(document.getElementById('promo-recuperas')?.value) || 0;
+        const saleData = { tienda:t, cliente:c, producto:p, cantidad:q, costo:co, precio:salePrice, total:q*salePrice, fechaStr:getMXDateStr(), timestamp:Date.now(), entregado:false, pagado:false };
+        if (promoVisible && promoCalc.total && promoRecuperas) {
+            saleData.promo = {
+                precioNormal: promoCalc.precio,
+                piezasPagadas: promoCalc.pagas,
+                totalPagado: promoCalc.total,
+                piezasRecibidas: promoRecibes,
+                piezasRecuperar: promoRecuperas,
+                costoUnitario: co
+            };
+        }
 
-        if (!window.state.stores.some(s  => (s.nombre||'').toUpperCase()===t))  col('stores').add({ nombre:t });
-        if (!window.state.clients.some(s => (s.nombre||'').toUpperCase()===c))  col('clients').add({ nombre:c });
-        const ep = window.state.products.find(s => (s.nombre||'').toUpperCase()===p);
-        if (!ep) col('products').add({ nombre:p, costo:co, precio:prI });
-        else     col('products').doc(ep.id).update({ costo:co, precio:prI });
+        await col('sales').add(saleData);
 
-        toast("¡Venta guardada!");
+        ensureCatalogItem('stores', t);
+        ensureCatalogItem('clients', c);
+        upsertBasicProduct(p, co, prI);
+
+        toast("Venta guardada!");
         document.getElementById('in-cliente').value  = '';
         document.getElementById('in-producto').value = '';
         document.getElementById('in-cantidad').value = '1';
         document.getElementById('in-costo').value    = '';
         document.getElementById('in-precio').value   = '';
+        resetPromoPanel();
+        renderCurrentStoreSales();
         document.getElementById('in-cliente').focus();
     };
 
@@ -731,9 +963,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 });
 
-/* ══════════════════════════════════════════════════════════════════
-   GESTIÓN CATÁLOGO
-══════════════════════════════════════════════════════════════════ */
+/* 
+   GESTIN CATLOGO
+ */
 function openAddProductModal()  { document.getElementById('add-product-modal').style.display = 'flex'; }
 function closeAddProductModal() { document.getElementById('add-product-modal').style.display = 'none'; }
 async function confirmAddProduct() {
@@ -742,7 +974,7 @@ async function confirmAddProduct() {
     const p = parseFloat(document.getElementById('add-prod-precio').value) || 0;
     if (!n) return toast("Ingresa nombre", "danger");
     await col('products').add({ nombre:n, costo:c, precio:p });
-    toast("Agregado ✅"); closeAddProductModal();
+    toast("Agregado "); closeAddProductModal();
 }
 
 function openResetModal()  { document.getElementById('reset-modal').style.display = 'flex'; }
@@ -750,9 +982,9 @@ function closeResetModal() { document.getElementById('reset-modal').style.displa
 function openDeleteModal(colName, id) { deleteRef = { col:colName, id }; document.getElementById('delete-modal').style.display = 'flex'; }
 function closeDeleteModal() { document.getElementById('delete-modal').style.display = 'none'; }
 
-/* ══════════════════════════════════════════════════════════════════
-   EDITAR REGISTRO (con lógica CRISTO y cascada)
-══════════════════════════════════════════════════════════════════ */
+/* 
+   EDITAR REGISTRO (con lgica CRISTO y cascada)
+ */
 function openEditModal(record) {
     editRef = record;
     document.getElementById('ed-tienda').value   = record.tienda;
@@ -779,25 +1011,23 @@ async function confirmUpdate() {
     const co  = parseFloat(document.getElementById('ed-costo').value)  || 0;
     const prI = parseFloat(document.getElementById('ed-precio').value) || 0;
     const fVal = document.getElementById('ed-fecha').value;
-    const salePrice = (c === 'CRISTO') ? co : prI;
+    const salePrice = ventaParaCliente(c, co, prI);
     const dp = fVal.split('-');
     const newFechaStr  = `${parseInt(dp[2])}/${parseInt(dp[1])}/${dp[0]}`;
     const newTimestamp = new Date(dp[0], dp[1]-1, dp[2], 12, 0, 0).getTime();
 
     await col('sales').doc(editRef.id).update({ tienda:t, cliente:c, producto:p, cantidad:q, costo:co, precio:salePrice, total:q*salePrice, fechaStr:newFechaStr, timestamp:newTimestamp });
 
-    if (!window.state.stores.some(s  => (s.nombre||'').toUpperCase()===t))  col('stores').add({ nombre:t });
-    if (!window.state.clients.some(s => (s.nombre||'').toUpperCase()===c))  col('clients').add({ nombre:c });
-    const ep = window.state.products.find(s => (s.nombre||'').toUpperCase()===p);
-    if (!ep) col('products').add({ nombre:p, costo:co, precio:prI });
-    else     col('products').doc(ep.id).update({ costo:co, precio:prI });
+    ensureCatalogItem('stores', t);
+    ensureCatalogItem('clients', c);
+    upsertBasicProduct(p, co, prI);
 
-    toast("Sincronizado ✅"); closeEditModal();
+    toast("Sincronizado "); closeEditModal();
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   EDITAR CATÁLOGO MAESTRO (con cascada 5 días)
-══════════════════════════════════════════════════════════════════ */
+/* 
+   EDITAR CATLOGO MAESTRO (con cascada 5 das)
+ */
 function openCatEditModal(type, item) {
     catEditRef = { type, item };
     const c = document.getElementById('cat-edit-fields');
@@ -826,12 +1056,12 @@ async function confirmCatUpdate() {
         if (type === 'products') { upd.costo=costVal; upd.precio = s.cliente==='CRISTO' ? costVal : priceVal; upd.total = s.cantidad * upd.precio; }
         await col('sales').doc(s.id).update(upd);
     }
-    toast("Sincronizado ✅"); closeCatEditModal();
+    toast("Sincronizado "); closeCatEditModal();
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   CONTROL — RENDER
-══════════════════════════════════════════════════════════════════ */
+/* 
+   CONTROL  RENDER
+ */
 function setCatFilter(f)         { activeCatFilter = f; productSearchTerm = ''; renderControlList(); }
 function handleProductSearch(v)  { productSearchTerm = v.toUpperCase(); renderControlListItems(); }
 
@@ -860,23 +1090,27 @@ function renderControlListItems() {
     if (activeCatFilter === 'productos' && productSearchTerm) items = items.filter(it => (it.nombre||'').toUpperCase().includes(productSearchTerm));
     items.sort((a,b) => (a.nombre||'').localeCompare(b.nombre||''));
     if (!items.length) { list.innerHTML = `<div class="text-center py-4 text-muted small fw-bold">SIN REGISTROS</div>`; return; }
-    list.innerHTML = items.map(it => `
+    list.innerHTML = items.map(it => {
+        const photoUrl = getProductPhotoUrl(it);
+        return `
         <div class="card-custom py-2 mb-1 d-flex justify-content-between align-items-center shadow-none border small px-3">
             <div>
                 <div class="text-uppercase fw-bold text-dark">${it.nombre||'S/N'}</div>
                 ${activeCatFilter==='productos' ? `<div class="d-flex align-items-center flex-wrap gap-1" style="font-size:0.65rem;"><span class="text-muted">A:<span class="text-danger fw-bold">$${(it.costo||0).toFixed(2)}</span></span> <span class="text-muted">V:<span class="text-success fw-bold">$${(it.precio||0).toFixed(2)}</span></span>${it.tiendaEscaneo ? ` <span style="background:#eff6ff;color:#2563eb;border-radius:6px;padding:1px 6px;font-weight:800;">${it.tiendaEscaneo}</span>` : ''}${it.fechaEscaneo  ? ` <span style="color:#94a3b8;">${it.fechaEscaneo}</span>` : ''}</div>` : ''}
-                ${it.foto ? `<img src="${it.foto}" style="width:40px; height:40px; object-fit:cover; border-radius:6px; margin-top:4px;">` : ''}
+                ${photoUrl ? `<img src="${photoUrl}" style="width:40px; height:40px; object-fit:cover; border-radius:6px; margin-top:4px;">` : ''}
             </div>
             <div class="d-flex gap-3 align-items-center">
+                ${activeCatFilter==='productos' ? `<i class="fas fa-share-nodes text-success" onclick="shareProductRecord('${it.id}')"></i>` : ''}
                 <i class="fas fa-pen text-primary" onclick='openCatEditModal("${map[activeCatFilter]}", ${JSON.stringify(it).replace(/'/g,"\\'")})'></i>
                 <i class="fas fa-trash-can text-danger" onclick="openDeleteModal('${map[activeCatFilter]}','${it.id}')"></i>
             </div>
-        </div>`).join('');
+        </div>`;
+    }).join('');
 }
 
-/* ══════════════════════════════════════════════════════════════════
+/* 
    FINANZAS
-══════════════════════════════════════════════════════════════════ */
+ */
 function renderFinanceMenu() {
     const container = document.getElementById('control-content');
     if (!container) return;
@@ -939,7 +1173,7 @@ function renderFinanceResults() {
         const s = new Date(finDateFrom+'T00:00:00'), e = new Date(finDateTo+'T23:59:59');
         filtered = window.state.sales.filter(x => { const [d,m,y] = (x.fechaStr||'').split('/'); const dx = new Date(y,m-1,d); return dx>=s && dx<=e; });
     } else if (finAllDates) {
-        // TODAS las fechas — sin filtro de fecha
+        // TODAS las fechas  sin filtro de fecha
         filtered = window.state.sales.slice();
     } else {
         const [y,m,d] = finDate.split('-');
@@ -992,7 +1226,7 @@ function updateFinFilter(key, val) {
     renderFinanceResults();
 }
 
-// Búsqueda predictiva de producto en finanzas
+// Bsqueda predictiva de producto en finanzas
 function filterFinProduct(val) {
     finProduct = val.trim();
     var sug = document.getElementById('fin-product-sug');
@@ -1000,7 +1234,7 @@ function filterFinProduct(val) {
     var q = val.toUpperCase();
     if (!q) { sug.style.display = 'none'; renderFinanceResults(); return; }
 
-    // Obtener productos únicos de las ventas filtradas
+    // Obtener productos nicos de las ventas filtradas
     var productos = [...new Set(window.state.sales.map(s => (s.producto||'').toUpperCase()))]
         .filter(p => p.includes(q)).sort().slice(0, 8);
 
@@ -1035,9 +1269,9 @@ document.addEventListener('click', function(e) {
 });
 function setFinView(v) { activeFinanceView = v; renderFinanceMenu(); }
 
-/* ══════════════════════════════════════════════════════════════════
+/* 
    REPARTO
-══════════════════════════════════════════════════════════════════ */
+ */
 function renderEntregas() {
     const list = document.getElementById('lista-entregas');
     const val  = document.getElementById('entregas-date')?.value;
@@ -1095,12 +1329,12 @@ async function shareTicket(n) {
     }, 'image/png');
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   SCANNER — API KEY GEMINI
-══════════════════════════════════════════════════════════════════ */
+/* 
+   SCANNER  API KEY GEMINI
+ */
 function saveGeminiKey() {
     const val = document.getElementById('user-gemini-key').value.trim();
-    if (val && val.length > 10) { localStorage.setItem('yaute_key_v3310', val); document.getElementById('key-config-modal').style.display = 'none'; toastScanner("✅ Key activada"); }
+    if (val && val.length > 10) { localStorage.setItem('yaute_key_v3310', val); document.getElementById('key-config-modal').style.display = 'none'; toastScanner("Key activada"); }
     else toastScanner("Key inválida", '#ef4444');
 }
 function changeGeminiKey() {
@@ -1108,10 +1342,10 @@ function changeGeminiKey() {
     document.getElementById('key-config-modal').style.display = 'flex';
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   SCANNER — CÁMARA
-══════════════════════════════════════════════════════════════════ */
-// Función general para filtrar sugerencias de tienda (usada por scanner y ahora por edición de producto)
+/* 
+   SCANNER  CMARA
+ */
+// Funcin general para filtrar sugerencias de tienda (usada por scanner y ahora por edicin de producto)
 function filterScanTienda(val) {
     const activeInput = document.activeElement;
     let boxId = '';
@@ -1137,11 +1371,11 @@ function filterScanTienda(val) {
     box.classList.remove('d-none');
 }
 
-// Event delegation para sugerencias de tienda en scanner/edición
+// Event delegation para sugerencias de tienda en scanner/edicin
 document.addEventListener('click', function(e) {
     var item = e.target.closest('.sug-scan-item');
     if (item) {
-        const inputId = item.closest('.sug-box').previousElementSibling.id; // Asume que el input está justo antes del sug-box
+        const inputId = item.closest('.sug-box').previousElementSibling.id; // Asume que el input est justo antes del sug-box
         document.getElementById(inputId).value = item.dataset.val || item.textContent.trim();
         document.getElementById(item.closest('.sug-box').id).classList.add('d-none');
         if (inputId === 'pm-tienda-escaneo' || inputId === 'ep-tienda-escaneo') {
@@ -1163,8 +1397,9 @@ document.addEventListener('click', function(e) {
 });
 
 
-async function openScannerModal() {
-    // Precargar fecha de hoy y tienda persistida antes de abrir cámara
+async function openScannerModal(mode = 'scan') {
+    scannerMode = mode;
+    // Precargar fecha de hoy y tienda persistida antes de abrir cmara
     var hoy = new Date().toISOString().slice(0,10);
     var tiendaPersistida = localStorage.getItem('yaute_scan_tienda') || '';
     var fechaEl  = document.getElementById('pm-fecha-escaneo');
@@ -1186,12 +1421,13 @@ async function openScannerModal() {
 function closeScanner() {
     if (scannerStream) scannerStream.getTracks().forEach(t => t.stop());
     scannerStream = null;
+    scannerMode = 'scan';
     document.getElementById('ia-modal').style.display = 'none';
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   PRECIO SUGERIDO LÓGICA (PARA AMBOS CONTEXTOS)
-══════════════════════════════════════════════════════════════════ */
+/* 
+   PRECIO SUGERIDO LGICA (PARA AMBOS CONTEXTOS)
+ */
 var MARGEN_DEFAULT = 20;
 
 function formatCaducidad(input) {
@@ -1216,7 +1452,7 @@ function redondearA10(valor) {
     return resto < 5 ? entero - resto : entero + (10 - resto);
 }
 
-/* Precarga precios en el panel del scanner (después de una captura IA) */
+/* Precarga precios en el panel del scanner (despus de una captura IA) */
 function precargarPrecios(precio, costo) {
     var ventaInput  = document.getElementById('pm-venta');
     var costoInput  = document.getElementById('pm-costo');
@@ -1225,42 +1461,39 @@ function precargarPrecios(precio, costo) {
         ventaInput.value = parseFloat(precio).toFixed(2);
         ventaInput.dataset.suggested = '';
     } else if (costo && parseFloat(costo) > 0) {
-        autoSuggestVenta(String(costo)); // Llama a la versión del scanner
+        autoSuggestVenta(String(costo)); // Llama a la versin del scanner
     } else {
         ventaInput.value = '';
     }
 }
 
+function setSuggestedVenta(costoStr, margenId, ventaId) {
+    var costo      = parseFloat(costoStr);
+    var margenEl   = document.getElementById(margenId);
+    var margen     = margenEl ? (parseFloat(margenEl.value) || MARGEN_DEFAULT) : MARGEN_DEFAULT;
+    var ventaInput = document.getElementById(ventaId);
+    if (!ventaInput) return;
+    if (!isNaN(costo) && costo > 0) {
+        var sugerido = redondearA10(costo + margen);
+        ventaInput.value = sugerido.toFixed(2);
+        ventaInput.dataset.suggested = sugerido.toFixed(2);
+    }
+}
+
 /* Auto-sugiere precio de venta para el modal del scanner */
 function autoSuggestVenta(costoStr) {
-    var costo      = parseFloat(costoStr);
-    var margenEl   = document.getElementById('pm-margen');
-    var margen     = margenEl ? (parseFloat(margenEl.value) || MARGEN_DEFAULT) : MARGEN_DEFAULT;
-    var ventaInput = document.getElementById('pm-venta');
-    if (!isNaN(costo) && costo > 0) {
-        var sugerido = redondearA10(costo + margen);
-        ventaInput.value = sugerido.toFixed(2);
-        ventaInput.dataset.suggested = sugerido.toFixed(2);
-    }
+    setSuggestedVenta(costoStr, 'pm-margen', 'pm-venta');
 }
 
-/* Auto-sugiere precio de venta para la página de edición de productos */
+/* Auto-sugiere precio de venta para la pgina de edicin de productos */
 function autoSuggestVentaOnEdit(costoStr) {
-    var costo      = parseFloat(costoStr);
-    var margenEl   = document.getElementById('ep-margen');
-    var margen     = margenEl ? (parseFloat(margenEl.value) || MARGEN_DEFAULT) : MARGEN_DEFAULT;
-    var ventaInput = document.getElementById('ep-venta');
-    if (!isNaN(costo) && costo > 0) {
-        var sugerido = redondearA10(costo + margen);
-        ventaInput.value = sugerido.toFixed(2);
-        ventaInput.dataset.suggested = sugerido.toFixed(2);
-    }
+    setSuggestedVenta(costoStr, 'ep-margen', 'ep-venta');
 }
 
 
-/* ══════════════════════════════════════════════════════════════════
-   SCANNER — CORRECCIÓN DE ORIENTACIÓN
-══════════════════════════════════════════════════════════════════ */
+/* 
+   SCANNER  CORRECCIN DE ORIENTACIN
+ */
 function captureOrientado(video) {
     var vw = video.videoWidth;
     var vh = video.videoHeight;
@@ -1286,56 +1519,161 @@ function captureOrientado(video) {
         ctx.drawImage(video, 0, 0, vw, vh);
     }
 
-    if (c.width > c.height) {
-        var c2   = document.createElement('canvas');
-        var ctx2 = c2.getContext('2d');
-        c2.width  = c.height;
-        c2.height = c.width;
-        ctx2.save();
-        ctx2.translate(c2.width, 0);
-        ctx2.rotate(Math.PI / 2);
-        ctx2.drawImage(c, 0, 0);
-        ctx2.restore();
-        return c2;
-    }
     return c;
 }
 
+function cropProductForeground(source) {
+    if (!source || !source.width || !source.height) return source;
+    var isLandscape = source.width > source.height;
+    var sw = source.width * (isLandscape ? 0.94 : 0.82);
+    var sh = source.height;
+    var sx = (source.width - sw) / 2;
+    var sy = 0;
+    var out = document.createElement('canvas');
+    out.width = Math.round(sw);
+    out.height = Math.round(sh);
+    out.getContext('2d').drawImage(source, sx, sy, sw, sh, 0, 0, out.width, out.height);
+    return out;
+}
 
-/* ══════════════════════════════════════════════════════════════════
-   SCANNER — CAPTURA + IA + DETECCIÓN DUPLICADOS
-══════════════════════════════════════════════════════════════════ */
+function rotateCanvas90(source, direction = 1) {
+    if (!source || !source.width || !source.height) return source;
+    var out = document.createElement('canvas');
+    out.width = source.height;
+    out.height = source.width;
+    var ctx = out.getContext('2d');
+    ctx.save();
+    if (direction > 0) {
+        ctx.translate(out.width, 0);
+        ctx.rotate(Math.PI / 2);
+    } else {
+        ctx.translate(0, out.height);
+        ctx.rotate(-Math.PI / 2);
+    }
+    ctx.drawImage(source, 0, 0);
+    ctx.restore();
+    return out;
+}
+
+function prepareSharePhoto(source, rotateHint = 0) {
+    if (!source || !source.width || !source.height) return source;
+    var img = source;
+    if (rotateHint) img = rotateCanvas90(img, rotateHint);
+    else if (img.width > img.height) img = rotateCanvas90(img, -1);
+    var out = document.createElement('canvas');
+    out.width = 1080;
+    out.height = 1350;
+    var ctx = out.getContext('2d');
+    ctx.fillStyle = '#dcfce7';
+    ctx.fillRect(0, 0, out.width, out.height);
+    var pad = 36;
+    var boxW = out.width - pad * 2;
+    var boxH = out.height - pad * 2;
+    var scale = Math.min(boxW / img.width, boxH / img.height);
+    var dw = img.width * scale;
+    var dh = img.height * scale;
+    ctx.drawImage(img, pad + (boxW - dw) / 2, pad + (boxH - dh) / 2, dw, dh);
+    return out;
+}
+
+function getCaptureRotateHint() {
+    const orientationAngle = (screen.orientation && typeof screen.orientation.angle === 'number')
+        ? screen.orientation.angle
+        : (typeof window.orientation === 'number' ? window.orientation : 0);
+
+    if (Math.abs(orientationAngle) === 90) return orientationAngle > 0 ? -1 : 1;
+    if (Math.abs(lastDeviceGamma) > 45) return lastDeviceGamma > 0 ? -1 : 1;
+    return 0;
+}
+
+function refreshPendingPhotoPreview() {
+    var box = document.getElementById('pm-photo-tools');
+    var img = document.getElementById('pm-photo-preview');
+    if (!box || !img) return;
+    if (!pendingCanvas) {
+        box.style.display = 'none';
+        img.removeAttribute('src');
+        return;
+    }
+    img.src = pendingCanvas.toDataURL('image/jpeg', 0.72);
+    box.style.display = 'block';
+}
+
+function rotatePendingPhoto() {
+    if (!pendingCanvas) return;
+    pendingCanvas = rotateCanvas90(pendingCanvas, -1);
+    refreshPendingPhotoPreview();
+    toastScanner("Foto girada");
+}
+
+function setEditPhotoCanvas(canvas) {
+    pendingEditCanvas = canvas;
+    var preview = document.getElementById('ep-foto-preview');
+    var label = document.getElementById('product-photo-label');
+    var rotateBtn = document.getElementById('btn-rotate-edit-photo');
+    if (!preview || !pendingEditCanvas) return;
+    preview.src = pendingEditCanvas.toDataURL('image/jpeg', 0.72);
+    preview.style.display = 'inline-block';
+    if (label) {
+        label.textContent = 'Nueva foto pendiente';
+        label.style.display = 'block';
+    }
+    if (rotateBtn) rotateBtn.style.display = 'inline-block';
+}
+
+function rotateEditPhoto() {
+    if (!pendingEditCanvas) return;
+    setEditPhotoCanvas(rotateCanvas90(pendingEditCanvas, -1));
+    toastScanner("Foto girada");
+}
+
+
+/* 
+   SCANNER  CAPTURA + IA + DETECCIN DUPLICADOS
+ */
 async function captureIA() {
     const key   = localStorage.getItem('yaute_key_v3310');
-    if (!key) { changeGeminiKey(); return; }
+    if (scannerMode !== 'editPhoto' && !key) { changeGeminiKey(); return; }
     const video = document.getElementById('cam-preview-ia');
     if (!video.srcObject || video.videoWidth === 0) { toastScanner("Cámara no lista", '#f59e0b'); return; }
 
     // Limpiar caducidad en cada nuevo escaneo
     document.getElementById('pm-caducidad').value = '';
+    pendingFotoUrl = '';
 
-    pendingCanvas = captureOrientado(video);
+    pendingRotateHint = getCaptureRotateHint();
+    pendingCanvas = prepareSharePhoto(cropProductForeground(captureOrientado(video)), pendingRotateHint);
+    refreshPendingPhotoPreview();
+    if (scannerMode === 'editPhoto') {
+        setEditPhotoCanvas(pendingCanvas);
+        pendingCanvas = null;
+        refreshPendingPhotoPreview();
+        closeScanner();
+        document.getElementById('product-edit-details').style.display = 'block';
+        toastScanner("Nueva foto lista");
+        return;
+    }
     const b64 = pendingCanvas.toDataURL('image/jpeg', 0.88).split(',')[1];
 
     const snapIcon = document.getElementById('snap-icon');
     snapIcon.className = 'fas fa-spinner fa-spin fa-2x text-primary';
     document.getElementById('snap-btn').style.pointerEvents = 'none';
 
-    // Reintento automático si Gemini responde 429 (quota por minuto)
+    // Reintento automtico si Gemini responde 429 (quota por minuto)
     const callGemini = async (intentos = 3) => {
         const res = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${key}`,
             { method:'POST', headers:{'Content-Type':'application/json'},
               body: JSON.stringify({ contents:[{ parts:[
                   { inline_data:{ mime_type:'image/jpeg', data:b64 } },
-                  { text:"Eres un lector experto de etiquetas de productos de consumo en México. Analiza la imagen y extrae: 1) Marca comercial, 2) Nombre del producto, 3) Presentación (gramaje, volumen, número de piezas, sabor o variante si aparece). Responde SOLO con el resultado en UNA LÍNEA en MAYÚSCULAS con el formato: MARCA NOMBRE PRESENTACIÓN. Sin explicaciones, sin puntos, sin saltos de línea." }
+                  { text:"Eres un lector experto de etiquetas de productos de consumo en Mxico. Analiza la imagen y extrae: 1) Marca comercial, 2) Nombre del producto, 3) Presentacin (gramaje, volumen, nmero de piezas, sabor o variante si aparece). Responde SOLO con el resultado en UNA LNEA en MAYSCULAS con el formato: MARCA NOMBRE PRESENTACIN. Sin explicaciones, sin puntos, sin saltos de lnea." }
               ]}], generationConfig:{ temperature:0.1, maxOutputTokens:120 } })
             }
         );
         const data = await res.json();
         if (res.status === 429 && intentos > 1) {
             const segs = intentos === 3 ? 20 : 40;
-            toastScanner(`⏳ Muchas consultas — reintentando en ${segs}s...`, '#f59e0b');
+            toastScanner(`Muchas consultas - reintentando en ${segs}s...`, '#f59e0b');
             await new Promise(r => setTimeout(r, segs * 1000));
             return callGemini(intentos - 1);
         }
@@ -1347,10 +1685,10 @@ async function captureIA() {
         const data = await callGemini();
         pendingNombre = data.candidates[0].content.parts[0].text.trim().toUpperCase();
 
-        // ── Detección de duplicados en 3 niveles ──────────────────────
+        //  Deteccin de duplicados en 3 niveles 
         // Nivel 1: coincidencia exacta
         // Nivel 2: uno contiene al otro (>= 6 chars)
-        // Nivel 3: >= 2 palabras clave de 4+ chars en común
+        // Nivel 3: >= 2 palabras clave de 4+ chars en comn
         const palabrasEsc = pendingNombre.split(' ').filter(w => w.length >= 4);
         const candidatos = window.state.products.filter(p => {
             const g = (p.nombre||'').toUpperCase().trim();
@@ -1363,25 +1701,27 @@ async function captureIA() {
         document.getElementById('pm-nombre').value = pendingNombre;
 
         if (candidatos.length === 1 && (candidatos[0].nombre||'').toUpperCase().trim() === pendingNombre) {
-            // Coincidencia exacta → panel directo con badge
+            // Coincidencia exacta  panel directo con badge
             pendingExisteId = candidatos[0].id;
+            pendingFotoUrl = getProductPhotoUrl(candidatos[0]);
             precargarPrecios(candidatos[0].precio, candidatos[0].costo);
             const badge = document.getElementById('dup-badge');
             var prev = candidatos[0];
             var infoExtra = '';
-            if (prev.fechaEscaneo) infoExtra += '<br>📅 Escaneado: ' + prev.fechaEscaneo;
-            if (prev.tiendaEscaneo) infoExtra += ' · ' + prev.tiendaEscaneo;
-            if (prev.caducidad)    infoExtra += '<br>⏳ Cad: ' + prev.caducidad;
+            if (prev.fechaEscaneo) infoExtra += '<br> Escaneado: ' + prev.fechaEscaneo;
+            if (prev.tiendaEscaneo) infoExtra += '  ' + prev.tiendaEscaneo;
+            if (prev.caducidad)    infoExtra += '<br> Cad: ' + prev.caducidad;
             document.getElementById('dup-text').innerHTML =
-                '<strong>¡Ya registrado!</strong><br>"' + prev.nombre + '"<br>' +
+                '<strong>Ya registrado!</strong><br>"' + prev.nombre + '"<br>' +
                 'Venta: <b>$' + (prev.precio||0) + '</b> | Costo: $' + (prev.costo||0) +
                 infoExtra +
                 '<br><em style="font-size:0.65rem;">Precios precargados, puedes modificar.</em>';
             badge.classList.add('show');
             document.getElementById('price-modal').style.display = 'flex';
         } else if (candidatos.length >= 1) {
-            // Similares → preguntar al usuario
-            pendingExisteId = null; // No hay un ID exacto todavía
+            // Similares  preguntar al usuario
+            pendingExisteId = null; // No hay un ID exacto todava
+            pendingFotoUrl = '';
             document.getElementById('pm-venta').value = '';
             document.getElementById('pm-costo').value = '';
             document.getElementById('dup-badge').classList.remove('show');
@@ -1389,6 +1729,7 @@ async function captureIA() {
         } else {
             // Producto nuevo
             pendingExisteId = null;
+            pendingFotoUrl = '';
             document.getElementById('pm-venta').value = '';
             document.getElementById('pm-costo').value = '';
             document.getElementById('dup-badge').classList.remove('show');
@@ -1403,9 +1744,9 @@ async function captureIA() {
     }
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   SCANNER — GESTIÓN DE DUPLICADOS
-══════════════════════════════════════════════════════════════════ */
+/* 
+   SCANNER  GESTIN DE DUPLICADOS
+ */
 function showDupConfirm(candidatos) {
     document.getElementById('dcm-escaneado').textContent = '"' + pendingNombre + '"';
     document.getElementById('dcm-candidatos').innerHTML = candidatos.map(function(p) {
@@ -1420,9 +1761,9 @@ function showDupConfirm(candidatos) {
                '<div style="font-size:0.72rem; color:#64748b; margin-top:2px;">' +
                'Venta: <span style="color:#10b981; font-weight:700;">$' + safePrecio + '</span> &nbsp;|&nbsp; ' +
                'Costo: <span style="color:#ef4444; font-weight:700;">$' + safeCosto + '</span></div>' +
-               ((p.fechaEscaneo || p.tiendaEscaneo) ? '<div style="font-size:0.62rem; color:#94a3b8; margin-top:2px;">📅 ' + (p.fechaEscaneo||'') + (p.tiendaEscaneo ? ' · '+p.tiendaEscaneo : '') + '</div>' : '') +
-               (p.caducidad ? '<div style="font-size:0.62rem; color:#f59e0b; margin-top:1px;">⏳ Cad: ' + p.caducidad + '</div>' : '') +
-               '<div style="font-size:0.65rem; color:#3b82f6; margin-top:4px; font-weight:700;">✓ SÍ, ES ESTE PRODUCTO</div>' +
+               ((p.fechaEscaneo || p.tiendaEscaneo) ? '<div style="font-size:0.62rem; color:#94a3b8; margin-top:2px;"> ' + (p.fechaEscaneo||'') + (p.tiendaEscaneo ? '  '+p.tiendaEscaneo : '') + '</div>' : '') +
+               (p.caducidad ? '<div style="font-size:0.62rem; color:#f59e0b; margin-top:1px;"> Cad: ' + p.caducidad + '</div>' : '') +
+               '<div style="font-size:0.65rem; color:#3b82f6; margin-top:4px; font-weight:700;">SÍ, ES ESTE PRODUCTO</div>' +
                '</div>';
     }).join('');
     // Usar event delegation en lugar de onclick inline para evitar bugs de comillas
@@ -1438,6 +1779,7 @@ function selectDuplicate(id, precio, costo) {
     precargarPrecios(precio, costo);
     var p = window.state.products.find(function(x){ return x.id === id; });
     if (p) {
+        pendingFotoUrl = getProductPhotoUrl(p);
         var badge = document.getElementById('dup-badge');
         document.getElementById('dup-text').innerHTML =
             '<strong>Seleccionado:</strong> "' + p.nombre + '"<br>Precios precargados, puedes modificar.';
@@ -1449,6 +1791,7 @@ function selectDuplicate(id, precio, costo) {
 
 function skipDuplicate() {
     pendingExisteId = null;
+    pendingFotoUrl = '';
     document.getElementById('dup-badge').classList.remove('show');
     document.getElementById('pm-venta').value = '';
     document.getElementById('pm-costo').value = '';
@@ -1458,14 +1801,14 @@ function skipDuplicate() {
 
 function closeDupConfirm() {
     document.getElementById('dup-confirm-modal').style.display = 'none';
-    pendingNombre = ''; pendingCanvas = null; pendingExisteId = null;
+    pendingNombre = ''; pendingCanvas = null; pendingExisteId = null; pendingFotoUrl = '';
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   SCANNER — CONFIRMAR PRECIOS (compartir + Storage + Firestore)
-   Esta función es la que se llama después de que el usuario interactúa
-   con el modal de precios del ESCÁNER.
-══════════════════════════════════════════════════════════════════ */
+/* 
+   SCANNER  CONFIRMAR PRECIOS (compartir + Storage + Firestore)
+   Esta funcin es la que se llama despus de que el usuario interacta
+   con el modal de precios del ESCNER.
+ */
 async function confirmPrices() {
     const nombre        = document.getElementById('pm-nombre').value.replace(/\n/g,' ').trim().toUpperCase();
     const venta         = parseFloat(document.getElementById('pm-venta').value)  || 0;
@@ -1477,38 +1820,23 @@ async function confirmPrices() {
 
     if (!nombre) { toastScanner("Nombre vacío", '#ef4444'); return; }
 
-    // Persistir tienda para el próximo escaneo
+    // Persistir tienda para el prximo escaneo
     if (tiendaEscaneo) localStorage.setItem('yaute_scan_tienda', tiendaEscaneo);
 
     document.getElementById('price-modal').style.display = 'none';
 
-    // 1. Web Share API — incluir caducidad si existe
-    // Solo compartir la imagen si se realizó un escaneo nuevo
-    let fileToShare = null;
-    if (pendingCanvas && navigator.canShare) {
-        try {
-            const blob = await new Promise(r => pendingCanvas.toBlob(r, 'image/jpeg', 0.88));
-            fileToShare = new File([blob], 'oferta.jpg', { type:'image/jpeg' });
-            let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + nombre + '\n💰 $' + venta;
-            if (caducidad)  msgWA += '\n⏳ Cad: ' + caducidad;
-            if (navigator.canShare({ files:[fileToShare] })) {
-                await navigator.share({ files:[fileToShare], text: msgWA });
-            } else {
-                window.open(`https://wa.me/?text=${encodeURIComponent(msgWA)}`, '_blank');
-            }
-        } catch(e) { if (e.name !== 'AbortError') console.warn('Share:', e.message); }
-    } else {
-        // Si no hay canvas (ej. edición directa sin rescanear), aún se puede compartir el texto
-        if (navigator.share) {
-             let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + nombre + '\n💰 $' + venta;
-            if (caducidad)  msgWA += '\n⏳ Cad: ' + caducidad;
-            try { await navigator.share({ text: msgWA }); } catch(e) { if (e.name !== 'AbortError') console.warn('Share (text only):', e.message); }
-        } else {
-            let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + nombre + '\n💰 $' + venta;
-            if (caducidad)  msgWA += '\n⏳ Cad: ' + caducidad;
-            window.open(`https://wa.me/?text=${encodeURIComponent(msgWA)}`, '_blank');
-        }
-    }
+    // 1. Compartir oferta: captura nueva, foto guardada del producto localizado o cartel sin foto.
+    const productoExistente = pendingExisteId
+        ? window.state.products.find(p => p.id === pendingExisteId)
+        : null;
+    await shareOfferData({
+        nombre,
+        venta,
+        caducidad,
+        tiendaEscaneo,
+        canvas: pendingCanvas,
+        fotoUrl: pendingFotoUrl || getProductPhotoUrl(productoExistente)
+    });
 
 
     // 2. Subir foto a Storage si hay un nuevo canvas
@@ -1522,15 +1850,15 @@ async function confirmPrices() {
     }
 
     // 3. Guardar / actualizar en Firestore
-    const data = { nombre, costo, precio: venta, fechaEscaneo, tiendaEscaneo, margen }; // Añadir margen aquí
+    const data = { nombre, costo, precio: venta, fechaEscaneo, tiendaEscaneo, margen }; // Anadir margen aqui
     if (fotoUrl)    data.foto      = fotoUrl;
     if (caducidad)  data.caducidad = caducidad;
 
-    if (pendingExisteId) { await col('products').doc(pendingExisteId).update(data); toastScanner("✅ Producto actualizado"); }
-    else                 { await col('products').add(data);                          toastScanner("✅ Producto guardado");    }
+    if (pendingExisteId) { await col('products').doc(pendingExisteId).update(data); toastScanner("Producto actualizado"); }
+    else                 { await col('products').add(data);                          toastScanner("Producto guardado");    }
 
     document.getElementById('pm-caducidad').value = '';
-    pendingNombre = ''; pendingCanvas = null; pendingExisteId = null;
+    pendingNombre = ''; pendingCanvas = null; pendingExisteId = null; pendingFotoUrl = '';
     closeScanner();
 }
 
@@ -1538,12 +1866,12 @@ function cancelPrices() {
     document.getElementById('price-modal').style.display = 'none';
     document.getElementById('dup-badge').classList.remove('show');
     document.getElementById('pm-caducidad').value = '';   // limpiar caducidad
-    pendingNombre = ''; pendingCanvas = null; pendingExisteId = null;
+    pendingNombre = ''; pendingCanvas = null; pendingExisteId = null; pendingFotoUrl = '';
 }
 
-/* ══════════════════════════════════════════════════════════════════
+/* 
    UTILITY FUNCTIONS
-══════════════════════════════════════════════════════════════════ */
+ */
 async function fetchImageAsFile(url, filename = 'image.jpg') {
     if (!url) return null;
     try {
@@ -1557,16 +1885,211 @@ async function fetchImageAsFile(url, filename = 'image.jpg') {
     }
 }
 
-/* ══════════════════════════════════════════════════════════════════
-   PRODUCTOS TAB — FUNCIONALIDADES ADICIONALES
-══════════════════════════════════════════════════════════════════ */
+async function canvasToImageFile(canvas, filename = 'oferta-yaute.png') {
+    if (!canvas) return null;
+    const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+    return blob ? new File([blob], filename, { type:'image/png' }) : null;
+}
 
-// Función para filtrar productos en la pestaña 'Productos' (para edición)
+function loadImageForCanvas(src) {
+    return new Promise(resolve => {
+        if (!src) { resolve(null); return; }
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = src;
+    });
+}
+
+function getProductPhotoUrl(product) {
+    if (!product) return '';
+    return product.foto || product.fotoUrl || product.imagen || product.image || product.photo || product.photoUrl || product.urlFoto || '';
+}
+
+function drawRoundedRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+}
+
+function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
+    const words = String(text || '').split(/\s+/);
+    let line = '';
+    let lines = 0;
+    for (let i = 0; i < words.length; i++) {
+        const test = line ? line + ' ' + words[i] : words[i];
+        if (ctx.measureText(test).width > maxWidth && line) {
+            ctx.fillText(line, x, y);
+            y += lineHeight;
+            lines++;
+            line = words[i];
+            if (lines >= maxLines - 1) break;
+        } else {
+            line = test;
+        }
+    }
+    if (line && lines < maxLines) ctx.fillText(line, x, y);
+}
+
+async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscaneo = '', fotoUrl = '', canvas = null, titulo = 'OFERTA RÁPIDA' }) {
+    const out = document.createElement('canvas');
+    out.width = 1080;
+    out.height = 1350;
+    const ctx = out.getContext('2d');
+
+    ctx.fillStyle = '#f8fafc';
+    ctx.fillRect(0, 0, out.width, out.height);
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, out.width, 210);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 58px Arial, sans-serif';
+    ctx.fillText('OFERTAS RÁPIDAS YAUTE', 70, 125);
+    ctx.fillStyle = '#3b82f6';
+    ctx.font = '800 34px Arial, sans-serif';
+    ctx.fillText(titulo, 72, 172);
+
+    const img = canvas || await loadImageForCanvas(fotoUrl);
+    if (img) {
+        ctx.save();
+        ctx.fillStyle = '#e2e8f0';
+        drawRoundedRect(ctx, 70, 260, 940, 550, 34);
+        ctx.fill();
+        drawRoundedRect(ctx, 70, 260, 940, 550, 34);
+        ctx.clip();
+        const iw = img.width || img.videoWidth;
+        const ih = img.height || img.videoHeight;
+        const scale = Math.min(900 / iw, 510 / ih);
+        const dw = iw * scale;
+        const dh = ih * scale;
+        ctx.drawImage(img, 90 + (900 - dw) / 2, 280 + (510 - dh) / 2, dw, dh);
+        ctx.restore();
+    } else {
+        ctx.fillStyle = '#e2e8f0';
+        drawRoundedRect(ctx, 70, 260, 940, 550, 34);
+        ctx.fill();
+        ctx.fillStyle = '#64748b';
+        ctx.font = '800 46px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(fotoUrl ? 'FOTO NO DISPONIBLE' : 'SIN FOTO GUARDADA', 540, 550);
+        ctx.textAlign = 'left';
+    }
+
+    ctx.fillStyle = '#ffffff';
+    drawRoundedRect(ctx, 70, 860, 940, 380, 28);
+    ctx.fill();
+    ctx.fillStyle = '#0f172a';
+    ctx.font = '900 48px Arial, sans-serif';
+    wrapCanvasText(ctx, nombre, 110, 940, 860, 58, 3);
+    ctx.fillStyle = '#10b981';
+    ctx.font = '900 96px Arial, sans-serif';
+    ctx.fillText('$' + (parseFloat(venta) || 0).toFixed(2), 110, 1155);
+    ctx.fillStyle = '#64748b';
+    ctx.font = '700 30px Arial, sans-serif';
+    const extra = [caducidad ? 'Cad: ' + caducidad : '', tiendaEscaneo || ''].filter(Boolean).join('  -  ');
+    if (extra) ctx.fillText(extra, 110, 1210);
+
+    try {
+        return await canvasToImageFile(out);
+    } catch(e) {
+        if (fotoUrl && !canvas) return createOfferCardFile({ nombre, venta, caducidad, tiendaEscaneo, fotoUrl:'', canvas:null, titulo });
+        throw e;
+    }
+}
+
+function buildOfferMessage(nombre, venta, caducidad, tiendaEscaneo, titulo = 'OFERTA RÁPIDA') {
+    let msgWA = '📦 ' + nombre + '\n💰 $' + venta;
+    if (caducidad) msgWA += '\nCad: ' + caducidad;
+    return msgWA;
+}
+
+function downloadOfferFile(file) {
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file.name || 'oferta-yaute.png';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function shareOfferData({ nombre, venta, caducidad = '', tiendaEscaneo = '', fotoUrl = '', canvas = null, titulo = 'OFERTA RÁPIDA' }) {
+    const msgWA = buildOfferMessage(nombre, venta, caducidad, tiendaEscaneo, titulo);
+    let fileToShare = null;
+    let cardFallback = false;
+    try {
+        fileToShare = canvas
+            ? await canvasToImageFile(canvas, 'oferta-yaute.png')
+            : await fetchImageAsFile(fotoUrl, 'oferta-yaute.jpg');
+        if (!fileToShare && fotoUrl) fileToShare = await fetchImageAsFile(fotoUrl, 'oferta-yaute.jpg');
+        if (!fileToShare) {
+            fileToShare = await createOfferCardFile({ nombre, venta, caducidad, tiendaEscaneo, fotoUrl, canvas, titulo });
+            cardFallback = true;
+        }
+
+        toastScanner(fileToShare ? "Preparando imagen para compartir..." : "No se pudo crear imagen", fileToShare ? '#3b82f6' : '#ef4444');
+        if (navigator.share && fileToShare) {
+            const attempts = cardFallback
+                ? [{ files:[fileToShare], title:'Oferta Yaute' }, { files:[fileToShare] }]
+                : [{ files:[fileToShare], title:'Oferta Yaute', text:msgWA }, { files:[fileToShare], title:'Oferta Yaute' }, { files:[fileToShare] }];
+            for (const data of attempts) {
+                try {
+                    if (navigator.canShare && !navigator.canShare(data)) continue;
+                    await navigator.share(data);
+                    return true;
+                } catch(e) {
+                    if (e.name === 'AbortError') return false;
+                    console.warn('Share image attempt:', e.message);
+                }
+            }
+        }
+
+        if (navigator.share) {
+            await navigator.share({ title:'Oferta Yaute', text: msgWA });
+            downloadOfferFile(fileToShare);
+            toastScanner("Se compartió texto y se descargó la imagen para adjuntarla.", '#f59e0b');
+            return true;
+        }
+    } catch(e) {
+        if (e.name === 'AbortError') return false;
+        console.warn('Share:', e.message);
+    }
+    downloadOfferFile(fileToShare);
+    window.open(`https://wa.me/?text=${encodeURIComponent(msgWA)}`, '_blank');
+    return true;
+}
+
+async function shareProductRecord(id) {
+    const product = (window.state.products || []).find(p => p.id === id);
+    if (!product) { toastScanner("Producto no encontrado", '#ef4444'); return; }
+    const fotoUrl = getProductPhotoUrl(product);
+    if (!fotoUrl) toastScanner("Este producto no tiene foto guardada", '#f59e0b');
+    await shareOfferData({
+        nombre: product.nombre || 'PRODUCTO',
+        venta: product.precio || 0,
+        caducidad: product.caducidad || '',
+        tiendaEscaneo: product.tiendaEscaneo || '',
+        fotoUrl
+    });
+}
+
+/* 
+   PRODUCTOS TAB  FUNCIONALIDADES ADICIONALES
+ */
+
+// Funcin para filtrar productos en la pestaa 'Productos' (para edicin)
 function filterProductsForEdit(val) {
     const inp = document.getElementById('product-search-input');
     const box = document.getElementById('sug-product-edit');
     const noProductMsg = document.getElementById('no-product-found-msg');
-    hideProductEditDetails(); // Ocultar el formulario de edición al empezar a buscar
+    editingProductId = null;
+    document.getElementById('product-edit-details').style.display = 'none';
     if (!inp || !box) return;
 
     const query = val.trim().toUpperCase();
@@ -1578,7 +2101,7 @@ function filterProductsForEdit(val) {
 
     const filtered = (window.state.products || [])
         .filter(p => (p.nombre || '').toUpperCase().includes(query))
-        .slice(0, 8); // Mostrar un máximo de 8 sugerencias
+        .slice(0, 8); // Mostrar un mximo de 8 sugerencias
 
     if (filtered.length === 0) {
         box.classList.add('d-none');
@@ -1590,19 +2113,37 @@ function filterProductsForEdit(val) {
         box.classList.remove('d-none');
         noProductMsg.style.display = 'none';
 
-        // Manejador de clic para las sugerencias de búsqueda de productos
-        // Se adjunta cada vez que se actualizan las sugerencias
-        box.onclick = e => {
+        let touchStart = null;
+        const handleSelect = e => {
             const it = e.target.closest('.sug-item');
             if (!it) return;
+            e.preventDefault();
             const productId = it.dataset.id;
+            inp.value = it.dataset.val || it.textContent.trim();
             selectProductForEdit(productId);
-            box.classList.add('d-none'); // Ocultar sugerencias después de la selección
+            box.classList.add('d-none');
+        };
+        box.onpointerdown = e => {
+            const it = e.target.closest('.sug-item');
+            touchStart = it ? { x:e.clientX, y:e.clientY, id:it.dataset.id } : null;
+        };
+        box.onpointerup = e => {
+            if (!touchStart) return;
+            const dx = Math.abs(e.clientX - touchStart.x);
+            const dy = Math.abs(e.clientY - touchStart.y);
+            const it = e.target.closest('.sug-item');
+            if (it && it.dataset.id === touchStart.id && dx < 8 && dy < 8) handleSelect(e);
+            touchStart = null;
+        };
+        box.onpointercancel = () => { touchStart = null; };
+        box.onclick = e => {
+            if (e.pointerType) return;
+            handleSelect(e);
         };
     }
 }
 
-// Función para seleccionar un producto de la sugerencia y mostrarlo para edición
+// Funcin para seleccionar un producto de la sugerencia y mostrarlo para edicin
 function selectProductForEdit(productId) {
     const product = window.state.products.find(p => p.id === productId);
     if (!product) {
@@ -1611,10 +2152,11 @@ function selectProductForEdit(productId) {
     }
 
     editingProductId = productId;
+    pendingEditCanvas = null;
     document.getElementById('product-search-section').style.display = 'none'; // Ocultar buscador
-    document.getElementById('product-edit-details').style.display = 'block'; // Mostrar formulario de edición
+    document.getElementById('product-edit-details').style.display = 'block'; // Mostrar formulario de edicin
 
-    // Rellenar campos de edición
+    // Rellenar campos de edicin
     document.getElementById('ep-nombre').value          = product.nombre || '';
     document.getElementById('ep-costo').value           = product.costo  || 0;
     document.getElementById('ep-venta').value           = product.precio || 0;
@@ -1625,8 +2167,9 @@ function selectProductForEdit(productId) {
 
     // Mostrar foto si existe
     const photoPreview = document.getElementById('ep-foto-preview');
-    if (product.foto) {
-        photoPreview.src = product.foto;
+    const productPhotoUrl = getProductPhotoUrl(product);
+    if (productPhotoUrl) {
+        photoPreview.src = productPhotoUrl;
         photoPreview.style.display = 'block';
         document.getElementById('product-photo-label').style.display = 'block';
     } else {
@@ -1634,24 +2177,27 @@ function selectProductForEdit(productId) {
         photoPreview.style.display = 'none';
         document.getElementById('product-photo-label').style.display = 'none';
     }
+    var rotateBtn = document.getElementById('btn-rotate-edit-photo');
+    if (rotateBtn) rotateBtn.style.display = 'none';
 
     // Asegurarse de que el campo de tienda tenga las sugerencias activas si hay texto
-    // La función filterScanTienda se encarga de esto al recibir input
-    // Deberíamos re-inicializar el listener oninput para el campo de tienda de edición
+    // La funcin filterScanTienda se encarga de esto al recibir input
+    // Deberamos re-inicializar el listener oninput para el campo de tienda de edicin
     document.getElementById('ep-tienda-escaneo').oninput = (e) => filterScanTienda(e.target.value);
 }
 
-// Ocultar el formulario de edición y volver a la búsqueda
+// Ocultar el formulario de edicin y volver a la bsqueda
 function hideProductEditDetails() {
     editingProductId = null;
+    pendingEditCanvas = null;
     document.getElementById('product-edit-details').style.display = 'none';
     document.getElementById('product-search-section').style.display = 'block';
-    document.getElementById('product-search-input').value = ''; // Limpiar búsqueda
+    document.getElementById('product-search-input').value = ''; // Limpiar bsqueda
     document.getElementById('sug-product-edit').classList.add('d-none'); // Ocultar sugerencias
-    resetProductEditDetails(); // Limpiar campos del formulario de edición
+    resetProductEditDetails(); // Limpiar campos del formulario de edicin
 }
 
-// Limpia los campos del formulario de edición
+// Limpia los campos del formulario de edicin
 function resetProductEditDetails() {
     document.getElementById('ep-nombre').value          = '';
     document.getElementById('ep-costo').value           = '';
@@ -1663,10 +2209,12 @@ function resetProductEditDetails() {
     document.getElementById('ep-foto-preview').src      = '';
     document.getElementById('ep-foto-preview').style.display = 'none';
     document.getElementById('product-photo-label').style.display = 'none';
+    var rotateBtn = document.getElementById('btn-rotate-edit-photo');
+    if (rotateBtn) rotateBtn.style.display = 'none';
 }
 
 
-// Función para guardar y compartir los datos de un producto editado
+// Funcin para guardar y compartir los datos de un producto editado
 async function confirmProductEdit() {
     if (!editingProductId) {
         toastScanner("No hay producto seleccionado para editar.", "danger");
@@ -1682,62 +2230,51 @@ async function confirmProductEdit() {
     const margen        = parseFloat(document.getElementById('ep-margen').value) || MARGEN_DEFAULT;
 
     if (!nombre) { toastScanner("Nombre vacío", '#ef4444'); return; }
-
-    // Persistir tienda para el próximo escaneo o edición
     if (tiendaEscaneo) localStorage.setItem('yaute_scan_tienda', tiendaEscaneo);
 
-    // Los datos a actualizar en Firestore
     const dataToUpdate = { nombre, costo, precio: venta, fechaEscaneo, tiendaEscaneo, margen };
     if (caducidad) dataToUpdate.caducidad = caducidad;
 
     try {
-        // 1. Actualizar en Firestore primero
-        await col('products').doc(editingProductId).update(dataToUpdate);
-        toastScanner("✅ Producto actualizado");
-
-        // 2. Preparar para compartir
-        // Obtener el producto actual para acceder a la URL de la foto
         const currentProduct = window.state.products.find(p => p.id === editingProductId);
-        let fileToShare = null;
-        let msgWA = '🛒 *OFERTA ACTUALIZADA*\n📦 ' + nombre + '\n💰 $' + venta;
-        if (caducidad) msgWA += '\n⏳ Cad: ' + caducidad;
-
-        if (currentProduct && currentProduct.foto) {
-            // Intenta descargar la imagen para compartirla si existe
-            fileToShare = await fetchImageAsFile(currentProduct.foto, `oferta_${nombre.replace(/\s+/g, '_')}.jpg`);
+        let currentPhotoUrl = getProductPhotoUrl(currentProduct);
+        if (pendingEditCanvas) {
+            toastScanner("Subiendo nueva foto...", '#3b82f6');
+            const blob = await new Promise(r => pendingEditCanvas.toBlob(r, 'image/jpeg', 0.82));
+            const ref = storage.ref('productos/' + Date.now() + '_' + nombre.replace(/\s+/g,'_') + '.jpg');
+            await ref.put(blob);
+            currentPhotoUrl = await ref.getDownloadURL();
+            dataToUpdate.foto = currentPhotoUrl;
         }
+        if (!currentPhotoUrl && !pendingEditCanvas) toastScanner("Este producto no tiene foto guardada", '#f59e0b');
+        toastScanner("Preparando imagen para compartir...", '#3b82f6');
+        const shared = await shareOfferData({
+            nombre,
+            venta,
+            caducidad,
+            tiendaEscaneo,
+            fotoUrl: pendingEditCanvas ? '' : currentPhotoUrl,
+            canvas: pendingEditCanvas,
+            titulo: 'OFERTA RÁPIDA'
+        });
 
-        // 3. Intentar compartir (esto puede ser cancelado por el usuario)
-        if (navigator.share) {
-            const shareData = { text: msgWA };
-            if (fileToShare && navigator.canShare({ files: [fileToShare] })) {
-                shareData.files = [fileToShare];
-            }
-            await navigator.share(shareData);
-            toastScanner("✅ Producto compartido"); // Solo muestra si la acción de compartir fue exitosa
-        } else {
-            // Fallback para entornos que no soportan Web Share API (ej. WhatsApp Web sin integración directa de archivos)
-            window.open(`https://wa.me/?text=${encodeURIComponent(msgWA)}`, '_blank');
-            toastScanner("✅ Producto compartido (navegador)"); // Para entornos sin Web Share API
-        }
-
-        hideProductEditDetails(); // Cierra el modal de edición si todo salió bien
+        await col('products').doc(editingProductId).update(dataToUpdate);
+        hideProductEditDetails();
     } catch (e) {
         if (e.name === 'AbortError') {
-            // Usuario canceló la acción de compartir. El producto ya se guardó.
-            toastScanner("✅ Producto actualizado (compartir cancelado)", '#f59e0b');
+            await col('products').doc(editingProductId).update(dataToUpdate);
+            toastScanner("Producto actualizado (compartir cancelado)", '#f59e0b');
         } else {
             console.error("Error al actualizar o compartir el producto:", e);
             toastScanner("Error al actualizar o compartir: " + e.message, '#ef4444');
         }
-        hideProductEditDetails(); // Cierra el modal de edición de todos modos
+        hideProductEditDetails();
     }
 }
 
-
-/* ══════════════════════════════════════════════════════════════════
+/* 
    ARRANQUE
-══════════════════════════════════════════════════════════════════ */
+ */
 window.onload = startSync;
 </script>
   <script>
@@ -1748,20 +2285,20 @@ window.onload = startSync;
             scope: './'
           })
           .then(function(reg) {
-            console.log('SW registrado para nueva raíz:', reg.scope);
+            reg.update();
           })
           .catch(function(err) {
-            console.warn('SW no disponible en la nueva raíz:', err);
+            console.warn('SW no disponible en la nueva raz:', err);
           });
       });
     }
 
-    // Banner de instalación en Android Chrome
+    // Banner de instalacin en Android Chrome
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', function(e) {
       e.preventDefault();
       deferredPrompt = e;
-      // Mostrar botón de instalar si no está ya instalada
+      // Mostrar botn de instalar si no est ya instalada
       var btn = document.getElementById('btn-install-pwa');
       if (btn) btn.style.display = 'flex';
     });
@@ -1783,3 +2320,4 @@ window.onload = startSync;
   </script>
 </body>
 </html>
+
