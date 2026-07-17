@@ -509,7 +509,7 @@
     <div class="scan-guide"></div>
     <div id="cam-top-bar">
         <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:white; border:1px solid rgba(255,255,255,0.3);" onclick="closeScanner()">X SALIR</button>
-        <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:#fbbf24; border:1px solid rgba(255,255,255,0.2); font-size:0.65rem;" onclick="changeGeminiKey()">API KEY</button>
+        <button class="btn btn-sm rounded-pill" style="background:rgba(0,0,0,0.5); color:#fbbf24; border:1px solid rgba(255,255,255,0.6); font-size:0.65rem;" onclick="changeGeminiKey()">API KEY</button>
     </div>
     <div id="snap-btn" onclick="captureIA()">
         <i class="fas fa-camera fa-2x text-primary" id="snap-icon"></i>
@@ -1559,32 +1559,37 @@ function prepareSharePhoto(source, rotateHint = 0) {
     if (!source || !source.width || !source.height) return source;
     var img = source;
     if (rotateHint) img = rotateCanvas90(img, rotateHint);
-    else if (img.width > img.height) img = rotateCanvas90(img, -1);
+    //else if (img.width > img.height) img = rotateCanvas90(img, -1); // <-- Removed this line to prevent automatic rotation in case of non-standard images
 
     var out = document.createElement('canvas');
     out.width = 1080;
     out.height = 1350; // Fixed aspect ratio for sharing (e.g., social media vertical post)
     var ctx = out.getContext('2d');
 
+    ctx.fillStyle = '#ffffff'; // Set white background for safety
+    ctx.fillRect(0, 0, out.width, out.height);
+
     // Calculate object-fit: cover for the image to fill the canvas
-    const imgAspect = img.width / img.height;
-    const canvasAspect = out.width / out.height;
+    const sourceAspect = img.width / img.height;
+    const destAspect   = out.width / out.height;
 
-    let sx = 0, sy = 0, sWidth = img.width, sHeight = img.height; // Source image cropping parameters
-    let dx = 0, dy = 0, dWidth = out.width, dHeight = out.height; // Destination canvas drawing parameters
+    let sx = 0; // Source X
+    let sy = 0; // Source Y
+    let sWidth = img.width; // Source Width
+    let sHeight = img.height; // Source Height
 
-    if (imgAspect > canvasAspect) {
-        // Image is wider than the canvas. Crop width of the image.
-        sWidth = img.height * canvasAspect;
-        sx = (img.width - sWidth) / 2;
+    if (sourceAspect > destAspect) {
+        // Source is wider than destination. Fit height, crop width.
+        sWidth = img.height * destAspect; // Calculate source width to match dest aspect ratio while using full source height
+        sx = (img.width - sWidth) / 2;    // Center horizontally
     } else {
-        // Image is taller than the canvas. Crop height of the image.
-        sHeight = img.width / canvasAspect;
-        sy = (img.height - sHeight) / 2;
+        // Source is taller than or equal to destination aspect. Fit width, crop height.
+        sHeight = img.width / destAspect; // Calculate source height to match dest aspect ratio while using full source width
+        sy = (img.height - sHeight) / 2;  // Center vertically
     }
 
-    // Draw the image, covering the entire canvas
-    ctx.drawImage(img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight);
+    // Draw the image, covering the entire canvas (destination)
+    ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, out.width, out.height);
 
     return out;
 }
@@ -1968,19 +1973,44 @@ async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscane
 
     const img = canvas || await loadImageForCanvas(fotoUrl);
     if (img) {
+        // Define the destination area for the image
+        const destX = 70;
+        const destY = 260;
+        const destWidth = 940;
+        const destHeight = 550;
+
         ctx.save();
         ctx.fillStyle = '#e2e8f0';
-        drawRoundedRect(ctx, 70, 260, 940, 550, 34);
+        drawRoundedRect(ctx, destX, destY, destWidth, destHeight, 34);
         ctx.fill();
-        drawRoundedRect(ctx, 70, 260, 940, 550, 34);
-        ctx.clip();
+        drawRoundedRect(ctx, destX, destY, destWidth, destHeight, 34);
+        ctx.clip(); // Clip subsequent drawing to this rounded rectangle
+
         const iw = img.width || img.videoWidth;
         const ih = img.height || img.videoHeight;
-        const scale = Math.min(900 / iw, 510 / ih);
-        const dw = iw * scale;
-        const dh = ih * scale;
-        ctx.drawImage(img, 90 + (900 - dw) / 2, 280 + (510 - dh) / 2, dw, dh);
-        ctx.restore();
+
+        const imgAspect  = iw / ih;
+        const destAspect = destWidth / destHeight;
+
+        let sx = 0, sy = 0, sWidth = iw, sHeight = ih; // Source image cropping parameters
+
+        if (imgAspect > destAspect) {
+            // Image is wider than the destination area. Scale to match height, crop width from source.
+            sHeight = ih;
+            sWidth = ih * destAspect;
+            sx = (iw - sWidth) / 2;
+            sy = 0;
+        } else {
+            // Image is taller than or equal to the destination area. Scale to match width, crop height from source.
+            sWidth = iw;
+            sHeight = iw / destAspect;
+            sx = 0;
+            sy = (ih - sHeight) / 2;
+        }
+        
+        // Draw the image using the calculated source (sx, sy, sWidth, sHeight) and fixed destination (destX, destY, destWidth, destHeight)
+        ctx.drawImage(img, sx, sy, sWidth, sHeight, destX, destY, destWidth, destHeight);
+        ctx.restore(); // Restore context to remove the clip
     } else {
         ctx.fillStyle = '#e2e8f0';
         drawRoundedRect(ctx, 70, 260, 940, 550, 34);

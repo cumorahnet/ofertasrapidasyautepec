@@ -236,7 +236,7 @@
             placeholder="Nombre del producto"
             style="resize:none; text-transform:uppercase; font-weight:700; font-size:0.9rem; line-height:1.4; word-break:break-word; white-space:pre-wrap;"></textarea>
         <div id="pm-photo-tools" class="mb-3" style="display:none;">
-            <div style="display:flex; align-items:center; gap:10px; background:#f8fafc; border-radius:16px; padding:10px;">
+            <div style="display:flex; align-items:center; gap:10px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:10px;">
                 <img id="pm-photo-preview" alt="Foto capturada" style="width:74px; height:74px; object-fit:cover; border-radius:12px; background:#e2e8f0;">
                 <button type="button" class="btn btn-outline-primary rounded-pill fw-bold flex-fill" onclick="rotatePendingPhoto()">
                     <i class="fas fa-rotate-right me-2"></i> GIRAR FOTO
@@ -1585,6 +1585,7 @@ function prepareSharePhoto(source, rotateHint = 0) {
     } else {
         // Source is taller than or equal to destination aspect. Fit width, crop height.
         sHeight = img.width / destAspect; // Calculate source height to match dest aspect ratio while using full source width
+        sx = 0;
         sy = (img.height - sHeight) / 2;  // Center vertically
     }
 
@@ -1684,7 +1685,7 @@ async function captureIA() {
             { method:'POST', headers:{'Content-Type':'application/json'},
               body: JSON.stringify({ contents:[{ parts:[
                   { inline_data:{ mime_type:'image/jpeg', data:b64 } },
-                  { text:"Eres un lector experto de etiquetas de productos de consumo en Mxico. Analiza la imagen y extrae: 1) Marca comercial, 2) Nombre del producto, 3) Presentacin (gramaje, volumen, nmero de piezas, sabor o variante si aparece). Responde SOLO con el resultado en UNA LNEA en MAYSCULAS con el formato: MARCA NOMBRE PRESENTACIN. Sin explicaciones, sin puntos, sin saltos de lnea." }
+                  { text:"Eres un lector experto de etiquetas de productos de consumo en Mxico. Analiza la imagen y extrae: 1) Marca comercial, 2) Nombre del producto, 3) Presentación (gramaje, volumen, número de piezas, sabor o variante si aparece). Responde SOLO con el resultado en UNA LÍNEA en MAYÚSCULAS con el formato: MARCA NOMBRE PRESENTACIÓN. Sin explicaciones, sin puntos, sin saltos de lnea." }
               ]}], generationConfig:{ temperature:0.1, maxOutputTokens:120 } })
             }
         );
@@ -1748,9 +1749,9 @@ async function captureIA() {
             // Producto nuevo
             pendingExisteId = null;
             pendingFotoUrl = '';
+            document.getElementById('dup-badge').classList.remove('show');
             document.getElementById('pm-venta').value = '';
             document.getElementById('pm-costo').value = '';
-            document.getElementById('dup-badge').classList.remove('show');
             document.getElementById('price-modal').style.display = 'flex';
         }
 
@@ -2005,7 +2006,7 @@ async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscane
             sWidth = iw;
             sHeight = iw / destAspect;
             sx = 0;
-            sy = (ih - sHeight) / 2;
+            sy = 0; // Se ha cambiado de (ih - sHeight) / 2 a 0 para priorizar la parte superior de la imagen
         }
         
         // Draw the image using the calculated source (sx, sy, sWidth, sHeight) and fixed destination (destX, destY, destWidth, destHeight)
