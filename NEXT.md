@@ -2,8 +2,8 @@
 
 ## Pendientes
 
-Sin pendientes registrados.
+verificar que todo funcione
 
 ## Próximo paso
 
-lograr que sigan funcionando
+esperar pruebas
