@@ -716,7 +716,7 @@ function startSync() {
             document.getElementById('status-dot').style.background = '#ef4444';
             // Si todas fallaron, quitar splash tambin
             colsReady++;
-            if (colsReady === 1) { clearTimeout(splashTimeout); hideSplash(); }
+            if (colsCols === 1) { clearTimeout(splashTimeout); hideSplash(); }
         });
     });
 
@@ -1551,10 +1551,10 @@ function rotateCanvas90(source, direction = 1) {
     out.height = source.width;
     var ctx = out.getContext('2d');
     ctx.save();
-    if (direction > 0) {
+    if (direction > 0) { // Clockwise
         ctx.translate(out.width, 0);
         ctx.rotate(Math.PI / 2);
-    } else {
+    } else { // Counter-clockwise
         ctx.translate(0, out.height);
         ctx.rotate(-Math.PI / 2);
     }
@@ -1643,13 +1643,19 @@ async function captureIA() {
     document.getElementById('snap-btn').style.pointerEvents = 'none';
 
     try {
-        pendingRotateHint = getCaptureRotateHint();
-        // Capture the full, oriented image. No automatic foreground crop here.
-        pendingRawCanvas = captureOrientado(video);
+        pendingRawCanvas = captureOrientado(video); // This canvas is correctly upright based on device orientation.
 
-        // Prepare for cropping
+        let imageForCropper = pendingRawCanvas;
+        // Target aspect ratio for the offer card is landscape (940/550 = ~1.709).
+        // If the captured raw canvas is portrait (e.g., phone held vertically),
+        // rotate it to landscape *for the cropper UI* to provide a more intuitive cropping experience
+        // given the fixed landscape output.
+        if (pendingRawCanvas.height > pendingRawCanvas.width) {
+            imageForCropper = rotateCanvas90(pendingRawCanvas, 1); // Rotate clockwise to make it landscape
+        }
+
         const cropImageElement = document.getElementById('crop-image');
-        cropImageElement.src = pendingRawCanvas.toDataURL('image/jpeg', 0.9);
+        cropImageElement.src = imageForCropper.toDataURL('image/jpeg', 0.9);
 
         document.getElementById('ia-modal').style.display = 'none'; // Hide scanner
         document.getElementById('crop-modal').style.display = 'flex'; // Show cropper
@@ -1658,7 +1664,6 @@ async function captureIA() {
         if (cropperInstance) {
             cropperInstance.destroy();
         }
-        // Aspect ratio for the share card's image slot: 940 / 550 = 1.709...
         const targetAspectRatio = 940 / 550; 
         cropperInstance = new Cropper(cropImageElement, {
             aspectRatio: targetAspectRatio, 
@@ -1666,7 +1671,7 @@ async function captureIA() {
             autoCropArea: 0.9, // Initial crop area (percentage of image)
             background: false,
             movable: true,
-            rotatable: true, // Allow rotation
+            rotatable: true, // Allow rotation *within* the cropper for fine-tuning
             scalable: true,
             zoomable: true,
             zoomOnTouch: true,
@@ -1822,7 +1827,7 @@ async function confirmCrop() {
         } finally {
             snapIcon.className = 'fas fa-camera fa-2x text-primary';
             document.getElementById('snap-btn').style.pointerEvents = 'auto';
-            closeScanner(); // Close camera stream regardless of AI success
+            // closeScanner(); // The scanner modal is hidden before crop, and will be closed after confirm prices or cancelled
         }
     }
 }
