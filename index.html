@@ -584,8 +584,6 @@ let pendingNombre   = '';
 let pendingCanvas   = null;
 let pendingExisteId = null;
 let pendingFotoUrl  = '';
-<<<<<<< HEAD
-=======
 let pendingRotateHint = 0;
 let lastDeviceGamma = 0;
 let scannerMode = 'scan';
@@ -600,7 +598,6 @@ if (window.DeviceOrientationEvent) {
 // Para la edicin de productos desde la pestaa 'Productos'
 let editingProductId = null; // Guarda el ID del producto que se est editando
 
->>>>>>> pruebas-promociones
 
 // Finanzas fechas
 const getMXTimeParts = () => {
@@ -1114,6 +1111,8 @@ function renderControlListItems() {
 /* 
    FINANZAS
  */
+function setFinView(v) { activeFinanceView = v; renderFinanceMenu(); }
+
 function renderFinanceMenu() {
     const container = document.getElementById('control-content');
     if (!container) return;
@@ -1270,7 +1269,6 @@ document.addEventListener('click', function(e) {
         sug.style.display = 'none';
     }
 });
-function setFinView(v) { activeFinanceView = v; renderFinanceMenu(); }
 
 /* 
    REPARTO
@@ -1374,94 +1372,7 @@ function filterScanTienda(val) {
     box.classList.remove('d-none');
 }
 
-<<<<<<< HEAD
-function selectScanTienda(val) {
-    document.getElementById('pm-tienda-escaneo').value = val;
-    document.getElementById('sug-scan-tienda').classList.add('d-none');
-    localStorage.setItem('yaute_scan_tienda', val);
-}
-
-async function canvasToFile(canvas, filename) {
-    if (!canvas) return null;
-    const blob = await new Promise(r => canvas.toBlob(r, 'image/jpeg', 0.88));
-    return blob ? new File([blob], filename, { type:'image/jpeg' }) : null;
-}
-
-async function imageUrlToFile(url, filename) {
-    if (!url) return null;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('No se pudo cargar la imagen guardada');
-    const blob = await res.blob();
-    const type = blob.type || 'image/jpeg';
-    return new File([blob], filename, { type });
-}
-
-async function getOfferShareFile(nombre) {
-    if (pendingCanvas) return canvasToFile(pendingCanvas, 'oferta.jpg');
-
-    const producto = pendingExisteId
-        ? window.state.products.find(p => p.id === pendingExisteId)
-        : null;
-    const foto = pendingFotoUrl || (producto && producto.foto) || '';
-    if (!foto) return null;
-
-    const safeName = (nombre || 'oferta').replace(/[^\w-]+/g, '_').slice(0, 40);
-    return imageUrlToFile(foto, safeName + '.jpg');
-}
-
-async function shareOffer(nombre, venta, caducidad) {
-    let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + nombre + '\n💰 $' + venta;
-    if (caducidad) msgWA += '\n⏳ Cad: ' + caducidad;
-
-    try {
-        const file = await getOfferShareFile(nombre);
-        if (file && navigator.canShare && navigator.canShare({ files:[file] })) {
-            await navigator.share({ files:[file], title:'Oferta Yaute', text:msgWA });
-            return;
-        }
-        if (navigator.share) {
-            await navigator.share({ title:'Oferta Yaute', text:msgWA });
-            return;
-        }
-    } catch(e) {
-        if (e.name === 'AbortError') return;
-        console.warn('Share:', e.message);
-    }
-
-    window.open('https://wa.me/?text=' + encodeURIComponent(msgWA), '_blank');
-}
-
-async function shareProductRecord(id) {
-    const producto = (window.state.products || []).find(p => p.id === id);
-    if (!producto) { toast("Producto no encontrado", 'danger'); return; }
-
-    let msgWA = '🛒 *OFERTA RÁPIDA*\n📦 ' + (producto.nombre || 'PRODUCTO') +
-                '\n💰 $' + (parseFloat(producto.precio) || 0).toFixed(2);
-    if (producto.caducidad) msgWA += '\n⏳ Cad: ' + producto.caducidad;
-    if (producto.tiendaEscaneo) msgWA += '\n🏪 ' + producto.tiendaEscaneo;
-
-    try {
-        const file = producto.foto ? await imageUrlToFile(producto.foto, 'oferta.jpg') : null;
-        if (file && navigator.canShare && navigator.canShare({ files:[file] })) {
-            await navigator.share({ files:[file], title:'Oferta Yaute', text:msgWA });
-            return;
-        }
-        if (navigator.share) {
-            await navigator.share({ title:'Oferta Yaute', text:msgWA });
-            return;
-        }
-    } catch(e) {
-        if (e.name === 'AbortError') return;
-        console.warn('Share product:', e.message);
-    }
-
-    window.open('https://wa.me/?text=' + encodeURIComponent(msgWA), '_blank');
-}
-
-// Event delegation para sugerencias de tienda en scanner
-=======
 // Event delegation para sugerencias de tienda en scanner/edicin
->>>>>>> pruebas-promociones
 document.addEventListener('click', function(e) {
     var item = e.target.closest('.sug-scan-item');
     if (item) {
@@ -1812,11 +1723,7 @@ async function captureIA() {
         if (candidatos.length === 1 && (candidatos[0].nombre||'').toUpperCase().trim() === pendingNombre) {
             // Coincidencia exacta  panel directo con badge
             pendingExisteId = candidatos[0].id;
-<<<<<<< HEAD
-            pendingFotoUrl = candidatos[0].foto || '';
-=======
             pendingFotoUrl = getProductPhotoUrl(candidatos[0]);
->>>>>>> pruebas-promociones
             precargarPrecios(candidatos[0].precio, candidatos[0].costo);
             const badge = document.getElementById('dup-badge');
             var prev = candidatos[0];
@@ -1892,11 +1799,7 @@ function selectDuplicate(id, precio, costo) {
     precargarPrecios(precio, costo);
     var p = window.state.products.find(function(x){ return x.id === id; });
     if (p) {
-<<<<<<< HEAD
-        pendingFotoUrl = p.foto || '';
-=======
         pendingFotoUrl = getProductPhotoUrl(p);
->>>>>>> pruebas-promociones
         var badge = document.getElementById('dup-badge');
         document.getElementById('dup-text').innerHTML =
             '<strong>Seleccionado:</strong> "' + p.nombre + '"<br>Precios precargados, puedes modificar.';
@@ -1942,10 +1845,6 @@ async function confirmPrices() {
 
     document.getElementById('price-modal').style.display = 'none';
 
-<<<<<<< HEAD
-    // 1. Compartir oferta: usa la foto recien tomada o la imagen guardada del producto localizado.
-    await shareOffer(nombre, venta, caducidad);
-=======
     // 1. Compartir oferta: captura nueva, foto guardada del producto localizado o cartel sin foto.
     const productoExistente = pendingExisteId
         ? window.state.products.find(p => p.id === pendingExisteId)
@@ -1958,7 +1857,6 @@ async function confirmPrices() {
         canvas: pendingCanvas,
         fotoUrl: pendingFotoUrl || getProductPhotoUrl(productoExistente)
     });
->>>>>>> pruebas-promociones
 
 
     // 2. Subir foto a Storage si hay un nuevo canvas
