@@ -105,7 +105,17 @@
         #ia-modal { position:fixed; inset:0; background:#000; z-index:10000; display:none; flex-direction:column; }
         #cam-preview-ia { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
         /* Gua visual ligera  sin sombra que oscurezca la imagen */
-        .scan-guide { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:82%; aspect-ratio:4/3; border:2px solid rgba(0,229,192,0.6); border-radius:16px; pointer-events:none; }
+        .scan-guide { 
+            position:absolute; 
+            top:50%; 
+            left:50%; 
+            transform:translate(-50%,-50%); 
+            width:82%; 
+            aspect-ratio: 940/550; /* Changed to match the output aspect ratio */
+            border:2px solid rgba(0,229,192,0.6); 
+            border-radius:16px; 
+            pointer-events:none; 
+        }
         .scan-guide::before, .scan-guide::after { content:''; position:absolute; width:22px; height:22px; border-color:#00e5c0; border-style:solid; }
         .scan-guide::before { top:-2px; left:-2px; border-width:3px 0 0 3px; border-radius:4px 0 0 0; }
         .scan-guide::after  { bottom:-2px; right:-2px; border-width:0 3px 3px 0; border-radius:0 0 4px 0; }
@@ -716,7 +726,7 @@ function startSync() {
             document.getElementById('status-dot').style.background = '#ef4444';
             // Si todas fallaron, quitar splash tambin
             colsReady++;
-            if (colsCols === 1) { clearTimeout(splashTimeout); hideSplash(); }
+            if (colsReady === 1) { clearTimeout(splashTimeout); hideSplash(); }
         });
     });
 
@@ -1806,7 +1816,7 @@ async function confirmCrop() {
                 document.getElementById('price-modal').style.display = 'flex';
             } else if (candidatos.length >= 1) {
                 // Similares  preguntar al usuario
-                pendingExisteId = null; // No hay un ID exacto todava
+                pendingExisteId = null; // No hay un ID exacto todavia
                 pendingFotoUrl = ''; // Clear existing photo URL as user needs to select
                 document.getElementById('pm-venta').value = '';
                 document.getElementById('pm-costo').value = '';
