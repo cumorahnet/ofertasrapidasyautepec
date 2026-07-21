@@ -16,7 +16,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <!-- Cropper.js CDN -->
+    <!-- Cropper.js CDN (mantengo el CDN aunque no se use el modal, por si hay otros usos o un futuro cambio) -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
 
@@ -146,7 +146,8 @@
     </div>
 </div>
 
-<!--  MODAL RECORTAR IMAGEN  -->
+<!-- REMOVIDO: MODAL RECORTAR IMAGEN (se procesará automáticamente) -->
+<!--
 <div id="crop-modal" class="modal-overlay">
     <div class="modal-content-custom" style="max-width:90%; height:80vh; padding:0; overflow:hidden; display:flex; flex-direction:column; border-radius:28px;">
         <div style="flex:1; overflow:hidden; position:relative; display:flex; align-items:center; justify-content:center;">
@@ -158,6 +159,7 @@
         </div>
     </div>
 </div>
+-->
 
 <!--  MODAL REINICIAR CATLOGO  -->
 <div id="reset-modal" class="modal-overlay">
@@ -600,9 +602,9 @@ let lastDeviceGamma = 0;
 let scannerMode = 'scan'; // 'scan' or 'editPhoto'
 let editingProductId = null; // Stores the ID of the product being edited
 
-let cropperInstance = null; // Cropper.js instance
+// REMOVIDO: cropperInstance = null; // Cropper.js instance
 let pendingRawCanvas = null; // Stores the canvas right after camera capture (oriented, full frame)
-let pendingCroppedCanvas = null; // Stores the canvas after user cropping
+let pendingCroppedCanvas = null; // Stores the canvas after user cropping (now, blur-filled)
 
 // For the product edit tab, the canvas specifically for that edit flow
 let pendingEditCanvas = null;
@@ -1574,7 +1576,7 @@ function refreshPendingPhotoPreview() {
     var img = document.getElementById('pm-photo-preview');
     if (!box || !img) return;
 
-    // Display the newly cropped image if available
+    // Display the newly processed (blur-filled) image if available
     if (pendingCroppedCanvas) {
         img.src = pendingCroppedCanvas.toDataURL('image/jpeg', 0.72);
         box.style.display = 'block';
@@ -1593,14 +1595,15 @@ function refreshPendingPhotoPreview() {
 }
 
 function rotatePendingPhoto() {
-    if (!pendingCroppedCanvas) return; // Rotate the *cropped* canvas
+    // Rotar el canvas blur-filled.
+    if (!pendingCroppedCanvas) return;
     pendingCroppedCanvas = rotateCanvas90(pendingCroppedCanvas, -1);
     refreshPendingPhotoPreview();
     toastScanner("Foto girada");
 }
 
 function setEditPhotoCanvas(canvas) {
-    pendingEditCanvas = canvas;
+    pendingEditCanvas = canvas; // Este canvas ya debería ser el cuadrado blur-filled
     var preview = document.getElementById('ep-foto-preview');
     var label = document.getElementById('product-photo-label');
     var rotateBtn = document.getElementById('btn-rotate-edit-photo');
@@ -1618,6 +1621,56 @@ function rotateEditPhoto() {
     if (!pendingEditCanvas) return;
     setEditPhotoCanvas(rotateCanvas90(pendingEditCanvas, -1));
     toastScanner("Foto girada");
+}
+
+/**
+ * Crea una imagen cuadrada con la imagen de origen centrada y los bordes rellenados con un desenfoque de la misma imagen.
+ * @param {HTMLCanvasElement} sourceCanvas El canvas original de la imagen capturada.
+ * @param {number} targetSize El tamaño (ancho y alto) deseado para el canvas de salida.
+ * @returns {HTMLCanvasElement} El nuevo canvas cuadrado con el efecto blur-fill.
+ */
+async function createSquareImageWithBlurFill(sourceCanvas, targetSize) {
+    const out = document.createElement('canvas');
+    out.width = targetSize;
+    out.height = targetSize;
+    const ctx = out.getContext('2d');
+
+    const srcAspect = sourceCanvas.width / sourceCanvas.height;
+    const targetAspect = 1; // Siempre 1 para el cuadrado
+
+    // 1. Dibujar el fondo desenfocado (efecto "cover")
+    ctx.save();
+    ctx.filter = 'blur(20px)'; // Ajusta el radio de desenfoque según se desee
+    let bgDrawX = 0, bgDrawY = 0, bgDrawW = targetSize, bgDrawH = targetSize;
+
+    if (srcAspect > targetAspect) { // La fuente es más ancha que el destino (landscape), llenar altura, recortar ancho
+        bgDrawH = targetSize;
+        bgDrawW = sourceCanvas.width * (targetSize / sourceCanvas.height);
+        bgDrawX = (targetSize - bgDrawW) / 2;
+    } else { // La fuente es más alta que el destino (portrait), llenar ancho, recortar altura
+        bgDrawW = targetSize;
+        bgDrawH = sourceCanvas.height * (targetSize / sourceCanvas.width);
+        bgDrawY = (targetSize - bgDrawH) / 2;
+    }
+    ctx.drawImage(sourceCanvas, bgDrawX, bgDrawY, bgDrawW, bgDrawH);
+    ctx.restore(); // Restablecer el filtro
+
+    // 2. Dibujar la imagen principal (sin desenfoque, efecto "contain")
+    ctx.filter = 'none'; // Asegurarse de que no haya desenfoque en la imagen principal
+    let mainDrawX = 0, mainDrawY = 0, mainDrawW = targetSize, mainDrawH = targetSize;
+
+    if (srcAspect > targetAspect) { // La fuente es más ancha, ajustar al ancho, centrar verticalmente
+        mainDrawW = targetSize;
+        mainDrawH = targetSize / srcAspect;
+        mainDrawY = (targetSize - mainDrawH) / 2;
+    } else { // La fuente es más alta, ajustar a la altura, centrar horizontalmente
+        mainDrawH = targetSize;
+        mainDrawW = targetSize * srcAspect;
+        mainDrawX = (targetSize - mainDrawW) / 2;
+    }
+    ctx.drawImage(sourceCanvas, mainDrawX, mainDrawY, mainDrawW, mainDrawH);
+
+    return out;
 }
 
 
@@ -1641,184 +1694,123 @@ async function captureIA() {
     try {
         pendingRawCanvas = captureOrientado(video); // This canvas is correctly upright based on device orientation.
 
-        const cropImageElement = document.getElementById('crop-image');
-        cropImageElement.src = pendingRawCanvas.toDataURL('image/jpeg', 0.9);
+        // NUEVO: Procesar la imagen capturada para que sea cuadrada con blur-fill, sin modal de recorte
+        pendingCroppedCanvas = await createSquareImageWithBlurFill(pendingRawCanvas, 940);
+        
+        // El scanner modal se oculta después de la captura, y se volverá a mostrar si se cancelan los precios
+        document.getElementById('ia-modal').style.display = 'none';
 
-        document.getElementById('ia-modal').style.display = 'none'; // Hide scanner
-        document.getElementById('crop-modal').style.display = 'flex'; // Show cropper
-
-        // Initialize Cropper.js
-        if (cropperInstance) {
-            cropperInstance.destroy();
-        }
-        // MODIFICACIÓN: Cambiar aspectRatio a 1 (1:1)
-        cropperInstance = new Cropper(cropImageElement, {
-            aspectRatio: 1, // CUADRADO 1:1
-            viewMode: 1, // Restrict the crop box to not exceed the canvas
-            autoCropArea: 0.9, // Initial crop area (percentage of image)
-            background: false,
-            movable: true,
-            rotatable: true, // Allow rotation *within* the cropper for fine-tuning
-            scalable: true,
-            zoomable: true,
-            zoomOnTouch: true,
-            zoomOnWheel: true,
-            minCropBoxWidth: 100,
-            minCropBoxHeight: 100,
-        });
+        // Continuar con el flujo de la IA y detección de duplicados
+        await processCapturedImageForAI();
 
     } catch(e) {
-        toastScanner("Error al capturar o iniciar editor: " + e.message, '#ef4444');
+        toastScanner("Error al capturar o procesar imagen: " + e.message, '#ef4444');
         snapIcon.className = 'fas fa-camera fa-2x text-primary';
         document.getElementById('snap-btn').style.pointerEvents = 'auto';
         closeScanner(); // Close camera stream
     }
 }
 
-function cancelCrop() {
-    if (cropperInstance) {
-        cropperInstance.destroy();
-        cropperInstance = null;
-    }
-    pendingRawCanvas = null;
-    pendingCroppedCanvas = null;
-    document.getElementById('crop-modal').style.display = 'none';
+// REMOVIDO: cancelCrop() - ya no se usa el modal de recorte
+// REMOVIDO: confirmCrop() - la lógica se ha movido o adaptado
+
+// Nueva función para manejar el procesamiento de la imagen después de la captura y la IA
+async function processCapturedImageForAI() {
+    // Esto es el flujo que antes seguía a confirmCrop
+    const b64 = pendingCroppedCanvas.toDataURL('image/jpeg', 0.88).split(',')[1];
     
-    // Resume scanner if it was for a new scan, or just exit if it was for edit
-    if (scannerMode === 'scan') {
-        document.getElementById('ia-modal').style.display = 'flex'; // Go back to scanner
-        const snapIcon = document.getElementById('snap-icon');
-        if (snapIcon) {
-            snapIcon.className = 'fas fa-camera fa-2x text-primary';
-            document.getElementById('snap-btn').style.pointerEvents = 'auto';
+    // (Asegurarse de que el spinner siga activo mientras se llama a la IA)
+    const snapIcon = document.getElementById('snap-icon');
+    snapIcon.className = 'fas fa-spinner fa-spin fa-2x text-primary';
+    document.getElementById('snap-btn').style.pointerEvents = 'none'; 
+
+    const callGemini = async (intentos = 3) => {
+        const res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${localStorage.getItem('yaute_key_v3310')}`,
+            { method:'POST', headers:{'Content-Type':'application/json'},
+              body: JSON.stringify({ contents:[{ parts:[
+                  { inline_data:{ mime_type:'image/jpeg', data:b64 } },
+                  { text:"Eres un lector experto de etiquetas de productos de consumo en Mxico. Analiza la imagen y extrae: 1) Marca comercial, 2) Nombre del producto, 3) Presentación (gramaje, volumen, número de piezas, sabor o variante si aparece). Responde SOLO con el resultado en UNA LÍNEA en MAYÚSCULAS con el formato: MARCA NOMBRE PRESENTACIÓN. Sin explicaciones, sin puntos, sin saltos de lnea." }
+              ]}], generationConfig:{ temperature:0.1, maxOutputTokens:120 } })
+            }
+        );
+        const data = await res.json();
+        if (res.status === 429 && intentos > 1) {
+            const segs = intentos === 3 ? 20 : 40;
+            toastScanner(`Muchas consultas - reintentando en ${segs}s...`, '#f59e0b');
+            await new Promise(r => setTimeout(r, segs * 1000));
+            return callGemini(intentos - 1);
         }
-    } else if (scannerMode === 'editPhoto') {
-        closeScanner(); // Just close camera, remain on product edit details
-        document.getElementById('product-edit-details').style.display = 'block';
+        if (!res.ok) throw new Error(data.error?.message || `HTTP ${res.status}`);
+        return data;
+    };
+
+    try {
+        const data = await callGemini();
+        pendingNombre = data.candidates[0].content.parts[0].text.trim().toUpperCase();
+
+        //  Deteccin de duplicados en 3 niveles 
+        // Nivel 1: coincidencia exacta
+        // Nivel 2: uno contiene al otro (>= 6 chars)
+        // Nivel 3: >= 2 palabras clave de 4+ chars en comn
+        const palabrasEsc = pendingNombre.split(' ').filter(w => w.length >= 4);
+        const candidatos = window.state.products.filter(p => {
+            const g = (p.nombre||'').toUpperCase().trim();
+            if (g === pendingNombre) return true;
+            if (g.length >= 6 && (pendingNombre.includes(g) || g.includes(pendingNombre))) return true;
+            const pg = g.split(' ').filter(w => w.length >= 4);
+            return palabrasEsc.filter(w => pg.includes(w)).length >= 2;
+        });
+
+        document.getElementById('pm-nombre').value = pendingNombre;
+
+        if (candidatos.length === 1 && (candidatos[0].nombre||'').toUpperCase().trim() === pendingNombre) {
+            // Coincidencia exacta  panel directo con badge
+            pendingExisteId = candidatos[0].id;
+            // pendingFotoUrl is used here for existing product's photo URL (if no new crop)
+            // For new scan with blur-fill, pendingCroppedCanvas will be used for display and upload.
+            pendingFotoUrl = getProductPhotoUrl(candidatos[0]); 
+            precargarPrecios(candidatos[0].precio, candidatos[0].costo);
+            const badge = document.getElementById('dup-badge');
+            var prev = candidatos[0];
+            var infoExtra = '';
+            if (prev.fechaEscaneo) infoExtra += '<br> Escaneado: ' + prev.fechaEscaneo;
+            if (prev.tiendaEscaneo) infoExtra += '  ' + prev.tiendaEscaneo;
+            if (prev.caducidad)    infoExtra += '<br> Cad: ' + prev.caducidad;
+            document.getElementById('dup-text').innerHTML =
+                '<strong>Ya registrado!</strong><br>"' + prev.nombre + '"<br>' +
+                'Venta: <b>$' + (prev.precio||0) + '</b> | Costo: $' + (prev.costo||0) +
+                infoExtra +
+                '<br><em style="font-size:0.65rem;">Precios precargados, puedes modificar.</em>';
+            badge.classList.add('show');
+            document.getElementById('price-modal').style.display = 'flex';
+        } else if (candidatos.length >= 1) {
+            // Similares  preguntar al usuario
+            pendingExisteId = null; // No hay un ID exacto todavia
+            pendingFotoUrl = ''; // Clear existing photo URL as user needs to select
+            document.getElementById('pm-venta').value = '';
+            document.getElementById('pm-costo').value = '';
+            document.getElementById('dup-badge').classList.remove('show');
+            showDupConfirm(candidatos);
+        } else {
+            // Producto nuevo
+            pendingExisteId = null;
+            pendingFotoUrl = '';
+            document.getElementById('dup-badge').classList.remove('show');
+            document.getElementById('pm-venta').value = '';
+            document.getElementById('pm-costo').value = '';
+            document.getElementById('price-modal').style.display = 'flex';
+        }
+        refreshPendingPhotoPreview(); // Update preview in price modal with blur-filled image or existing
+    } catch(e) {
+        toastScanner("Error IA: " + e.message, '#ef4444');
+    } finally {
+        snapIcon.className = 'fas fa-camera fa-2x text-primary';
+        document.getElementById('snap-btn').style.pointerEvents = 'auto';
+        // closeScanner(); // The scanner modal is hidden, but the camera stream is still active
     }
 }
 
-async function confirmCrop() {
-    if (!cropperInstance) return;
-
-    // MODIFICACIÓN: Cambiar dimensiones de salida para que sea cuadrada 1:1
-    pendingCroppedCanvas = cropperInstance.getCroppedCanvas({
-        width: 940, // Output width for 1:1 square
-        height: 940, // Output height for 1:1 square
-        fillColor: '#ffffff' // Fill transparent areas with white
-    });
-    
-    if (cropperInstance) {
-        cropperInstance.destroy();
-        cropperInstance = null;
-    }
-    pendingRawCanvas = null; // No longer needed
-
-    document.getElementById('crop-modal').style.display = 'none';
-
-    // Continue the workflow based on scannerMode
-    if (scannerMode === 'editPhoto') {
-        setEditPhotoCanvas(pendingCroppedCanvas);
-        pendingCroppedCanvas = null; // Reset after usage
-        closeScanner(); // Close camera stream
-        document.getElementById('product-edit-details').style.display = 'block';
-        toastScanner("Nueva foto lista");
-    } else {
-        // This is the scan mode (new product or existing product price update)
-        // Resume Gemini call now that we have the cropped image
-        const b64 = pendingCroppedCanvas.toDataURL('image/jpeg', 0.88).split(',')[1];
-        
-        const snapIcon = document.getElementById('snap-icon');
-        snapIcon.className = 'fas fa-spinner fa-spin fa-2x text-primary';
-        document.getElementById('snap-btn').style.pointerEvents = 'none'; // Ensure it's disabled during AI call
-
-        const callGemini = async (intentos = 3) => {
-            const res = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${localStorage.getItem('yaute_key_v3310')}`,
-                { method:'POST', headers:{'Content-Type':'application/json'},
-                  body: JSON.stringify({ contents:[{ parts:[
-                      { inline_data:{ mime_type:'image/jpeg', data:b64 } },
-                      { text:"Eres un lector experto de etiquetas de productos de consumo en Mxico. Analiza la imagen y extrae: 1) Marca comercial, 2) Nombre del producto, 3) Presentación (gramaje, volumen, número de piezas, sabor o variante si aparece). Responde SOLO con el resultado en UNA LÍNEA en MAYÚSCULAS con el formato: MARCA NOMBRE PRESENTACIÓN. Sin explicaciones, sin puntos, sin saltos de lnea." }
-                  ]}], generationConfig:{ temperature:0.1, maxOutputTokens:120 } })
-                }
-            );
-            const data = await res.json();
-            if (res.status === 429 && intentos > 1) {
-                const segs = intentos === 3 ? 20 : 40;
-                toastScanner(`Muchas consultas - reintentando en ${segs}s...`, '#f59e0b');
-                await new Promise(r => setTimeout(r, segs * 1000));
-                return callGemini(intentos - 1);
-            }
-            if (!res.ok) throw new Error(data.error?.message || `HTTP ${res.status}`);
-            return data;
-        };
-
-        try {
-            const data = await callGemini();
-            pendingNombre = data.candidates[0].content.parts[0].text.trim().toUpperCase();
-
-            //  Deteccin de duplicados en 3 niveles 
-            // Nivel 1: coincidencia exacta
-            // Nivel 2: uno contiene al otro (>= 6 chars)
-            // Nivel 3: >= 2 palabras clave de 4+ chars en comn
-            const palabrasEsc = pendingNombre.split(' ').filter(w => w.length >= 4);
-            const candidatos = window.state.products.filter(p => {
-                const g = (p.nombre||'').toUpperCase().trim();
-                if (g === pendingNombre) return true;
-                if (g.length >= 6 && (pendingNombre.includes(g) || g.includes(pendingNombre))) return true;
-                const pg = g.split(' ').filter(w => w.length >= 4);
-                return palabrasEsc.filter(w => pg.includes(w)).length >= 2;
-            });
-
-            document.getElementById('pm-nombre').value = pendingNombre;
-
-            if (candidatos.length === 1 && (candidatos[0].nombre||'').toUpperCase().trim() === pendingNombre) {
-                // Coincidencia exacta  panel directo con badge
-                pendingExisteId = candidatos[0].id;
-                // pendingFotoUrl is used here for existing product's photo URL (if no new crop)
-                // For new scan with crop, pendingCroppedCanvas will be used for display and upload.
-                pendingFotoUrl = getProductPhotoUrl(candidatos[0]); 
-                precargarPrecios(candidatos[0].precio, candidatos[0].costo);
-                const badge = document.getElementById('dup-badge');
-                var prev = candidatos[0];
-                var infoExtra = '';
-                if (prev.fechaEscaneo) infoExtra += '<br> Escaneado: ' + prev.fechaEscaneo;
-                if (prev.tiendaEscaneo) infoExtra += '  ' + prev.tiendaEscaneo;
-                if (prev.caducidad)    infoExtra += '<br> Cad: ' + prev.caducidad;
-                document.getElementById('dup-text').innerHTML =
-                    '<strong>Ya registrado!</strong><br>"' + prev.nombre + '"<br>' +
-                    'Venta: <b>$' + (prev.precio||0) + '</b> | Costo: $' + (prev.costo||0) +
-                    infoExtra +
-                    '<br><em style="font-size:0.65rem;">Precios precargados, puedes modificar.</em>';
-                badge.classList.add('show');
-                document.getElementById('price-modal').style.display = 'flex';
-            } else if (candidatos.length >= 1) {
-                // Similares  preguntar al usuario
-                pendingExisteId = null; // No hay un ID exacto todavia
-                pendingFotoUrl = ''; // Clear existing photo URL as user needs to select
-                document.getElementById('pm-venta').value = '';
-                document.getElementById('pm-costo').value = '';
-                document.getElementById('dup-badge').classList.remove('show');
-                showDupConfirm(candidatos);
-            } else {
-                // Producto nuevo
-                pendingExisteId = null;
-                pendingFotoUrl = '';
-                document.getElementById('dup-badge').classList.remove('show');
-                document.getElementById('pm-venta').value = '';
-                document.getElementById('pm-costo').value = '';
-                document.getElementById('price-modal').style.display = 'flex';
-            }
-            refreshPendingPhotoPreview(); // Update preview in price modal with cropped image or existing
-        } catch(e) {
-            toastScanner("Error IA: " + e.message, '#ef4444');
-        } finally {
-            snapIcon.className = 'fas fa-camera fa-2x text-primary';
-            document.getElementById('snap-btn').style.pointerEvents = 'auto';
-            // closeScanner(); // The scanner modal is hidden before crop, and will be closed after confirm prices or cancelled
-        }
-    }
-}
 
 /* 
    SCANNER  GESTIN DE DUPLICADOS
@@ -1879,14 +1871,14 @@ function skipDuplicate() {
 
 function closeDupConfirm() {
     document.getElementById('dup-confirm-modal').style.display = 'none';
-    // If user cancels here, they go back to the scanner.
+    // Si el usuario cancela aquí, vuelve al escáner.
     document.getElementById('ia-modal').style.display = 'flex';
     const snapIcon = document.getElementById('snap-icon');
     if (snapIcon) {
         snapIcon.className = 'fas fa-camera fa-2x text-primary';
         document.getElementById('snap-btn').style.pointerEvents = 'auto';
     }
-    // Clear all pending state for this scan
+    // Limpiar todo el estado pendiente para este escaneo
     pendingNombre = ''; pendingRawCanvas = null; pendingCroppedCanvas = null; pendingExisteId = null; pendingFotoUrl = '';
 }
 
@@ -1911,7 +1903,7 @@ async function confirmPrices() {
 
     document.getElementById('price-modal').style.display = 'none';
 
-    // 1. Compartir oferta: captura nueva (recortada), foto guardada del producto localizado o cartel sin foto.
+    // 1. Compartir oferta: utiliza el canvas ya procesado (blur-filled), o la foto guardada del producto localizado.
     const productoExistente = pendingExisteId
         ? window.state.products.find(p => p.id === pendingExisteId)
         : null;
@@ -1920,14 +1912,14 @@ async function confirmPrices() {
         venta,
         caducidad,
         tiendaEscaneo,
-        canvas: pendingCroppedCanvas, // Use the cropped canvas here
+        canvas: pendingCroppedCanvas, // Usa el canvas blur-filled aquí
         fotoUrl: pendingFotoUrl || getProductPhotoUrl(productoExistente)
     });
 
 
-    // 2. Subir foto a Storage si hay un nuevo canvas (el que el usuario ya recortó)
+    // 2. Subir foto a Storage si hay un nuevo canvas (el que ya se procesó con blur-fill)
     let fotoUrl = '';
-    if (pendingCroppedCanvas) { // Use the cropped canvas
+    if (pendingCroppedCanvas) { // Usa el canvas blur-filled
         try {
             const blob = await new Promise(r => pendingCroppedCanvas.toBlob(r, 'image/jpeg', 0.82));
             const ref  = storage.ref('productos/' + Date.now() + '_' + nombre.replace(/\s+/g,'_') + '.jpg');
@@ -1946,10 +1938,10 @@ async function confirmPrices() {
     document.getElementById('pm-caducidad').value = '';
     pendingNombre = ''; 
     pendingRawCanvas = null; // Clear raw canvas
-    pendingCroppedCanvas = null; // Clear cropped canvas
+    pendingCroppedCanvas = null; // Clear blur-filled canvas
     pendingExisteId = null; 
     pendingFotoUrl = '';
-    // closeScanner(); // Already closed by confirmCrop or closeDupConfirm
+    // closeScanner(); // Ya cerrado por el flujo previo.
 }
 
 function cancelPrices() {
@@ -2038,9 +2030,8 @@ function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
 
 async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscaneo = '', fotoUrl = '', canvas = null, titulo = 'OFERTA RÁPIDA' }) {
     const out = document.createElement('canvas');
-    // MODIFICACIÓN: Aumentar la altura del canvas para la imagen 1:1
     out.width = 1080;
-    out.height = 1700; // Ajustada para la imagen 1:1 y los elementos de texto debajo
+    out.height = 1700; 
     const ctx = out.getContext('2d');
 
     ctx.fillStyle = '#f8fafc';
@@ -2054,77 +2045,71 @@ async function createOfferCardFile({ nombre, venta, caducidad = '', tiendaEscane
     ctx.font = '800 34px Arial, sans-serif';
     ctx.fillText(titulo, 72, 172);
 
+    // Definir el área de destino para la imagen como 1:1
+    const destX = 70;
+    const destY = 260;
+    const destWidth = 940;
+    const destHeight = 940; 
+
+    // Dibujar el fondo redondeado para la imagen
+    ctx.fillStyle = '#e2e8f0';
+    drawRoundedRect(ctx, destX, destY, destWidth, destHeight, 34);
+    ctx.fill();
+
     const img = canvas || await loadImageForCanvas(fotoUrl);
     if (img) {
-        // MODIFICACIÓN: Definir el área de destino para la imagen como 1:1
-        const destX = 70;
-        const destY = 260;
-        const destWidth = 940;
-        const destHeight = 940; // Cambiado a 940 para 1:1
-
         ctx.save();
-        ctx.fillStyle = '#e2e8f0';
         drawRoundedRect(ctx, destX, destY, destWidth, destHeight, 34);
-        ctx.fill();
-        drawRoundedRect(ctx, destX, destY, destWidth, destHeight, 34);
-        ctx.clip(); // Clip subsequent drawing to this rounded rectangle
+        ctx.clip(); // Recortar dibujos subsiguientes a este rectángulo redondeado
 
-        if (canvas) { // If a user-cropped canvas is provided (already 940x940 aspect ratio)
+        if (canvas) { // Si ya tenemos un canvas procesado (blur-filled y cuadrado)
             ctx.drawImage(img, destX, destY, destWidth, destHeight);
-        } else { // If it's an existing image from a URL, use the 'cover' logic to fit it into the new square area
+        } else { // Si es una imagen existente de URL, aplicamos el efecto "cover" para que llene el cuadrado
             const iw = img.width || img.videoWidth;
             const ih = img.height || img.videoHeight;
 
             const imgAspect  = iw / ih;
-            const destAspect = destWidth / destHeight; // This will now be 1 (940/940)
+            const destAspect = destWidth / destHeight; // Esto será 1 (940/940)
 
-            let sx = 0, sy = 0, sWidth = iw, sHeight = ih; // Source image cropping parameters
+            let sx = 0, sy = 0, sWidth = iw, sHeight = ih; // Parámetros de recorte de imagen de origen
 
             if (imgAspect > destAspect) {
-                // Image is wider than the destination area (e.g., a landscape image into a square slot).
-                // Scale to match height, crop width from source.
                 sHeight = ih;
                 sWidth = ih * destAspect;
                 sx = (iw - sWidth) / 2;
                 sy = 0;
             } else {
-                // Image is taller than or equal to the destination area (e.g., a portrait image into a square slot).
-                // Scale to match width, crop height from source.
                 sWidth = iw;
                 sHeight = iw / destAspect;
                 sx = 0;
                 sy = (ih - sHeight) / 2;
             }
-            // Draw the image using the calculated source (sx, sy, sWidth, sHeight) and fixed destination (destX, destY, destWidth, destHeight)
             ctx.drawImage(img, sx, sy, sWidth, sHeight, destX, destY, destWidth, destHeight);
         }
-        ctx.restore(); // Restore context to remove the clip
+        ctx.restore(); // Restaurar contexto para eliminar el clip
     } else {
-        ctx.fillStyle = '#e2e8f0';
-        drawRoundedRect(ctx, 70, 260, 940, 940, 34); // MODIFICACIÓN: Cambiado a 940x940
-        ctx.fill();
         ctx.fillStyle = '#64748b';
         ctx.font = '800 46px Arial, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(fotoUrl ? 'FOTO NO DISPONIBLE' : 'SIN FOTO GUARDADA', 540, 710); // MODIFICACIÓN: Nueva posición Y centrada para la caja 940x940
+        ctx.fillText(fotoUrl ? 'FOTO NO DISPONIBLE' : 'SIN FOTO GUARDADA', 540, 710); 
         ctx.textAlign = 'left';
     }
 
-    // MODIFICACIÓN: Ajuste de las posiciones Y de los elementos de texto
-    const textBlockStartY = 260 + 940 + 50; // Imagen finaliza en Y=1200, +50px de espacio = 1250
+    // Ajuste de las posiciones Y de los elementos de texto
+    const textBlockStartY = destY + destHeight + 50; 
     ctx.fillStyle = '#ffffff';
     drawRoundedRect(ctx, 70, textBlockStartY, 940, 380, 28);
     ctx.fill();
     ctx.fillStyle = '#0f172a';
     ctx.font = '900 48px Arial, sans-serif';
-    wrapCanvasText(ctx, nombre, 110, textBlockStartY + 80, 860, 58, 3); // Posición Y relativa al inicio del bloque de texto
+    wrapCanvasText(ctx, nombre, 110, textBlockStartY + 80, 860, 58, 3); 
     ctx.fillStyle = '#10b981';
     ctx.font = '900 96px Arial, sans-serif';
-    ctx.fillText('$' + (parseFloat(venta) || 0).toFixed(2), 110, textBlockStartY + 295); // Posición Y relativa
+    ctx.fillText('$' + (parseFloat(venta) || 0).toFixed(2), 110, textBlockStartY + 295); 
     ctx.fillStyle = '#64748b';
     ctx.font = '700 30px Arial, sans-serif';
     const extra = [caducidad ? 'Cad: ' + caducidad : '', tiendaEscaneo || ''].filter(Boolean).join('  -  ');
-    if (extra) ctx.fillText(extra, 110, textBlockStartY + 350); // Posición Y relativa
+    if (extra) ctx.fillText(extra, 110, textBlockStartY + 350); 
 
     try {
         return await canvasToImageFile(out);
@@ -2372,7 +2357,7 @@ async function confirmProductEdit() {
     try {
         const currentProduct = window.state.products.find(p => p.id === editingProductId);
         let currentPhotoUrl = getProductPhotoUrl(currentProduct);
-        if (pendingEditCanvas) { // If a new photo has been cropped and is pending
+        if (pendingEditCanvas) { // If a new photo has been blur-filled and is pending
             toastScanner("Subiendo nueva foto...", '#3b82f6');
             const blob = await new Promise(r => pendingEditCanvas.toBlob(r, 'image/jpeg', 0.82));
             const ref = storage.ref('productos/' + Date.now() + '_' + nombre.replace(/\s+/g,'_') + '.jpg');
@@ -2388,7 +2373,7 @@ async function confirmProductEdit() {
             caducidad,
             tiendaEscaneo,
             fotoUrl: pendingEditCanvas ? '' : currentPhotoUrl, // Use existing URL if no new canvas
-            canvas: pendingEditCanvas, // Pass the newly cropped canvas if available
+            canvas: pendingEditCanvas, // Pass the newly processed canvas if available
             titulo: 'OFERTA RÁPIDA'
         });
 
